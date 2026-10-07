@@ -9,7 +9,7 @@ extends Node2D
 ]
 
 @export var cena_chefe: String = "res://cenas/sala_chefe.tscn"
-@export var limite_salas_para_chefe: int = 50
+@export var limite_salas_para_chefe: int = 4
 
 var sala_atual: Node = null
 var historico_salas: Array[String] = []
@@ -35,10 +35,27 @@ func avancar_para_nova_sala() -> void:
 	var caminho_sala = ""
 	
 	if indice_historico == historico_salas.size() - 1:
+		# Verifica se atingiu o limite para tentar o chefe
 		if historico_salas.size() >= limite_salas_para_chefe:
-			caminho_sala = cena_chefe
-			print("Chegou na sala do chefe!")
-		else:
+			var temp_chefe = load(cena_chefe).instantiate()
+			var entrada_chefe = ""
+			
+			if temp_chefe.has_method("get_tipo_entrada"):
+				entrada_chefe = temp_chefe.get_tipo_entrada()
+			elif "tipo_entrada" in temp_chefe:
+				entrada_chefe = temp_chefe.tipo_entrada
+			
+			temp_chefe.queue_free()
+			
+			# Se encaixar perfeitamente, define o chefe
+			if proxima_entrada_requerida == entrada_chefe:
+				caminho_sala = cena_chefe
+				print("Chegou na sala do chefe com encaixe perfeito!")
+			else:
+				print("Limite atingido, mas incompatível com o chefe. Gerando sala normal para continuar...")
+		
+		# Se ainda não for o chefe (ou se o chefe falhou no encaixe), escolhe uma sala normal
+		if caminho_sala == "":
 			var cenas_compativeis: Array[String] = []
 			
 			var ultima_sala = ""
@@ -57,17 +74,14 @@ func avancar_para_nova_sala() -> void:
 			
 			# Percorre todas as cenas para verificar a compatibilidade
 			for caminho in lista_cenas:
-				# Evita repetir a mesma sala consecutivamente
 				if caminho == ultima_sala:
 					print("-> Ignorada (é a última sala): ", caminho)
 					continue
 				
 				var temp_cena = load(caminho).instantiate()
-				
 				var aceita: bool = true
 				var tipo_entrada_candidata = ""
 				
-				# Obtém o tipo_entrada da sala candidata
 				if temp_cena.has_method("get_tipo_entrada"):
 					tipo_entrada_candidata = temp_cena.get_tipo_entrada()
 				elif "tipo_entrada" in temp_cena:
@@ -75,7 +89,6 @@ func avancar_para_nova_sala() -> void:
 				
 				print("Testando sala: ", caminho, " | Tem Entrada: [", tipo_entrada_candidata, "] vs Exigido: [", proxima_entrada_requerida, "]")
 				
-				# Validação estrita
 				if tipo_entrada_candidata != "":
 					if tipo_entrada_candidata != proxima_entrada_requerida:
 						aceita = false
@@ -112,6 +125,7 @@ func avancar_para_nova_sala() -> void:
 		
 	direcao_chegada = "direita"
 	carregar_sala(caminho_sala)
+
 
 func voltar_para_sala_anterior() -> void:
 	if indice_historico > 0:
