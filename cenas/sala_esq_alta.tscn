@@ -1,0 +1,129 @@
+[gd_scene load_steps=10 format=3 uid="uid://ba54a222kvenq"]
+
+[ext_resource type="PackedScene" uid="uid://0a5evneeqmok" path="res://cenas/player.tscn" id="1_comkh"]
+[ext_resource type="Script" uid="uid://mcxa0bpouoq7" path="res://scripts/salas.gd" id="1_p288x"]
+[ext_resource type="PackedScene" uid="uid://c34cejxsbg1x" path="res://cenas/porta.tscn" id="2_p288x"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qc7pr"]
+size = Vector2(1158, 73)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_xpaae"]
+size = Vector2(53, 556)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gwrry"]
+size = Vector2(61, 550)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8s4y4"]
+size = Vector2(156, 43)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wuxr3"]
+size = Vector2(151, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_n16bx"]
+size = Vector2(158, 47)
+
+[node name="sala_esq_alta" type="Node2D"]
+script = ExtResource("1_p288x")
+tipo_entrada = "esq_alta"
+
+[node name="Piso" type="StaticBody2D" parent="."]
+position = Vector2(-2, 600)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Piso"]
+position = Vector2(576, 33.5)
+shape = SubResource("RectangleShape2D_qc7pr")
+
+[node name="ColorRect" type="ColorRect" parent="Piso"]
+custom_minimum_size = Vector2(1152, 64)
+offset_left = 3.0
+offset_top = 1.0
+offset_right = 1155.0
+offset_bottom = 65.0
+color = Color(0.643751, 0.269161, 0.671133, 1)
+
+[node name="Teto" type="StaticBody2D" parent="."]
+position = Vector2(-2, 600)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Teto"]
+position = Vector2(577, -583)
+shape = SubResource("RectangleShape2D_qc7pr")
+
+[node name="ColorRect" type="ColorRect" parent="Teto"]
+custom_minimum_size = Vector2(1152, 64)
+offset_top = -620.0
+offset_right = 1152.0
+offset_bottom = -556.0
+color = Color(0.643137, 0.270588, 0.670588, 1)
+
+[node name="ParedeEsquerda" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ParedeEsquerda"]
+position = Vector2(14, 402)
+shape = SubResource("RectangleShape2D_xpaae")
+
+[node name="ColorRect" type="ColorRect" parent="ParedeEsquerda"]
+offset_left = -10.0
+offset_top = 130.0
+offset_right = 40.0
+offset_bottom = 673.0
+color = Color(0.643137, 0.270588, 0.670588, 1)
+
+[node name="ParedeDireita" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ParedeDireita"]
+position = Vector2(1131, 247)
+shape = SubResource("RectangleShape2D_gwrry")
+
+[node name="ColorRect" type="ColorRect" parent="ParedeDireita"]
+offset_left = 1106.0
+offset_top = -30.0
+offset_right = 1156.0
+offset_bottom = 513.0
+color = Color(0.643137, 0.270588, 0.670588, 1)
+
+[node name="Plataforma" type="StaticBody2D" parent="."]
+
+[node name="Plataforma1 - Colisão" type="CollisionShape2D" parent="Plataforma"]
+position = Vector2(823, 448)
+shape = SubResource("RectangleShape2D_8s4y4")
+
+[node name="Plataforma1-Sprite" type="ColorRect" parent="Plataforma"]
+offset_left = 748.0
+offset_top = 428.0
+offset_right = 899.0
+offset_bottom = 468.0
+
+[node name="Plataforma2 - Colisão" type="CollisionShape2D" parent="Plataforma"]
+position = Vector2(513, 336)
+shape = SubResource("RectangleShape2D_wuxr3")
+
+[node name="Plataforma2-Sprite" type="ColorRect" parent="Plataforma"]
+offset_left = 435.0
+offset_top = 317.0
+offset_right = 586.0
+offset_bottom = 357.0
+
+[node name="Plataforma3 - Colisão" type="CollisionShape2D" parent="Plataforma"]
+position = Vector2(206, 220)
+shape = SubResource("RectangleShape2D_n16bx")
+
+[node name="Plataforma3-Sprite" type="ColorRect" parent="Plataforma"]
+offset_left = 133.0
+offset_top = 201.0
+offset_right = 284.0
+offset_bottom = 241.0
+
+[node name="Player" parent="." instance=ExtResource("1_comkh")]
+position = Vector2(4, 76)
+
+[node name="PortaSaida" parent="." instance=ExtResource("2_p288x")]
+position = Vector2(1168, 425)
+
+[node name="PortaEntrada" parent="." instance=ExtResource("2_p288x")]
+position = Vector2(-523, -47)
+
+[node name="SpawnEsquerda" type="Marker2D" parent="."]
+position = Vector2(32, 95)
+
+[node name="SpawnDireita" type="Marker2D" parent="."]
+position = Vector2(1097, 566)
