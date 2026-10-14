@@ -5,7 +5,8 @@ extends Node2D
 	"res://cenas/sala_plataforma.tscn",
 	"res://cenas/sala_queda.tscn",
 	"res://cenas/sala_topo_1.tscn",
-	"res://cenas/sala_esq_alta.tscn"
+	"res://cenas/sala_esq_alta.tscn",
+	"res://cenas/sala_esq_alta_trapfall.tscn"
 ]
 
 @export var cena_chefe: String = "res://cenas/sala_chefe.tscn"
