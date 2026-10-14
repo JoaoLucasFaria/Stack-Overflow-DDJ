@@ -1,0 +1,260 @@
+[gd_scene load_steps=16 format=3 uid="uid://cy25yh3d3jml1"]
+
+[ext_resource type="Script" uid="uid://mcxa0bpouoq7" path="res://scripts/salas.gd" id="1_cbqqh"]
+[ext_resource type="PackedScene" uid="uid://0a5evneeqmok" path="res://cenas/player.tscn" id="2_6jrx1"]
+[ext_resource type="PackedScene" uid="uid://c34cejxsbg1x" path="res://cenas/porta.tscn" id="3_kigv1"]
+[ext_resource type="PackedScene" uid="uid://culwc25asd38g" path="res://cenas/Trap.tscn" id="4_6jrx1"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qq1x5"]
+size = Vector2(1166, 63.8126)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qc7pr"]
+size = Vector2(1166, 64.8125)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jdauw"]
+size = Vector2(52, 468.5)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gwrry"]
+size = Vector2(52, 532)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cbqqh"]
+size = Vector2(42, 391)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6jrx1"]
+size = Vector2(42, 391.5)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_kigv1"]
+size = Vector2(51.2478, 260)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wuxr3"]
+size = Vector2(101.328, 53.5)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4lumh"]
+size = Vector2(100.164, 55.25)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_25e0h"]
+size = Vector2(100.342, 53)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_a75p4"]
+size = Vector2(101, 56.9998)
+
+[node name="sala_esq_alta_trapfall" type="Node2D"]
+script = ExtResource("1_cbqqh")
+tipo_entrada = "esq_alta"
+
+[node name="Piso" type="StaticBody2D" parent="."]
+position = Vector2(-2, 600)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Piso"]
+position = Vector2(574, 32.9063)
+shape = SubResource("RectangleShape2D_qq1x5")
+
+[node name="ColorRect" type="ColorRect" parent="Piso"]
+custom_minimum_size = Vector2(1152, 64)
+offset_left = 3.0
+offset_top = 1.0
+offset_right = 1159.0
+offset_bottom = 65.0
+color = Color(0.643751, 0.269161, 0.671133, 1)
+
+[node name="Teto" type="StaticBody2D" parent="."]
+position = Vector2(-2, 600)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Teto"]
+position = Vector2(577, -588.188)
+shape = SubResource("RectangleShape2D_qc7pr")
+
+[node name="ColorRect" type="ColorRect" parent="Teto"]
+custom_minimum_size = Vector2(1152, 64)
+offset_left = -5.0
+offset_top = -620.0
+offset_right = 1152.0
+offset_bottom = -556.0
+color = Color(0.643137, 0.270588, 0.670588, 1)
+
+[node name="ParedeEsquerda" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ParedeEsquerda"]
+position = Vector2(14, 364.25)
+shape = SubResource("RectangleShape2D_jdauw")
+
+[node name="ColorRect" type="ColorRect" parent="ParedeEsquerda"]
+offset_left = -10.0
+offset_top = 130.0
+offset_right = 40.0
+offset_bottom = 665.0
+color = Color(0.643137, 0.270588, 0.670588, 1)
+
+[node name="ParedeDireita" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ParedeDireita"]
+position = Vector2(1132, 246)
+shape = SubResource("RectangleShape2D_gwrry")
+
+[node name="ColorRect" type="ColorRect" parent="ParedeDireita"]
+offset_left = 1106.0
+offset_top = -20.0
+offset_right = 1156.0
+offset_bottom = 513.0
+color = Color(0.643137, 0.270588, 0.670588, 1)
+
+[node name="UpperLeftPlatform" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="UpperLeftPlatform"]
+position = Vector2(210.5, 207)
+rotation = 1.5708
+shape = SubResource("RectangleShape2D_cbqqh")
+
+[node name="ColorRect" type="ColorRect" parent="UpperLeftPlatform"]
+offset_left = 405.0
+offset_top = 186.0
+offset_right = 447.0
+offset_bottom = 575.0
+rotation = 1.5708
+color = Color(0.643137, 0.270588, 0.670588, 1)
+
+[node name="UpperRightPlatform" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="UpperRightPlatform"]
+position = Vector2(940.75, 207)
+rotation = 1.5708
+shape = SubResource("RectangleShape2D_6jrx1")
+
+[node name="ColorRect" type="ColorRect" parent="UpperRightPlatform"]
+offset_left = 1134.0
+offset_top = 186.0
+offset_right = 1176.0
+offset_bottom = 575.0
+rotation = 1.5708
+color = Color(0.643137, 0.270588, 0.670588, 1)
+
+[node name="LeftTrapPlatform" type="StaticBody2D" parent="."]
+
+[node name="PillarPlatform" type="ColorRect" parent="LeftTrapPlatform"]
+offset_left = 303.0
+offset_top = 229.0
+offset_right = 354.0
+offset_bottom = 488.0
+
+[node name="SuperiorPlatform" type="ColorRect" parent="LeftTrapPlatform"]
+offset_left = 303.0
+offset_top = 228.0
+offset_right = 405.0
+offset_bottom = 281.0
+
+[node name="MiddlePlatform" type="ColorRect" parent="LeftTrapPlatform"]
+offset_left = 304.0
+offset_top = 331.0
+offset_right = 405.0
+offset_bottom = 385.0
+
+[node name="InferiorPlatform" type="ColorRect" parent="LeftTrapPlatform"]
+offset_left = 303.0
+offset_top = 435.0
+offset_right = 405.0
+offset_bottom = 488.0
+
+[node name="PillarCollision3D" type="CollisionShape2D" parent="LeftTrapPlatform"]
+z_index = 2
+position = Vector2(328.75, 357.875)
+shape = SubResource("RectangleShape2D_kigv1")
+
+[node name="SuperiorCollision2D" type="CollisionShape2D" parent="LeftTrapPlatform"]
+z_index = 2
+position = Vector2(355, 254.5)
+shape = SubResource("RectangleShape2D_wuxr3")
+
+[node name="MiddleCollision3D" type="CollisionShape2D" parent="LeftTrapPlatform"]
+z_index = 2
+position = Vector2(354.918, 358.375)
+shape = SubResource("RectangleShape2D_4lumh")
+
+[node name="InferiorCollision3D" type="CollisionShape2D" parent="LeftTrapPlatform"]
+z_index = 2
+position = Vector2(354.336, 461.25)
+shape = SubResource("RectangleShape2D_wuxr3")
+
+[node name="RightTrapPlatform2" type="StaticBody2D" parent="."]
+position = Vector2(1000, 1200)
+rotation = 3.14159
+
+[node name="PillarPlatform" type="ColorRect" parent="RightTrapPlatform2"]
+offset_left = 154.0
+offset_top = 712.0
+offset_right = 204.0
+offset_bottom = 972.0
+
+[node name="UpperPlatform" type="ColorRect" parent="RightTrapPlatform2"]
+offset_left = 155.0
+offset_top = 762.0
+offset_right = 255.0
+offset_bottom = 815.0
+
+[node name="InferiorPlatform" type="ColorRect" parent="RightTrapPlatform2"]
+offset_left = 154.0
+offset_top = 865.0
+offset_right = 255.0
+offset_bottom = 922.0
+
+[node name="PillarCollision3D" type="CollisionShape2D" parent="RightTrapPlatform2"]
+z_index = 2
+position = Vector2(179.374, 842.001)
+shape = SubResource("RectangleShape2D_kigv1")
+
+[node name="UpperCollision3D" type="CollisionShape2D" parent="RightTrapPlatform2"]
+z_index = 2
+position = Vector2(204.827, 788.501)
+shape = SubResource("RectangleShape2D_25e0h")
+
+[node name="InferiorCollision3D" type="CollisionShape2D" parent="RightTrapPlatform2"]
+z_index = 2
+position = Vector2(204.498, 893.501)
+shape = SubResource("RectangleShape2D_a75p4")
+
+[node name="Trap" parent="." instance=ExtResource("4_6jrx1")]
+position = Vector2(355, 281)
+scale = Vector2(0.892, 0.892)
+shoot_interval = 1.5
+
+[node name="Trap2" parent="." instance=ExtResource("4_6jrx1")]
+position = Vector2(355, 385)
+scale = Vector2(0.892, 0.892)
+constant_linear_velocity = Vector2(1, 0)
+
+[node name="Trap3" parent="." instance=ExtResource("4_6jrx1")]
+position = Vector2(745, 228)
+scale = Vector2(0.892, 0.892)
+constant_linear_velocity = Vector2(1, 0)
+projectile_direction = Vector2(-1, 0)
+
+[node name="Trap4" parent="." instance=ExtResource("4_6jrx1")]
+position = Vector2(745.3, 335)
+scale = Vector2(0.892, 0.892)
+constant_linear_velocity = Vector2(1, 0)
+projectile_direction = Vector2(-1, 0)
+shoot_interval = 0.9
+
+[node name="Trap5" parent="." instance=ExtResource("4_6jrx1")]
+position = Vector2(745.3, 438)
+scale = Vector2(0.892, 0.892)
+constant_linear_velocity = Vector2(1, 0)
+projectile_direction = Vector2(-1, 0)
+shoot_interval = 1.5
+
+[node name="Player" parent="." instance=ExtResource("2_6jrx1")]
+position = Vector2(4, 76)
+
+[node name="PortaSaida" parent="." instance=ExtResource("3_kigv1")]
+position = Vector2(1168, 425)
+
+[node name="PortaEntrada" parent="." instance=ExtResource("3_kigv1")]
+position = Vector2(-523, -47)
+
+[node name="SpawnEsquerda" type="Marker2D" parent="."]
+position = Vector2(32, 95)
+
+[node name="SpawnDireita" type="Marker2D" parent="."]
+position = Vector2(1097, 566)
+
+[node name="SpawnDireita2" type="Marker2D" parent="."]
+position = Vector2(1096, 535)
