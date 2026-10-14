@@ -1,0 +1,82 @@
+[gd_scene load_steps=7 format=3 uid="uid://xrl0m24xxtj3"]
+
+[ext_resource type="Script" uid="uid://mcxa0bpouoq7" path="res://scripts/salas.gd" id="1_dhh0x"]
+[ext_resource type="PackedScene" uid="uid://0a5evneeqmok" path="res://cenas/player.tscn" id="1_r35mv"]
+[ext_resource type="PackedScene" uid="uid://c34cejxsbg1x" path="res://cenas/porta.tscn" id="2_456hx"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_p2wol"]
+size = Vector2(1158, 73)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6xuwu"]
+size = Vector2(53, 556)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0iwc2"]
+size = Vector2(61, 710)
+
+[node name="SalaChefe" type="Node2D"]
+script = ExtResource("1_dhh0x")
+proxima_entrada = "undefined"
+
+[node name="Piso" type="StaticBody2D" parent="."]
+position = Vector2(-2, 600)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Piso"]
+position = Vector2(576, 33.5)
+shape = SubResource("RectangleShape2D_p2wol")
+
+[node name="ColorRect" type="ColorRect" parent="Piso"]
+custom_minimum_size = Vector2(1152, 64)
+offset_left = 3.0
+offset_top = 1.0
+offset_right = 1155.0
+offset_bottom = 65.0
+color = Color(0.609333, 0.397308, 0.158781, 1)
+
+[node name="Teto" type="StaticBody2D" parent="."]
+position = Vector2(-2, 600)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Teto"]
+position = Vector2(577, -583)
+shape = SubResource("RectangleShape2D_p2wol")
+
+[node name="ColorRect" type="ColorRect" parent="Teto"]
+custom_minimum_size = Vector2(1152, 64)
+offset_top = -620.0
+offset_right = 1152.0
+offset_bottom = -556.0
+color = Color(0.607843, 0.396078, 0.156863, 1)
+
+[node name="ParedeEsquerda" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ParedeEsquerda"]
+position = Vector2(16.5, 246)
+shape = SubResource("RectangleShape2D_6xuwu")
+
+[node name="ColorRect" type="ColorRect" parent="ParedeEsquerda"]
+offset_left = -10.0
+offset_top = -26.0
+offset_right = 40.0
+offset_bottom = 517.0
+color = Color(0.607843, 0.396078, 0.156863, 1)
+
+[node name="ParedeDireita" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ParedeDireita"]
+position = Vector2(1131.5, 322)
+shape = SubResource("RectangleShape2D_0iwc2")
+
+[node name="ColorRect" type="ColorRect" parent="ParedeDireita"]
+offset_left = 1105.0
+offset_top = -28.0
+offset_right = 1155.0
+offset_bottom = 669.0
+color = Color(0.607843, 0.396078, 0.156863, 1)
+
+[node name="Player" parent="." instance=ExtResource("1_r35mv")]
+position = Vector2(22, 552)
+
+[node name="PortaEntrada" parent="." instance=ExtResource("2_456hx")]
+position = Vector2(-509, 440)
+
+[node name="SpawnEsquerda" type="Marker2D" parent="."]
+position = Vector2(50, 565)

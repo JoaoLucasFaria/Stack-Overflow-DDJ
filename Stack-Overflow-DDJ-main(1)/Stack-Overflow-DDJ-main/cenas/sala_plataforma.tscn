@@ -1,0 +1,129 @@
+[gd_scene load_steps=10 format=3 uid="uid://vgllbv455e4b"]
+
+[ext_resource type="PackedScene" uid="uid://0a5evneeqmok" path="res://cenas/player.tscn" id="1_0dq1c"]
+[ext_resource type="Script" uid="uid://mcxa0bpouoq7" path="res://scripts/salas.gd" id="1_ted8m"]
+[ext_resource type="PackedScene" uid="uid://c34cejxsbg1x" path="res://cenas/porta.tscn" id="2_7vvri"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_p2wol"]
+size = Vector2(1158, 73)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6xuwu"]
+size = Vector2(53, 556)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0iwc2"]
+size = Vector2(61, 550)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_fuflk"]
+size = Vector2(156, 43)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0dq1c"]
+size = Vector2(151, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7vvri"]
+size = Vector2(158, 47)
+
+[node name="SalaPlataforma" type="Node2D"]
+script = ExtResource("1_ted8m")
+proxima_entrada = "esq_alta"
+
+[node name="Piso" type="StaticBody2D" parent="."]
+position = Vector2(-2, 600)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Piso"]
+position = Vector2(576, 33.5)
+shape = SubResource("RectangleShape2D_p2wol")
+
+[node name="ColorRect" type="ColorRect" parent="Piso"]
+custom_minimum_size = Vector2(1152, 64)
+offset_left = 3.0
+offset_top = 1.0
+offset_right = 1155.0
+offset_bottom = 65.0
+color = Color(0.767462, 0.236892, 0.217223, 1)
+
+[node name="Teto" type="StaticBody2D" parent="."]
+position = Vector2(-2, 600)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Teto"]
+position = Vector2(577, -583)
+shape = SubResource("RectangleShape2D_p2wol")
+
+[node name="ColorRect" type="ColorRect" parent="Teto"]
+custom_minimum_size = Vector2(1152, 64)
+offset_top = -620.0
+offset_right = 1152.0
+offset_bottom = -556.0
+color = Color(0.768627, 0.235294, 0.215686, 1)
+
+[node name="ParedeEsquerda" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ParedeEsquerda"]
+position = Vector2(16.5, 246)
+shape = SubResource("RectangleShape2D_6xuwu")
+
+[node name="ColorRect" type="ColorRect" parent="ParedeEsquerda"]
+offset_left = -10.0
+offset_top = -26.0
+offset_right = 40.0
+offset_bottom = 517.0
+color = Color(0.768627, 0.235294, 0.215686, 1)
+
+[node name="ParedeDireita" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ParedeDireita"]
+position = Vector2(1129, 413)
+shape = SubResource("RectangleShape2D_0iwc2")
+
+[node name="ColorRect" type="ColorRect" parent="ParedeDireita"]
+offset_left = 1103.0
+offset_top = 144.0
+offset_right = 1153.0
+offset_bottom = 687.0
+color = Color(0.768627, 0.235294, 0.215686, 1)
+
+[node name="Plataforma" type="StaticBody2D" parent="."]
+
+[node name="Plataforma1 - Colisão" type="CollisionShape2D" parent="Plataforma"]
+position = Vector2(957, 227.5)
+shape = SubResource("RectangleShape2D_fuflk")
+
+[node name="Plataforma1-Sprite" type="ColorRect" parent="Plataforma"]
+offset_left = 882.0
+offset_top = 207.0
+offset_right = 1033.0
+offset_bottom = 247.0
+
+[node name="Plataforma2 - Colisão" type="CollisionShape2D" parent="Plataforma"]
+position = Vector2(707.5, 350)
+shape = SubResource("RectangleShape2D_0dq1c")
+
+[node name="Plataforma2-Sprite" type="ColorRect" parent="Plataforma"]
+offset_left = 633.0
+offset_top = 331.0
+offset_right = 784.0
+offset_bottom = 371.0
+
+[node name="Plataforma3 - Colisão" type="CollisionShape2D" parent="Plataforma"]
+position = Vector2(404, 461.5)
+shape = SubResource("RectangleShape2D_7vvri")
+
+[node name="Plataforma3-Sprite" type="ColorRect" parent="Plataforma"]
+offset_left = 328.0
+offset_top = 441.0
+offset_right = 479.0
+offset_bottom = 481.0
+
+[node name="Player" parent="." instance=ExtResource("1_0dq1c")]
+position = Vector2(22, 552)
+
+[node name="PortaSaida" parent="." instance=ExtResource("2_7vvri")]
+position = Vector2(1166, -6)
+
+[node name="PortaEntrada" parent="." instance=ExtResource("2_7vvri")]
+position = Vector2(-517, 432)
+
+[node name="SpawnEsquerda" type="Marker2D" parent="."]
+position = Vector2(43, 571)
+
+[node name="SpawnDireita" type="Marker2D" parent="."]
+position = Vector2(1111, 97)
