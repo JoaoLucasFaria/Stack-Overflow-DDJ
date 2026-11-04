@@ -1,0 +1,87 @@
+[gd_scene format=3 uid="uid://l8hypty5n1g1"]
+
+[ext_resource type="PackedScene" uid="uid://c34cejxsbg1x" path="res://cenas/porta.tscn" id="1_l3g2n"]
+[ext_resource type="Script" uid="uid://mcxa0bpouoq7" path="res://scripts/salas.gd" id="1_qtlay"]
+[ext_resource type="PackedScene" uid="uid://0a5evneeqmok" path="res://cenas/player.tscn" id="2_qtlay"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_p2wol"]
+size = Vector2(2573, 73)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6xuwu"]
+size = Vector2(60.5, 545)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0iwc2"]
+size = Vector2(61, 550)
+
+[node name="SalaPadrão" type="Node2D" unique_id=1623282185]
+script = ExtResource("1_qtlay")
+
+[node name="Piso" type="StaticBody2D" parent="." unique_id=1395678707]
+position = Vector2(-2, 600)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Piso" unique_id=1971720950]
+position = Vector2(1283.5, 33.5)
+shape = SubResource("RectangleShape2D_p2wol")
+
+[node name="ColorRect" type="ColorRect" parent="Piso" unique_id=346900001]
+custom_minimum_size = Vector2(1152, 64)
+offset_left = 3.0
+offset_top = 1.0
+offset_right = 2566.0
+offset_bottom = 65.0
+color = Color(0.0784314, 0.537255, 0.290196, 1)
+
+[node name="Teto" type="StaticBody2D" parent="." unique_id=1185076657]
+position = Vector2(-2, 600)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Teto" unique_id=664335390]
+position = Vector2(1242, -590)
+shape = SubResource("RectangleShape2D_p2wol")
+
+[node name="ColorRect" type="ColorRect" parent="Teto" unique_id=169632013]
+custom_minimum_size = Vector2(1152, 64)
+offset_top = -620.0
+offset_right = 2567.0
+offset_bottom = -556.0
+color = Color(0.079829, 0.537807, 0.289708, 1)
+
+[node name="ParedeEsquerda" type="StaticBody2D" parent="." unique_id=2136310721]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ParedeEsquerda" unique_id=1571119905]
+position = Vector2(16.5, 246)
+shape = SubResource("RectangleShape2D_6xuwu")
+
+[node name="ColorRect" type="ColorRect" parent="ParedeEsquerda" unique_id=1604469883]
+offset_left = -10.0
+offset_top = -26.0
+offset_right = 40.0
+offset_bottom = 517.0
+color = Color(0.0784314, 0.537255, 0.290196, 1)
+
+[node name="ParedeDireita" type="StaticBody2D" parent="." unique_id=439372446]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ParedeDireita" unique_id=498274894]
+position = Vector2(2534, 226)
+shape = SubResource("RectangleShape2D_0iwc2")
+
+[node name="ColorRect" type="ColorRect" parent="ParedeDireita" unique_id=249205121]
+offset_left = 2508.0
+offset_top = -48.0
+offset_right = 2558.0
+offset_bottom = 495.0
+color = Color(0.0784314, 0.537255, 0.290196, 1)
+
+[node name="PortaSaida" parent="." unique_id=248945140 instance=ExtResource("1_l3g2n")]
+position = Vector2(2568, 426)
+
+[node name="PortaEntrada" parent="." unique_id=98144486 instance=ExtResource("1_l3g2n")]
+position = Vector2(-511, 430)
+
+[node name="Player" parent="." unique_id=407398242 instance=ExtResource("2_qtlay")]
+position = Vector2(22, 552)
+
+[node name="SpawnEsquerda" type="Marker2D" parent="." unique_id=6825206]
+position = Vector2(54, 565)
+
+[node name="SpawnDireita" type="Marker2D" parent="." unique_id=299471094]
+position = Vector2(1096, 559)

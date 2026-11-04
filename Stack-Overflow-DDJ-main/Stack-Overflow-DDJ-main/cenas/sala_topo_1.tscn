@@ -1,0 +1,150 @@
+[gd_scene load_steps=12 format=3 uid="uid://3pnv4dwnmmm2"]
+
+[ext_resource type="PackedScene" uid="uid://c34cejxsbg1x" path="res://cenas/porta.tscn" id="1_x3c58"]
+[ext_resource type="Script" uid="uid://mcxa0bpouoq7" path="res://scripts/salas.gd" id="1_y51qd"]
+[ext_resource type="PackedScene" uid="uid://0a5evneeqmok" path="res://cenas/player.tscn" id="2_a3wqc"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6agvv"]
+size = Vector2(1158, 73)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_x3c58"]
+size = Vector2(511, 88)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_a3wqc"]
+size = Vector2(515.5, 84.5)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_y51qd"]
+size = Vector2(53, 636)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jmv7w"]
+size = Vector2(61, 550)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_00hr2"]
+size = Vector2(156, 43)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sgtp8"]
+size = Vector2(151, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_pgoxx"]
+size = Vector2(158, 47)
+
+[node name="SalaTopo1" type="Node2D"]
+script = ExtResource("1_y51qd")
+tipo_entrada = "topo"
+
+[node name="Piso" type="StaticBody2D" parent="."]
+position = Vector2(-2, 600)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Piso"]
+position = Vector2(576, 33.5)
+shape = SubResource("RectangleShape2D_6agvv")
+
+[node name="ColorRect" type="ColorRect" parent="Piso"]
+custom_minimum_size = Vector2(1152, 64)
+offset_left = 3.0
+offset_top = 1.0
+offset_right = 1155.0
+offset_bottom = 65.0
+color = Color(0.609333, 0.397308, 0.158781, 1)
+
+[node name="Piso2" type="StaticBody2D" parent="."]
+position = Vector2(-2, 600)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Piso2"]
+position = Vector2(244, -583)
+shape = SubResource("RectangleShape2D_x3c58")
+
+[node name="ColorRect" type="ColorRect" parent="Piso2"]
+offset_left = -9.0
+offset_top = -621.0
+offset_right = 495.0
+offset_bottom = -547.0
+color = Color(0.211494, 0.2491, 0.558232, 1)
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Piso2"]
+position = Vector2(911, -581)
+shape = SubResource("RectangleShape2D_a3wqc")
+
+[node name="ColorRect2" type="ColorRect" parent="Piso2"]
+offset_left = 657.0
+offset_top = -618.0
+offset_right = 1162.0
+offset_bottom = -545.0
+color = Color(0.211765, 0.25098, 0.556863, 1)
+
+[node name="ParedeEsquerda" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ParedeEsquerda"]
+position = Vector2(16.5, 286)
+shape = SubResource("RectangleShape2D_y51qd")
+
+[node name="ColorRect" type="ColorRect" parent="ParedeEsquerda"]
+offset_left = -10.0
+offset_top = -26.0
+offset_right = 40.0
+offset_bottom = 600.0
+color = Color(0.768627, 0.235294, 0.215686, 1)
+
+[node name="ParedeDireita" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ParedeDireita"]
+position = Vector2(1131.5, 242)
+shape = SubResource("RectangleShape2D_jmv7w")
+
+[node name="ColorRect" type="ColorRect" parent="ParedeDireita"]
+offset_left = 1105.0
+offset_top = -28.0
+offset_right = 1155.0
+offset_bottom = 515.0
+color = Color(0.0784314, 0.537255, 0.290196, 1)
+
+[node name="PortaSaida" parent="." instance=ExtResource("1_x3c58")]
+position = Vector2(1166, 457)
+
+[node name="PortaSaida2" parent="." instance=ExtResource("1_x3c58")]
+position = Vector2(-519, 445)
+
+[node name="PortaEntrada" parent="." instance=ExtResource("1_x3c58")]
+position = Vector2(322, -231)
+
+[node name="SpawnEsquerda" type="Marker2D" parent="."]
+position = Vector2(573, 53)
+
+[node name="SpawnDireita" type="Marker2D" parent="."]
+position = Vector2(579, 552)
+
+[node name="Plataforma" type="StaticBody2D" parent="."]
+position = Vector2(-148, -74)
+
+[node name="Plataforma1 - Colisão" type="CollisionShape2D" parent="Plataforma"]
+position = Vector2(725, 233)
+shape = SubResource("RectangleShape2D_00hr2")
+
+[node name="Plataforma1-Sprite" type="ColorRect" parent="Plataforma"]
+offset_left = 650.0
+offset_top = 214.0
+offset_right = 801.0
+offset_bottom = 254.0
+
+[node name="Plataforma2 - Colisão" type="CollisionShape2D" parent="Plataforma"]
+position = Vector2(1039, 384)
+shape = SubResource("RectangleShape2D_sgtp8")
+
+[node name="Plataforma2-Sprite" type="ColorRect" parent="Plataforma"]
+offset_left = 964.0
+offset_top = 365.0
+offset_right = 1115.0
+offset_bottom = 405.0
+
+[node name="Plataforma3 - Colisão" type="CollisionShape2D" parent="Plataforma"]
+position = Vector2(726, 514)
+shape = SubResource("RectangleShape2D_pgoxx")
+
+[node name="Plataforma3-Sprite" type="ColorRect" parent="Plataforma"]
+offset_left = 650.0
+offset_top = 494.0
+offset_right = 801.0
+offset_bottom = 534.0
+
+[node name="Player" parent="." instance=ExtResource("2_a3wqc")]
+position = Vector2(555, 32)
