@@ -1,0 +1,31 @@
+[gd_scene load_steps=5 format=3 uid="uid://phj877agp272"]
+
+[ext_resource type="Script" uid="uid://dpfrsa2w6r2sf" path="res://scripts/Projectiletype1.gd" id="1_sm56h"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_5jadg"]
+radius = 15.0333
+
+[sub_resource type="Gradient" id="Gradient_f4x6a"]
+offsets = PackedFloat32Array(0.409091, 0.415584, 0.415584, 0.857143)
+colors = PackedColorArray(0.863436, 5.31845e-06, 7.70092e-07, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_sm56h"]
+gradient = SubResource("Gradient_f4x6a")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0, 1)
+metadata/_snap_enabled = true
+
+[node name="TrapProjectileType1" type="Area2D"]
+script = ExtResource("1_sm56h")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(15, 15)
+shape = SubResource("CircleShape2D_5jadg")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(15, 15)
+scale = Vector2(0.2, 0.2)
+texture = SubResource("GradientTexture2D_sm56h")

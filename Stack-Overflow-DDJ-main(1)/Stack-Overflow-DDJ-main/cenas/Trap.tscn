@@ -1,0 +1,27 @@
+[gd_scene load_steps=3 format=3 uid="uid://culwc25asd38g"]
+
+[ext_resource type="Script" uid="uid://dclow6qar32um" path="res://scripts/trap.gd" id="1_28qan"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7fys3"]
+size = Vector2(56.25, 56.2816)
+
+[node name="Trap" type="StaticBody2D"]
+script = ExtResource("1_28qan")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(27.875, 27.8592)
+shape = SubResource("RectangleShape2D_7fys3")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+custom_minimum_size = Vector2(32, 32)
+offset_right = 56.0
+offset_bottom = 56.0
+color = Color(0, 0, 0, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="Marker2D" type="Marker2D" parent="."]
+position = Vector2(28, 21)
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 1.7
+autostart = true
