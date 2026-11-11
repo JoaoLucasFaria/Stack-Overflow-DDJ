@@ -20,13 +20,17 @@ var jump_release_timer: float = 0.0
 var jump_released: bool = false
 var direcao_olhar: int = 1
 
+## Progressão desta partida; o Main concede as habilidades pelos chefes.
+var pulo_duplo_liberado: bool = false
+var grapple_liberado: bool = false
+
 @onready var dash_component: DashComponent = $DashComponent
 
 
 func _ready() -> void:
 	add_to_group("jogador")
 	vida_atual = vida_maxima
-	jumps_remaining = MAX_JUMPS
+	jumps_remaining = quantidade_pulos_disponiveis()
 	vida_alterada.emit(vida_atual, vida_maxima)
 
 
@@ -47,7 +51,7 @@ func _physics_process(delta: float) -> void:
 	if not no_chao:
 		velocity += get_gravity() * delta
 	else:
-		jumps_remaining = MAX_JUMPS
+		jumps_remaining = quantidade_pulos_disponiveis()
 
 	if Input.is_action_just_pressed("ui_accept") and jumps_remaining > 0:
 		velocity.y = JUMP_VELOCITY
@@ -75,6 +79,23 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 
+func quantidade_pulos_disponiveis() -> int:
+	return maxi(2, MAX_JUMPS) if pulo_duplo_liberado else 1
+
+
+func desbloquear_pulo_duplo() -> void:
+	pulo_duplo_liberado = true
+	jumps_remaining = quantidade_pulos_disponiveis()
+
+
+func desbloquear_dash() -> void:
+	dash_component.dash_desbloqueado = true
+
+
+func desbloquear_grapple() -> void:
+	grapple_liberado = true
+
+
 func receber_dano(dano: int) -> void:
 	if dano <= 0 or vida_atual <= 0:
 		return
@@ -97,7 +118,7 @@ func morrer() -> void:
 func preparar_para_nova_sala() -> void:
 	## Mantém a vida e os desbloqueios. Reinicia apenas estados transitórios.
 	velocity = Vector2.ZERO
-	jumps_remaining = MAX_JUMPS
+	jumps_remaining = quantidade_pulos_disponiveis()
 	jump_release_timer = 0.0
 	jump_released = false
 	dash_component.cancelar_dash()

@@ -1,176 +1,220 @@
 extends Node2D
 
-## Controla geração, histórico, portas e jogador persistente.
-## Os mapas continuam editáveis e executáveis individualmente no Godot.
+## Mundo persistente em matriz. Um único Jogador atravessa passagens físicas;
+## somente o módulo atual é instanciado. Chefes e habilidades são permanentes.
 const CENA_JOGADOR: PackedScene = preload("res://cenas/player.tscn")
-const SALA_INICIAL: String = "res://cenas/sala_padrao.tscn"
+const CENA_HUD = preload("res://scripts/hud_matriz.gd")
+const CENA_MAPA = preload("res://scripts/mapa_matriz.gd")
 
-@export_category("Geração de salas")
-@export var lista_cenas: Array[String] = [
-	"res://cenas/sala_padrao.tscn",
-	"res://cenas/sala_plataforma.tscn",
-	"res://cenas/sala_queda.tscn",
-	"res://cenas/sala_topo_1.tscn",
-	"res://cenas/sala_esq_alta.tscn",
-	"res://cenas/sala_esq_alta_trapfall.tscn",
-]
-@export_file("*.tscn") var cena_chefe: String = "res://cenas/sala_chefe.tscn"
-@export_range(1, 100, 1) var limite_salas_para_chefe: int = 4
+@export_category("Matriz procedural")
+@export_range(0, 40, 1) var quantidade_salas_extras: int = 12
+## Semente zero cria um mapa diferente a cada partida.
+@export var semente_fixa: int = 0
 
-var sala_atual: Sala = null
-var jogador: Jogador = null
-var historico_salas: Array[String] = []
-var indice_historico: int = -1
-
-var _entradas_por_caminho: Dictionary = {}
-var _em_transicao: bool = false
+var mapa: MapaMatriz
+var coordenada_atual: Vector2i = Vector2i.ZERO
+var sala_atual: SalaMatriz
+var jogador: Jogador
+var hud: HUDMatriz
+var chefes_derrotados: Dictionary = {}
+var mensagem: String = ""
+var tempo_mensagem: float = 0.0
+var em_transicao: bool = false
+## Bloqueia uma segunda transição logo após a entrada em um módulo.
+## O disparo real exige também atravessar o limite físico da sala.
+const TEMPO_PROTECAO_ENTRADA: float = 0.30
+const MARGEM_RECUPERACAO: float = 115.0
+var protecao_entrada_restante: float = 0.0
+var posicao_segura_atual: Vector2 = Vector2(100, 540)
+var partida_terminou: bool = false
 
 
 func _ready() -> void:
-	randomize()
+	mapa = CENA_MAPA.new() as MapaMatriz
+	mapa.gerar(quantidade_salas_extras, semente_fixa)
 	jogador = CENA_JOGADOR.instantiate() as Jogador
-	if jogador == null:
-		push_error("O jogador precisa utilizar o script Jogador.")
-		return
 	add_child(jogador)
+	jogador.pulo_duplo_liberado = false
+	jogador.dash_component.dash_desbloqueado = false
+	jogador.grapple_liberado = false
+	jogador.morreu.connect(_ao_morrer)
+	hud = CENA_HUD.new() as HUDMatriz
+	add_child(hud)
+	_entrar_sala(Vector2i.ZERO, Vector2i.ZERO)
+	_aviso("Encontre Ice Age Sid. Explore atravessando as passagens.", 3.8)
 
-	if _trocar_sala(SALA_INICIAL, "direita"):
-		historico_salas.append(SALA_INICIAL)
-		indice_historico = 0
+
+func _process(delta: float) -> void:
+	if Input.is_action_just_pressed("reiniciar_partida"):
+		get_tree().reload_current_scene()
+		return
+	if Input.is_action_just_pressed("alternar_mapa"):
+		hud.alternar_mapa()
+	if Input.is_action_just_pressed("alternar_debug"):
+		hud.alternar_debug()
+	if tempo_mensagem > 0.0:
+		tempo_mensagem -= delta
+		if tempo_mensagem <= 0.0:
+			mensagem = ""
+	_atualizar_dica()
+	hud.atualizar(mapa, coordenada_atual, jogador, chefes_derrotados, mensagem)
 
 
-func avancar_para_nova_sala() -> void:
-	if _em_transicao or sala_atual == null:
+func _physics_process(delta: float) -> void:
+	if partida_terminou or em_transicao or sala_atual == null or not is_instance_valid(jogador):
+		return
+	if protecao_entrada_restante > 0.0:
+		protecao_entrada_restante = maxf(0.0, protecao_entrada_restante - delta)
 		return
 
-	var proximo_indice: int = indice_historico + 1
-	var nova_sala: bool = proximo_indice >= historico_salas.size()
-	var caminho: String
+	# ÚNICO ponto responsável pelas trocas de sala. Os gatilhos antigos
+	# detectavam sobreposição perto da porta e podiam disparar duas vezes.
+	var direcao: Vector2i = sala_atual.direcao_de_passagem_confirmada(jogador)
+	if direcao != Vector2i.ZERO:
+		_ao_atravessar_saida(direcao)
+		return
 
-	if nova_sala:
-		caminho = _sortear_proxima_sala()
+	# Recuperação excepcional: se alguma física/colisão empurrar o jogador
+	# para fora do módulo sem atravessar uma saída válida, evitar softlock.
+	var colisao: CollisionShape2D = jogador.get_node_or_null("CollisionShape2D") as CollisionShape2D
+	if colisao == null:
+		return
+	var centro: Vector2 = sala_atual.to_local(colisao.global_position)
+	if centro.x < -MARGEM_RECUPERACAO or centro.x > SalaMatriz.LARGURA + MARGEM_RECUPERACAO or centro.y < -MARGEM_RECUPERACAO or centro.y > SalaMatriz.ALTURA + MARGEM_RECUPERACAO:
+		_recuperar_posicao_segura()
+
+
+func _recuperar_posicao_segura() -> void:
+	if not is_instance_valid(jogador):
+		return
+	jogador.preparar_para_nova_sala()
+	jogador.global_position = posicao_segura_atual
+	protecao_entrada_restante = TEMPO_PROTECAO_ENTRADA
+	push_warning("Jogador recuperado após sair dos limites do módulo sem conexão válida.")
+
+
+
+func _atualizar_dica() -> void:
+	if partida_terminou or sala_atual == null or not is_instance_valid(jogador):
+		hud.definir_dica("")
+		return
+	var tipo: String = sala_atual.dados.get("tipo", "normal")
+	if tipo == "final":
+		if sala_atual.grapple_realizado:
+			hud.definir_dica("Aproxime-se do altar luminoso para encerrar o loop.")
+		else:
+			hud.definir_dica("G: conecte-se ao ponto de ancoragem azul.")
+	elif tipo.begins_with("boss"):
+		var numero: int = tipo.substr(4).to_int()
+		if not chefes_derrotados.has(numero):
+			hud.definir_dica("Guardião provisório: aproxime-se e pressione F três vezes.")
+		else:
+			hud.definir_dica("")
 	else:
-		caminho = historico_salas[proximo_indice]
+		hud.definir_dica("")
 
-	if caminho.is_empty() or not _trocar_sala(caminho, "direita"):
+
+func _ao_atravessar_saida(direcao: Vector2i) -> void:
+	if em_transicao or partida_terminou or sala_atual == null:
 		return
-
-	if nova_sala:
-		historico_salas.append(caminho)
-	indice_historico = proximo_indice
-
-
-func voltar_para_sala_anterior() -> void:
-	if _em_transicao or indice_historico <= 0:
+	if not is_instance_valid(jogador):
 		return
-
-	var indice_anterior: int = indice_historico - 1
-	if _trocar_sala(historico_salas[indice_anterior], "esquerda"):
-		indice_historico = indice_anterior
-
-
-func _sortear_proxima_sala() -> String:
-	var entrada_necessaria: String = sala_atual.get_proxima_entrada()
-
-	# O chefe só entra quando sua porta é compatível com a sala atual.
-	if historico_salas.size() >= limite_salas_para_chefe:
-		if _tipo_entrada(cena_chefe) == entrada_necessaria:
-			return cena_chefe
-
-	var compativeis: Array[String] = []
-	var sem_repetir: Array[String] = []
-	var ultima_sala: String = historico_salas.back()
-	for caminho in lista_cenas:
-		if _tipo_entrada(caminho) != entrada_necessaria:
-			continue
-		compativeis.append(caminho)
-		if caminho != ultima_sala:
-			sem_repetir.append(caminho)
-
-	# Se a única sala compatível for a atual, repetir é melhor que quebrar o mapa.
-	if not sem_repetir.is_empty():
-		return sem_repetir.pick_random()
-	if not compativeis.is_empty():
-		return compativeis.pick_random()
-
-	push_error("Nenhuma sala com entrada '" + entrada_necessaria + "' foi encontrada.")
-	return ""
+	var destino: Vector2i = mapa.vizinho(coordenada_atual, direcao)
+	if destino == coordenada_atual:
+		return
+	if not mapa.pode_atravessar(
+		coordenada_atual, destino,
+		jogador.pulo_duplo_liberado,
+		jogador.dash_component.dash_desbloqueado,
+		jogador.grapple_liberado
+	):
+		# Requisitos lógicos são proteção extra; a geometria deve continuar
+		# sendo o bloqueio principal. Reposicione antes da borda para não travar.
+		_aviso("Caminho ainda inacessível.", 2.0)
+		jogador.preparar_para_nova_sala()
+		jogador.global_position = sala_atual.spawn_para_entrada(-direcao)
+		posicao_segura_atual = jogador.global_position
+		protecao_entrada_restante = TEMPO_PROTECAO_ENTRADA
+		return
+	em_transicao = true
+	# A troca acontece após o frame físico, evitando remover colisões no meio da simulação.
+	call_deferred("_entrar_sala", destino, direcao)
 
 
-func _tipo_entrada(caminho: String) -> String:
-	if _entradas_por_caminho.has(caminho):
-		return _entradas_por_caminho[caminho]
-
+func _entrar_sala(destino: Vector2i, direcao: Vector2i) -> void:
+	if not is_instance_valid(jogador):
+		em_transicao = false
+		return
+	var info: Dictionary = mapa.obter(destino)
+	if info.is_empty():
+		push_error("A coordenada não tem sala no mapa: " + str(destino))
+		em_transicao = false
+		return
+	var caminho: String = info.get("modelo", "")
 	var recurso: PackedScene = load(caminho) as PackedScene
 	if recurso == null:
-		push_error("Cena não encontrada: " + caminho)
-		return ""
-
-	var instancia: Sala = recurso.instantiate() as Sala
-	if instancia == null:
-		push_error("A cena não usa scripts/salas.gd: " + caminho)
-		return ""
-
-	var tipo: String = instancia.get_tipo_entrada()
-	instancia.free()
-	_entradas_por_caminho[caminho] = tipo
-	return tipo
-
-
-func _trocar_sala(caminho: String, direcao_chegada: String) -> bool:
-	if _em_transicao:
-		return false
-	_em_transicao = true
-
-	var recurso: PackedScene = load(caminho) as PackedScene
-	if recurso == null:
-		push_error("Não foi possível carregar: " + caminho)
-		_em_transicao = false
-		return false
-
-	var nova_sala: Sala = recurso.instantiate() as Sala
-	if nova_sala == null:
-		push_error("A cena precisa ter uma raiz Sala: " + caminho)
-		_em_transicao = false
-		return false
-
-	# Cada sala conserva o Player no editor e pode ser testada isoladamente.
-	# No jogo completo, removemos esse duplicado para manter um único jogador.
-	var jogador_da_sala: Node = nova_sala.get_node_or_null("Player")
-	if jogador_da_sala != null:
-		nova_sala.remove_child(jogador_da_sala)
-		jogador_da_sala.free()
-
+		push_error("Sala manual não encontrada: " + caminho)
+		em_transicao = false
+		return
+	var nova: SalaMatriz = recurso.instantiate() as SalaMatriz
+	if nova == null or nova.mascara_saidas != int(info.get("mascara", 0)):
+		push_error("Cena incompatível com a matriz: " + caminho)
+		if nova != null:
+			nova.free()
+		em_transicao = false
+		return
+	nova.configurar(destino, info, jogador, chefes_derrotados)
 	if sala_atual != null:
 		remove_child(sala_atual)
 		sala_atual.queue_free()
-
-	sala_atual = nova_sala
+	sala_atual = nova
+	coordenada_atual = destino
 	add_child(sala_atual)
-	# O jogador fica acima das formas visuais e do cenário da sala.
 	move_child(jogador, get_child_count() - 1)
 	jogador.preparar_para_nova_sala()
-	sala_atual.configurar_spawn(direcao_chegada, jogador)
-	_conectar_portas(sala_atual)
-
-	print("Sala carregada: ", caminho)
-	_em_transicao = false
-	return true
-
-
-func _conectar_portas(sala: Sala) -> void:
-	for filho in sala.get_children():
-		if not filho.has_signal("jogador_entrou"):
-			continue
-		if String(filho.name).begins_with("PortaSaida"):
-			filho.connect("jogador_entrou", Callable(self, "_on_porta_saida_ativada"))
-		elif String(filho.name).begins_with("PortaEntrada"):
-			filho.connect("jogador_entrou", Callable(self, "_on_porta_entrada_ativada"))
+	jogador.global_position = sala_atual.spawn_para_entrada(direcao)
+	posicao_segura_atual = jogador.global_position
+	# Ignora qualquer sobreposição residual do quadro de física anterior.
+	protecao_entrada_restante = TEMPO_PROTECAO_ENTRADA
+	sala_atual.boss_derrotado.connect(_ao_derrotar_boss)
+	sala_atual.altar_ativado.connect(_ao_vencer)
+	mapa.visitar(destino)
+	em_transicao = false
+	print("[MAPA] ", destino, " / ", info["tipo"], " / ", info["modelo"])
 
 
-func _on_porta_saida_ativada() -> void:
-	avancar_para_nova_sala()
+func _ao_derrotar_boss(identificador: int) -> void:
+	if chefes_derrotados.has(identificador):
+		return
+	chefes_derrotados[identificador] = true
+	match identificador:
+		1:
+			jogador.desbloquear_pulo_duplo()
+			_aviso("ICE AGE SID derrotado: pulo duplo liberado!", 5.0)
+		2:
+			jogador.desbloquear_dash()
+			_aviso("WOODBREAKER derrotado: malloc() / dash liberado!", 5.0)
+		3:
+			jogador.desbloquear_grapple()
+			_aviso("STONEMAKER derrotado: grapple final liberado!", 5.0)
 
 
-func _on_porta_entrada_ativada() -> void:
-	voltar_para_sala_anterior()
+func _ao_morrer() -> void:
+	partida_terminou = true
+	_aviso("Processo encerrado. Pressione R para reiniciar.", 999.0)
+	hud.mostrar_morte()
+
+
+func _ao_vencer() -> void:
+	if partida_terminou:
+		return
+	partida_terminou = true
+	if is_instance_valid(jogador):
+		jogador.set_physics_process(false)
+	_aviso("return();  Loop infinito encerrado!", 999.0)
+	hud.mostrar_vitoria()
+
+
+func _aviso(texto: String, segundos: float) -> void:
+	mensagem = texto
+	tempo_mensagem = segundos

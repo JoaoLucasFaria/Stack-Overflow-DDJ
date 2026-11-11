@@ -1,0 +1,38 @@
+[gd_scene load_steps=2 format=3 uid="uid://civeyox7c68a6"]
+
+[ext_resource type="Script" uid="uid://4gcmli1os648" path="res://scripts/sala_matriz.gd" id="1_sala"]
+
+[node name="SalaBase" type="Node2D"]
+script = ExtResource("1_sala")
+
+[node name="Fundo" type="ColorRect" parent="."]
+show_behind_parent = true
+offset_right = 1152.0
+offset_bottom = 648.0
+mouse_filter = 2
+color = Color(0.07, 0.13, 0.18, 1)
+
+[node name="Contorno" type="Node2D" parent="."]
+
+[node name="Plataformas" type="Node2D" parent="."]
+
+[node name="Decoracao" type="Node2D" parent="."]
+
+[node name="Conteudo" type="Node2D" parent="."]
+
+[node name="Pontos" type="Node2D" parent="."]
+
+[node name="SpawnInicio" type="Marker2D" parent="Pontos"]
+position = Vector2(105, 540)
+
+[node name="SpawnEsquerda" type="Marker2D" parent="Pontos"]
+position = Vector2(96, 540)
+
+[node name="SpawnDireita" type="Marker2D" parent="Pontos"]
+position = Vector2(1015, 540)
+
+[node name="SpawnCima" type="Marker2D" parent="Pontos"]
+position = Vector2(566, 492)
+
+[node name="SpawnBaixo" type="Marker2D" parent="Pontos"]
+position = Vector2(576, 116)

@@ -4,7 +4,7 @@ extends Node
 ## Habilidade malloc: dash horizontal com invencibilidade opcional.
 ## A movimentação física é aplicada apenas pelo Jogador; este nó gerencia estado.
 @export_category("Estado de Desbloqueio")
-@export var dash_desbloqueado: bool = true
+@export var dash_desbloqueado: bool = false
 
 @export_category("Configurações do Dash")
 @export_range(1.0, 2000.0, 1.0) var velocidade_dash: float = 600.0
