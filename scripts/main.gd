@@ -1,173 +1,176 @@
 extends Node2D
 
+## Controla geração, histórico, portas e jogador persistente.
+## Os mapas continuam editáveis e executáveis individualmente no Godot.
+const CENA_JOGADOR: PackedScene = preload("res://cenas/player.tscn")
+const SALA_INICIAL: String = "res://cenas/sala_padrao.tscn"
+
+@export_category("Geração de salas")
 @export var lista_cenas: Array[String] = [
 	"res://cenas/sala_padrao.tscn",
 	"res://cenas/sala_plataforma.tscn",
 	"res://cenas/sala_queda.tscn",
 	"res://cenas/sala_topo_1.tscn",
 	"res://cenas/sala_esq_alta.tscn",
-	"res://cenas/sala_esq_alta_trapfall.tscn"
+	"res://cenas/sala_esq_alta_trapfall.tscn",
 ]
+@export_file("*.tscn") var cena_chefe: String = "res://cenas/sala_chefe.tscn"
+@export_range(1, 100, 1) var limite_salas_para_chefe: int = 4
 
-@export var cena_chefe: String = "res://cenas/sala_chefe.tscn"
-@export var limite_salas_para_chefe: int = 4
-
-var sala_atual: Node = null
+var sala_atual: Sala = null
+var jogador: Jogador = null
 var historico_salas: Array[String] = []
 var indice_historico: int = -1
-var direcao_chegada: String = "direita"
 
-# Guarda o requisito que a sala ATUAL exige para a PRÓXIMA sala
-var proxima_entrada_requerida: String = "esq_baixo" # Valor inicial padrão
+var _entradas_por_caminho: Dictionary = {}
+var _em_transicao: bool = false
+
 
 func _ready() -> void:
 	randomize()
-	
-	# Define obrigatoriamente a sala padrão como a primeira cena do jogo
-	var caminho_inicial = "res://cenas/sala_padrao.tscn"
-	
-	historico_salas.append(caminho_inicial)
-	indice_historico = 0
-	
-	direcao_chegada = "direita"
-	carregar_sala(caminho_inicial)
+	jogador = CENA_JOGADOR.instantiate() as Jogador
+	if jogador == null:
+		push_error("O jogador precisa utilizar o script Jogador.")
+		return
+	add_child(jogador)
+
+	if _trocar_sala(SALA_INICIAL, "direita"):
+		historico_salas.append(SALA_INICIAL)
+		indice_historico = 0
+
 
 func avancar_para_nova_sala() -> void:
-	var caminho_sala = ""
-	
-	if indice_historico == historico_salas.size() - 1:
-		# Verifica se atingiu o limite para tentar o chefe
-		if historico_salas.size() >= limite_salas_para_chefe:
-			var temp_chefe = load(cena_chefe).instantiate()
-			var entrada_chefe = ""
-			
-			if temp_chefe.has_method("get_tipo_entrada"):
-				entrada_chefe = temp_chefe.get_tipo_entrada()
-			elif "tipo_entrada" in temp_chefe:
-				entrada_chefe = temp_chefe.tipo_entrada
-			
-			temp_chefe.queue_free()
-			
-			# Se encaixar perfeitamente, define o chefe
-			if proxima_entrada_requerida == entrada_chefe:
-				caminho_sala = cena_chefe
-				print("Chegou na sala do chefe com encaixe perfeito!")
-			else:
-				print("Limite atingido, mas incompatível com o chefe. Gerando sala normal para continuar...")
-		
-		# Se ainda não for o chefe (ou se o chefe falhou no encaixe), escolhe uma sala normal
-		if caminho_sala == "":
-			var cenas_compativeis: Array[String] = []
-			
-			var ultima_sala = ""
-			if historico_salas.size() > 0:
-				ultima_sala = historico_salas[historico_salas.size() - 1]
-			
-			# Lê o que a sala atual estipula como "proxima_entrada"
-			if sala_atual != null:
-				if sala_atual.has_method("get_proxima_entrada"):
-					proxima_entrada_requerida = sala_atual.get_proxima_entrada()
-				elif "proxima_entrada" in sala_atual:
-					proxima_entrada_requerida = sala_atual.proxima_entrada
-			
-			print("--------------------------------------------------")
-			print("Próxima entrada exigida pela sala atual: ", proxima_entrada_requerida)
-			
-			# Percorre todas as cenas para verificar a compatibilidade
-			for caminho in lista_cenas:
-				if caminho == ultima_sala:
-					print("-> Ignorada (é a última sala): ", caminho)
-					continue
-				
-				var temp_cena = load(caminho).instantiate()
-				var aceita: bool = true
-				var tipo_entrada_candidata = ""
-				
-				if temp_cena.has_method("get_tipo_entrada"):
-					tipo_entrada_candidata = temp_cena.get_tipo_entrada()
-				elif "tipo_entrada" in temp_cena:
-					tipo_entrada_candidata = temp_cena.tipo_entrada
-				
-				print("Testando sala: ", caminho, " | Tem Entrada: [", tipo_entrada_candidata, "] vs Exigido: [", proxima_entrada_requerida, "]")
-				
-				if tipo_entrada_candidata != "":
-					if tipo_entrada_candidata != proxima_entrada_requerida:
-						aceita = false
-				else:
-					aceita = false
-				
-				temp_cena.queue_free()
-				
-				if aceita:
-					print("   -> ACEITE! Adicionada aos compatíveis.")
-					cenas_compativeis.append(caminho)
-				else:
-					print("   -> REJEITADA por incompatibilidade.")
-			
-			print("Cenas compatíveis encontradas: ", cenas_compativeis)
-			
-			# Fallback caso nenhuma sala cumpra a regra estrita
-			if cenas_compativeis.size() == 0:
-				print("AVISO: Nenhuma sala compatível encontrada! Usando fallback.")
-				for caminho in lista_cenas:
-					if caminho != ultima_sala:
-						cenas_compativeis.append(caminho)
-			
-			var indice_aleatorio_escolha = randi() % cenas_compativeis.size()
-			caminho_sala = cenas_compativeis[indice_aleatorio_escolha]
-			print(">>> SALA ESCOLHIDA PARA AVANÇAR: ", caminho_sala)
-			print("--------------------------------------------------")
-			
-		historico_salas.append(caminho_sala)
-		indice_historico += 1
+	if _em_transicao or sala_atual == null:
+		return
+
+	var proximo_indice: int = indice_historico + 1
+	var nova_sala: bool = proximo_indice >= historico_salas.size()
+	var caminho: String
+
+	if nova_sala:
+		caminho = _sortear_proxima_sala()
 	else:
-		indice_historico += 1
-		caminho_sala = historico_salas[indice_historico]
-		
-	direcao_chegada = "direita"
-	carregar_sala(caminho_sala)
+		caminho = historico_salas[proximo_indice]
+
+	if caminho.is_empty() or not _trocar_sala(caminho, "direita"):
+		return
+
+	if nova_sala:
+		historico_salas.append(caminho)
+	indice_historico = proximo_indice
 
 
 func voltar_para_sala_anterior() -> void:
-	if indice_historico > 0:
-		indice_historico -= 1
-		var caminho_sala = historico_salas[indice_historico]
-		direcao_chegada = "esquerda"
-		carregar_sala(caminho_sala)
-		print("Voltando para a sala anterior: ", caminho_sala)
-	else:
-		print("Você está na primeira sala da masmorra, não dá para voltar mais!")
+	if _em_transicao or indice_historico <= 0:
+		return
 
-func carregar_sala(caminho: String) -> void:
+	var indice_anterior: int = indice_historico - 1
+	if _trocar_sala(historico_salas[indice_anterior], "esquerda"):
+		indice_historico = indice_anterior
+
+
+func _sortear_proxima_sala() -> String:
+	var entrada_necessaria: String = sala_atual.get_proxima_entrada()
+
+	# O chefe só entra quando sua porta é compatível com a sala atual.
+	if historico_salas.size() >= limite_salas_para_chefe:
+		if _tipo_entrada(cena_chefe) == entrada_necessaria:
+			return cena_chefe
+
+	var compativeis: Array[String] = []
+	var sem_repetir: Array[String] = []
+	var ultima_sala: String = historico_salas.back()
+	for caminho in lista_cenas:
+		if _tipo_entrada(caminho) != entrada_necessaria:
+			continue
+		compativeis.append(caminho)
+		if caminho != ultima_sala:
+			sem_repetir.append(caminho)
+
+	# Se a única sala compatível for a atual, repetir é melhor que quebrar o mapa.
+	if not sem_repetir.is_empty():
+		return sem_repetir.pick_random()
+	if not compativeis.is_empty():
+		return compativeis.pick_random()
+
+	push_error("Nenhuma sala com entrada '" + entrada_necessaria + "' foi encontrada.")
+	return ""
+
+
+func _tipo_entrada(caminho: String) -> String:
+	if _entradas_por_caminho.has(caminho):
+		return _entradas_por_caminho[caminho]
+
+	var recurso: PackedScene = load(caminho) as PackedScene
+	if recurso == null:
+		push_error("Cena não encontrada: " + caminho)
+		return ""
+
+	var instancia: Sala = recurso.instantiate() as Sala
+	if instancia == null:
+		push_error("A cena não usa scripts/salas.gd: " + caminho)
+		return ""
+
+	var tipo: String = instancia.get_tipo_entrada()
+	instancia.free()
+	_entradas_por_caminho[caminho] = tipo
+	return tipo
+
+
+func _trocar_sala(caminho: String, direcao_chegada: String) -> bool:
+	if _em_transicao:
+		return false
+	_em_transicao = true
+
+	var recurso: PackedScene = load(caminho) as PackedScene
+	if recurso == null:
+		push_error("Não foi possível carregar: " + caminho)
+		_em_transicao = false
+		return false
+
+	var nova_sala: Sala = recurso.instantiate() as Sala
+	if nova_sala == null:
+		push_error("A cena precisa ter uma raiz Sala: " + caminho)
+		_em_transicao = false
+		return false
+
+	# Cada sala conserva o Player no editor e pode ser testada isoladamente.
+	# No jogo completo, removemos esse duplicado para manter um único jogador.
+	var jogador_da_sala: Node = nova_sala.get_node_or_null("Player")
+	if jogador_da_sala != null:
+		nova_sala.remove_child(jogador_da_sala)
+		jogador_da_sala.free()
+
 	if sala_atual != null:
+		remove_child(sala_atual)
 		sala_atual.queue_free()
-	
-	var cena_sala = load(caminho)
-	sala_atual = cena_sala.instantiate()
-	
-	# Atualiza o requisito da sala recém-carregada
-	if sala_atual.has_method("get_proxima_entrada"):
-		proxima_entrada_requerida = sala_atual.get_proxima_entrada()
-	elif "proxima_entrada" in sala_atual:
-		proxima_entrada_requerida = sala_atual.proxima_entrada
-	else:
-		proxima_entrada_requerida = "esq_baixo" # Padrão de segurança
-	
-	if sala_atual.has_method("configurar_spawn"):
-		sala_atual.configurar_spawn(direcao_chegada)
-	
+
+	sala_atual = nova_sala
 	add_child(sala_atual)
-	
-	var porta_saida = sala_atual.get_node_or_null("PortaSaida")
-	if porta_saida != null:
-		porta_saida.connect("jogador_entrou", Callable(self, "_on_porta_saida_ativada"))
-		
-	var porta_entrada = sala_atual.get_node_or_null("PortaEntrada")
-	if porta_entrada != null:
-		porta_entrada.connect("jogador_entrou", Callable(self, "_on_porta_entrada_ativada"))
+	# O jogador fica acima das formas visuais e do cenário da sala.
+	move_child(jogador, get_child_count() - 1)
+	jogador.preparar_para_nova_sala()
+	sala_atual.configurar_spawn(direcao_chegada, jogador)
+	_conectar_portas(sala_atual)
+
+	print("Sala carregada: ", caminho)
+	_em_transicao = false
+	return true
+
+
+func _conectar_portas(sala: Sala) -> void:
+	for filho in sala.get_children():
+		if not filho.has_signal("jogador_entrou"):
+			continue
+		if String(filho.name).begins_with("PortaSaida"):
+			filho.connect("jogador_entrou", Callable(self, "_on_porta_saida_ativada"))
+		elif String(filho.name).begins_with("PortaEntrada"):
+			filho.connect("jogador_entrou", Callable(self, "_on_porta_entrada_ativada"))
+
 
 func _on_porta_saida_ativada() -> void:
 	avancar_para_nova_sala()
+
 
 func _on_porta_entrada_ativada() -> void:
 	voltar_para_sala_anterior()
