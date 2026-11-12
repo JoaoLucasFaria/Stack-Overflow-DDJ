@@ -1,6 +1,6 @@
-[gd_scene load_steps=9 format=3 uid="uid://4plv8syu077y"]
+[gd_scene load_steps=9 format=3]
 
-[ext_resource type="PackedScene" uid="uid://civeyox7c68a6" path="res://cenas/salas/sala_base.tscn" id="1_base"]
+[ext_resource type="PackedScene" path="res://cenas/salas/sala_base.tscn" id="1_base"]
 
 [sub_resource type="RectangleShape2D" id="shape_1"]
 size = Vector2(26, 496)
@@ -26,114 +26,117 @@ size = Vector2(72, 180)
 [node name="sala_pulo_duplo" instance=ExtResource("1_base")]
 mascara_saidas = 3
 
-[node name="ParedeEsqAcima" type="StaticBody2D" parent="Contorno" index="0"]
+[node name="ParedeEsqAcima" type="StaticBody2D" parent="Contorno"]
+position = Vector2(0, 0)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeEsqAcima" index="0"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeEsqAcima"]
 position = Vector2(13, 248)
 shape = SubResource("shape_1")
 
-[node name="Visual" type="ColorRect" parent="Contorno/ParedeEsqAcima" index="1"]
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeEsqAcima"]
 offset_right = 26.0
 offset_bottom = 496.0
-mouse_filter = 2
 color = Color(0.235, 0.325, 0.405, 1)
+mouse_filter = 2
 
-[node name="ParedeEsqAbaixo" type="StaticBody2D" parent="Contorno" index="1"]
+[node name="ParedeEsqAbaixo" type="StaticBody2D" parent="Contorno"]
 position = Vector2(0, 600)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeEsqAbaixo" index="0"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeEsqAbaixo"]
 position = Vector2(13, 24)
 shape = SubResource("shape_2")
 
-[node name="Visual" type="ColorRect" parent="Contorno/ParedeEsqAbaixo" index="1"]
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeEsqAbaixo"]
 offset_right = 26.0
 offset_bottom = 48.0
-mouse_filter = 2
 color = Color(0.235, 0.325, 0.405, 1)
+mouse_filter = 2
 
-[node name="ParedeDirAcima" type="StaticBody2D" parent="Contorno" index="2"]
+[node name="ParedeDirAcima" type="StaticBody2D" parent="Contorno"]
 position = Vector2(1126, 0)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeDirAcima" index="0"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeDirAcima"]
 position = Vector2(13, 248)
 shape = SubResource("shape_3")
 
-[node name="Visual" type="ColorRect" parent="Contorno/ParedeDirAcima" index="1"]
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeDirAcima"]
 offset_right = 26.0
 offset_bottom = 496.0
-mouse_filter = 2
 color = Color(0.235, 0.325, 0.405, 1)
+mouse_filter = 2
 
-[node name="ParedeDirAbaixo" type="StaticBody2D" parent="Contorno" index="3"]
+[node name="ParedeDirAbaixo" type="StaticBody2D" parent="Contorno"]
 position = Vector2(1126, 600)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeDirAbaixo" index="0"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeDirAbaixo"]
 position = Vector2(13, 24)
 shape = SubResource("shape_4")
 
-[node name="Visual" type="ColorRect" parent="Contorno/ParedeDirAbaixo" index="1"]
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeDirAbaixo"]
 offset_right = 26.0
 offset_bottom = 48.0
-mouse_filter = 2
 color = Color(0.235, 0.325, 0.405, 1)
+mouse_filter = 2
 
-[node name="Teto" type="StaticBody2D" parent="Contorno" index="4"]
+[node name="Teto" type="StaticBody2D" parent="Contorno"]
+position = Vector2(0, 0)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/Teto" index="0"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/Teto"]
 position = Vector2(576, 13)
 shape = SubResource("shape_5")
 
-[node name="Visual" type="ColorRect" parent="Contorno/Teto" index="1"]
+[node name="Visual" type="ColorRect" parent="Contorno/Teto"]
 offset_right = 1152.0
 offset_bottom = 26.0
-mouse_filter = 2
 color = Color(0.235, 0.325, 0.405, 1)
+mouse_filter = 2
 
-[node name="Piso" type="StaticBody2D" parent="Contorno" index="5"]
+[node name="Piso" type="StaticBody2D" parent="Contorno"]
 position = Vector2(0, 600)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/Piso" index="0"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/Piso"]
 position = Vector2(576, 24)
 shape = SubResource("shape_6")
 
-[node name="Visual" type="ColorRect" parent="Contorno/Piso" index="1"]
+[node name="Visual" type="ColorRect" parent="Contorno/Piso"]
 offset_right = 1152.0
 offset_bottom = 48.0
-mouse_filter = 2
 color = Color(0.235, 0.325, 0.405, 1)
+mouse_filter = 2
 
-[node name="MuroPuloDuplo" type="StaticBody2D" parent="Contorno" index="6"]
+[node name="MuroPuloDuplo" type="StaticBody2D" parent="Contorno"]
 position = Vector2(541, 420)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/MuroPuloDuplo" index="0"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/MuroPuloDuplo"]
 position = Vector2(36, 90)
 shape = SubResource("shape_7")
 
-[node name="Visual" type="ColorRect" parent="Contorno/MuroPuloDuplo" index="1"]
+[node name="Visual" type="ColorRect" parent="Contorno/MuroPuloDuplo"]
 offset_right = 72.0
 offset_bottom = 180.0
-mouse_filter = 2
 color = Color(0.49, 0.48, 0.72, 1)
+mouse_filter = 2
 
-[node name="BordaEsq" type="ColorRect" parent="Decoracao" index="0"]
+[node name="BordaEsq" type="ColorRect" parent="Decoracao"]
+offset_left = 0.0
 offset_top = 490.0
 offset_right = 26.0
 offset_bottom = 495.0
-mouse_filter = 2
 color = Color(0.28, 0.76, 0.71, 1)
+mouse_filter = 2
 
-[node name="BordaDir" type="ColorRect" parent="Decoracao" index="1"]
+[node name="BordaDir" type="ColorRect" parent="Decoracao"]
 offset_left = 1126.0
 offset_top = 490.0
 offset_right = 1152.0
 offset_bottom = 495.0
-mouse_filter = 2
 color = Color(0.28, 0.76, 0.71, 1)
+mouse_filter = 2
 
-[node name="AvisoMuro" type="ColorRect" parent="Decoracao" index="2"]
+[node name="AvisoMuro" type="ColorRect" parent="Decoracao"]
 offset_left = 535.0
 offset_top = 412.0
 offset_right = 619.0
 offset_bottom = 420.0
-mouse_filter = 2
 color = Color(0.63, 0.73, 0.93, 1)
+mouse_filter = 2

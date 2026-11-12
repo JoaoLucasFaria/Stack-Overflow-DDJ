@@ -1,7 +1,8 @@
-[gd_scene load_steps=11 format=3 uid="uid://37t3fi5n2cr4"]
+[gd_scene load_steps=12 format=3 uid="uid://duk210b42ov7h"]
 
-[ext_resource type="PackedScene" uid="uid://civeyox7c68a6" path="res://cenas/salas/sala_base.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://in0k036vtlnr" path="res://cenas/salas/sala_base.tscn" id="1_base"]
 [ext_resource type="PackedScene" uid="uid://culwc25asd38g" path="res://cenas/Trap.tscn" id="2_trap"]
+[ext_resource type="Script" uid="uid://0qbu5h1xwn6v" path="res://scripts/inimigos/ponto_spawn_inimigo.gd" id="9_spawn"]
 
 [sub_resource type="RectangleShape2D" id="shape_1"]
 size = Vector2(26, 496)
@@ -152,3 +153,15 @@ color = Color(0.28, 0.76, 0.71, 1)
 [node name="EmissorProjetil" parent="Conteudo" index="0" instance=ExtResource("2_trap")]
 position = Vector2(170, 544)
 shoot_interval = 2.6
+
+[node name="SpawnsInimigos" type="Node2D" parent="Conteudo" index="1"]
+
+[node name="Inimigo_1" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="0"]
+position = Vector2(365, 568)
+script = ExtResource("9_spawn")
+tipo_inimigo = "memory_leak"
+
+[node name="Inimigo_2" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="1"]
+position = Vector2(838, 568)
+script = ExtResource("9_spawn")
+tipo_inimigo = "segmentation_fault"

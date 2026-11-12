@@ -130,9 +130,9 @@ func atualizar(mapa: MapaMatriz, posicao: Vector2i, jogador: Jogador, derrotados
 		habilidades += "  •  MALLOC"
 	if jogador.grapple_liberado:
 		habilidades += "  •  GRAPPLE"
-	rotulo_estado.text = "HP %d/%d%s     [M] Mapa" % [jogador.vida_atual, jogador.vida_maxima, habilidades]
+	rotulo_estado.text = "HP %d/%d   STACK %.0f/%.0f%s     [M] Mapa" % [jogador.vida_atual, jogador.vida_maxima, jogador.overflow_atual, jogador.overflow_maximo, habilidades]
 	if debug_visivel:
-		rotulo_debug.text = "DEBUG [F3] | Sala %s | Seed %d | Chefes %s\nSetas mover | Espaço pular | Shift/X dash | F boss teste | G grapple | R reiniciar" % [str(posicao), mapa.semente, str(derrotados.keys())]
+		rotulo_debug.text = "DEBUG [F3] | Sala %s | Seed %d | Chefes %s\nSetas mover | Espaço pular | J/clique atacar | E descansar | F boss teste | O +25 STACK | R reiniciar" % [str(posicao), mapa.semente, str(derrotados.keys())]
 	if not mapa_visivel:
 		return
 	var linhas: PackedStringArray = []
