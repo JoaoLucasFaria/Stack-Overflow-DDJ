@@ -1,6 +1,7 @@
-[gd_scene load_steps=10 format=3 uid="uid://dfulneedov5up"]
+[gd_scene load_steps=11 format=3 uid="uid://dxh51noa7bx43"]
 
-[ext_resource type="PackedScene" uid="uid://civeyox7c68a6" path="res://cenas/salas/sala_base.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://in0k036vtlnr" path="res://cenas/salas/sala_base.tscn" id="1_base"]
+[ext_resource type="Script" uid="uid://0qbu5h1xwn6v" path="res://scripts/inimigos/ponto_spawn_inimigo.gd" id="9_spawn"]
 
 [sub_resource type="RectangleShape2D" id="shape_1"]
 size = Vector2(26, 496)
@@ -147,3 +148,14 @@ offset_right = 1152.0
 offset_bottom = 495.0
 mouse_filter = 2
 color = Color(0.28, 0.76, 0.71, 1)
+
+[node name="SpawnsInimigos" type="Node2D" parent="Conteudo" index="0"]
+
+[node name="Inimigo_1" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="0"]
+position = Vector2(365, 568)
+script = ExtResource("9_spawn")
+tipo_inimigo = "segmentation_fault"
+
+[node name="Inimigo_2" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="1"]
+position = Vector2(838, 568)
+script = ExtResource("9_spawn")

@@ -1,6 +1,6 @@
-[gd_scene load_steps=11 format=3 uid="uid://bwp3p181nhqt0"]
+[gd_scene load_steps=11 format=3]
 
-[ext_resource type="PackedScene" uid="uid://civeyox7c68a6" path="res://cenas/salas/sala_base.tscn" id="1_base"]
+[ext_resource type="PackedScene" path="res://cenas/salas/sala_base.tscn" id="1_base"]
 
 [sub_resource type="RectangleShape2D" id="shape_1"]
 size = Vector2(26, 496)
@@ -20,149 +20,153 @@ size = Vector2(1152, 26)
 [sub_resource type="RectangleShape2D" id="shape_6"]
 size = Vector2(1152, 48)
 
-[sub_resource type="RectangleShape2D" id="shape_9"]
-size = Vector2(40, 574)
-
 [sub_resource type="RectangleShape2D" id="shape_7"]
 size = Vector2(160, 14)
 
 [sub_resource type="RectangleShape2D" id="shape_8"]
 size = Vector2(160, 14)
 
+[sub_resource type="RectangleShape2D" id="shape_9"]
+size = Vector2(40, 574)
+
 [node name="sala_boss_3" instance=ExtResource("1_base")]
 mascara_saidas = 3
 
-[node name="ParedeEsqAcima" type="StaticBody2D" parent="Contorno" index="0"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeEsqAcima" index="0"]
+[node name="ParedeEsqAcima" type="StaticBody2D" parent="Contorno"]
+position = Vector2(0, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeEsqAcima"]
 position = Vector2(13, 248)
 shape = SubResource("shape_1")
 
-[node name="Visual" type="ColorRect" parent="Contorno/ParedeEsqAcima" index="1"]
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeEsqAcima"]
 offset_right = 26.0
 offset_bottom = 496.0
+color = Color(0.40, 0.30, 0.38, 1)
 mouse_filter = 2
-color = Color(0.4, 0.3, 0.38, 1)
 
-[node name="ParedeEsqAbaixo" type="StaticBody2D" parent="Contorno" index="1"]
+[node name="ParedeEsqAbaixo" type="StaticBody2D" parent="Contorno"]
 position = Vector2(0, 600)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeEsqAbaixo" index="0"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeEsqAbaixo"]
 position = Vector2(13, 24)
 shape = SubResource("shape_2")
 
-[node name="Visual" type="ColorRect" parent="Contorno/ParedeEsqAbaixo" index="1"]
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeEsqAbaixo"]
 offset_right = 26.0
 offset_bottom = 48.0
+color = Color(0.40, 0.30, 0.38, 1)
 mouse_filter = 2
-color = Color(0.4, 0.3, 0.38, 1)
 
-[node name="ParedeDirAcima" type="StaticBody2D" parent="Contorno" index="2"]
+[node name="ParedeDirAcima" type="StaticBody2D" parent="Contorno"]
 position = Vector2(1126, 0)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeDirAcima" index="0"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeDirAcima"]
 position = Vector2(13, 248)
 shape = SubResource("shape_3")
 
-[node name="Visual" type="ColorRect" parent="Contorno/ParedeDirAcima" index="1"]
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeDirAcima"]
 offset_right = 26.0
 offset_bottom = 496.0
+color = Color(0.40, 0.30, 0.38, 1)
 mouse_filter = 2
-color = Color(0.4, 0.3, 0.38, 1)
 
-[node name="ParedeDirAbaixo" type="StaticBody2D" parent="Contorno" index="3"]
+[node name="ParedeDirAbaixo" type="StaticBody2D" parent="Contorno"]
 position = Vector2(1126, 600)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeDirAbaixo" index="0"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeDirAbaixo"]
 position = Vector2(13, 24)
 shape = SubResource("shape_4")
 
-[node name="Visual" type="ColorRect" parent="Contorno/ParedeDirAbaixo" index="1"]
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeDirAbaixo"]
 offset_right = 26.0
 offset_bottom = 48.0
+color = Color(0.40, 0.30, 0.38, 1)
 mouse_filter = 2
-color = Color(0.4, 0.3, 0.38, 1)
 
-[node name="Teto" type="StaticBody2D" parent="Contorno" index="4"]
+[node name="Teto" type="StaticBody2D" parent="Contorno"]
+position = Vector2(0, 0)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/Teto" index="0"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/Teto"]
 position = Vector2(576, 13)
 shape = SubResource("shape_5")
 
-[node name="Visual" type="ColorRect" parent="Contorno/Teto" index="1"]
+[node name="Visual" type="ColorRect" parent="Contorno/Teto"]
 offset_right = 1152.0
 offset_bottom = 26.0
+color = Color(0.40, 0.30, 0.38, 1)
 mouse_filter = 2
-color = Color(0.4, 0.3, 0.38, 1)
 
-[node name="Piso" type="StaticBody2D" parent="Contorno" index="5"]
+[node name="Piso" type="StaticBody2D" parent="Contorno"]
 position = Vector2(0, 600)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/Piso" index="0"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/Piso"]
 position = Vector2(576, 24)
 shape = SubResource("shape_6")
 
-[node name="Visual" type="ColorRect" parent="Contorno/Piso" index="1"]
+[node name="Visual" type="ColorRect" parent="Contorno/Piso"]
 offset_right = 1152.0
 offset_bottom = 48.0
+color = Color(0.40, 0.30, 0.38, 1)
 mouse_filter = 2
-color = Color(0.4, 0.3, 0.38, 1)
 
-[node name="Boss3Barrier" type="StaticBody2D" parent="Contorno" index="6"]
-position = Vector2(965, 26)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/Boss3Barrier" index="0"]
-position = Vector2(20, 287)
-shape = SubResource("shape_9")
-
-[node name="Visual" type="ColorRect" parent="Contorno/Boss3Barrier" index="1"]
-offset_right = 40.0
-offset_bottom = 574.0
-mouse_filter = 2
-color = Color(0.49, 0.48, 0.72, 1)
-
-[node name="EstradoBossEsq" type="StaticBody2D" parent="Plataformas" index="0"]
+[node name="EstradoBossEsq" type="StaticBody2D" parent="Plataformas"]
 position = Vector2(175, 492)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/EstradoBossEsq" index="0"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/EstradoBossEsq"]
 position = Vector2(80, 7)
 shape = SubResource("shape_7")
 one_way_collision = true
 
-[node name="Visual" type="ColorRect" parent="Plataformas/EstradoBossEsq" index="1"]
+[node name="Visual" type="ColorRect" parent="Plataformas/EstradoBossEsq"]
 offset_right = 160.0
 offset_bottom = 14.0
-mouse_filter = 2
 color = Color(0.31, 0.64, 0.73, 1)
+mouse_filter = 2
 
-[node name="EstradoBossDir" type="StaticBody2D" parent="Plataformas" index="1"]
+[node name="EstradoBossDir" type="StaticBody2D" parent="Plataformas"]
 position = Vector2(810, 492)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/EstradoBossDir" index="0"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/EstradoBossDir"]
 position = Vector2(80, 7)
 shape = SubResource("shape_8")
 one_way_collision = true
 
-[node name="Visual" type="ColorRect" parent="Plataformas/EstradoBossDir" index="1"]
+[node name="Visual" type="ColorRect" parent="Plataformas/EstradoBossDir"]
 offset_right = 160.0
 offset_bottom = 14.0
-mouse_filter = 2
 color = Color(0.31, 0.64, 0.73, 1)
+mouse_filter = 2
 
-[node name="BordaEsq" type="ColorRect" parent="Decoracao" index="0"]
+[node name="Boss3Barrier" type="StaticBody2D" parent="Contorno"]
+position = Vector2(965, 26)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/Boss3Barrier"]
+position = Vector2(20, 287)
+shape = SubResource("shape_9")
+
+[node name="Visual" type="ColorRect" parent="Contorno/Boss3Barrier"]
+offset_right = 40.0
+offset_bottom = 574.0
+color = Color(0.49, 0.48, 0.72, 1)
+mouse_filter = 2
+
+[node name="BordaEsq" type="ColorRect" parent="Decoracao"]
+offset_left = 0.0
 offset_top = 490.0
 offset_right = 26.0
 offset_bottom = 495.0
-mouse_filter = 2
 color = Color(0.28, 0.76, 0.71, 1)
+mouse_filter = 2
 
-[node name="BordaDir" type="ColorRect" parent="Decoracao" index="1"]
+[node name="BordaDir" type="ColorRect" parent="Decoracao"]
 offset_left = 1126.0
 offset_top = 490.0
 offset_right = 1152.0
 offset_bottom = 495.0
-mouse_filter = 2
 color = Color(0.28, 0.76, 0.71, 1)
+mouse_filter = 2
 
-[node name="PosicaoBoss" type="Marker2D" parent="Pontos" index="5"]
+[node name="PosicaoBoss" type="Marker2D" parent="Pontos"]
 position = Vector2(575, 600)

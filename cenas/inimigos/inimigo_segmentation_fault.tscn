@@ -1,0 +1,34 @@
+[gd_scene load_steps=3 format=3 uid="uid://fjvnnnmx7a3y"]
+
+[ext_resource type="Script" uid="uid://berp1svot2yak" path="res://scripts/inimigos/segmentation_fault.gd" id="1_enemy"]
+
+[sub_resource type="RectangleShape2D" id="shape_enemy"]
+size = Vector2(30, 30)
+
+[node name="SegmentationFault" type="CharacterBody2D"]
+collision_layer = 2
+script = ExtResource("1_enemy")
+item_id = &"segmentation_fault"
+nome_visivel = "Segmentation Fault"
+velocidade = 0.0
+alcance_ataque = 50.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("shape_enemy")
+
+[node name="Visual" type="ColorRect" parent="."]
+offset_left = -15.0
+offset_top = -15.0
+offset_right = 15.0
+offset_bottom = 15.0
+mouse_filter = 2
+color = Color(0.98, 0.7, 0.24, 1)
+
+[node name="Nome" type="Label" parent="."]
+offset_left = -95.0
+offset_top = -44.0
+offset_right = 95.0
+offset_bottom = -22.0
+theme_override_font_sizes/font_size = 13
+text = "Segmentation Fault"
+horizontal_alignment = 1

@@ -1,5 +1,5 @@
 class_name BossProvisorio
-extends Node2D
+extends StaticBody2D
 
 ## Placeholder de integração da FRENTE B; será substituído por chefes reais.
 ## F (3 vezes) perto do chefe simula sua derrota e concede habilidade.
@@ -20,6 +20,15 @@ func configurar(boss_id: int, alvo: Jogador) -> void:
 
 
 func _ready() -> void:
+	# Colisão exclusiva do golpe do jogador; não bloqueia movimento.
+	collision_layer = 2
+	collision_mask = 0
+	var forma: RectangleShape2D = RectangleShape2D.new()
+	forma.size = Vector2(110, 90)
+	var caixa: CollisionShape2D = CollisionShape2D.new()
+	caixa.position = Vector2(0, -45)
+	caixa.shape = forma
+	add_child(caixa)
 	var corpo: ColorRect = ColorRect.new()
 	corpo.color = Color(0.8, 0.22, 0.25, 0.96)
 	corpo.position = Vector2(-55, -90)
@@ -41,15 +50,21 @@ func _process(delta: float) -> void:
 	tempo_proximo_golpe = maxf(0.0, tempo_proximo_golpe - delta)
 	if Input.is_action_just_pressed("ataque_teste") and tempo_proximo_golpe <= 0.0:
 		if jogador.global_position.distance_to(global_position) <= 155.0:
-			vida -= 1
-			tempo_proximo_golpe = 0.16
-			_atualizar_rotulo()
-			if vida <= 0:
-				encerrado = true
-				derrotado.emit(identificador)
-				queue_free()
+			receber_dano(1)
+
+
+func receber_dano(dano: int) -> void:
+	if encerrado or dano <= 0 or tempo_proximo_golpe > 0.0:
+		return
+	vida -= dano
+	tempo_proximo_golpe = 0.16
+	_atualizar_rotulo()
+	if vida <= 0:
+		encerrado = true
+		derrotado.emit(identificador)
+		queue_free()
 
 
 func _atualizar_rotulo() -> void:
 	if rotulo != null:
-		rotulo.text = "%s (protótipo) | F para atacar (%d/3)" % [NOMES.get(identificador, "GUARDIÃO"), vida]
+		rotulo.text = "%s (protótipo) | J/clique (ou F teste) (%d/3)" % [NOMES.get(identificador, "GUARDIÃO"), vida]
