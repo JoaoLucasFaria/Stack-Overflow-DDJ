@@ -94,7 +94,7 @@ static func mascara_das_conexoes(conexoes: Dictionary) -> int:
 	return mascara
 
 
-func gerar(quantidade_ramos: int = 12, semente_fixa: int = 0) -> void:
+func gerar(quantidade_ramos: int = 23, semente_fixa: int = 0, salas_ate_boss1: int = 7, salas_ate_boss2: int = 11, salas_entre_boss2_boss3: int = 7) -> void:
 	salas.clear()
 	visitadas.clear()
 	if semente_fixa == 0:
@@ -103,38 +103,76 @@ func gerar(quantidade_ramos: int = 12, semente_fixa: int = 0) -> void:
 		gerador.seed = semente_fixa
 	semente = gerador.seed
 
-	# Progressão principal invariável; só as ramificações e as salas comuns variam.
-	var principal: Array[Dictionary] = [
-		{"p": Vector2i(0, 0), "tipo": "inicio"},
-		{"p": Vector2i(-1, 0), "tipo": "normal"},
-		{"p": Vector2i(-2, 0), "tipo": "normal"},
-		{"p": Vector2i(-3, 0), "tipo": "boss1"},
-		{"p": Vector2i(0, -1), "tipo": "normal"},
-		{"p": Vector2i(1, -1), "tipo": "normal"},
-		{"p": Vector2i(2, -1), "tipo": "bloqueio_pulo"},
-		{"p": Vector2i(3, -1), "tipo": "boss2"},
-		{"p": Vector2i(3, -2), "tipo": "normal"},
-		{"p": Vector2i(4, -2), "tipo": "bloqueio_dash"},
-		{"p": Vector2i(5, -2), "tipo": "boss3"},
-		{"p": Vector2i(6, -2), "tipo": "final"}
-	]
-	for dado in principal:
-		_adicionar(dado["p"], dado["tipo"])
+	# Cada distancia conta as TRANSICOES desde o ponto indicado.
+	# Mantemos a orientacao das cenas especiais, cujas saidas sao fixas:
+	# inicio (esquerda/cima), boss1 (direita), boss2 (esquerda/cima),
+	# bloqueios (esquerda/direita), boss3 (esquerda/direita), final (esquerda).
+	salas_ate_boss1 = maxi(3, salas_ate_boss1)
+	salas_ate_boss2 = maxi(4, salas_ate_boss2)
+	salas_entre_boss2_boss3 = maxi(3, salas_entre_boss2_boss3)
+	quantidade_ramos = maxi(0, quantidade_ramos)
 
-	var trilhas: Array[Array] = [
-		[Vector2i(0, 0), Vector2i(-1, 0), Vector2i(-2, 0), Vector2i(-3, 0)],
-		[Vector2i(0, 0), Vector2i(0, -1), Vector2i(1, -1), Vector2i(2, -1), Vector2i(3, -1)],
-		[Vector2i(3, -1), Vector2i(3, -2), Vector2i(4, -2), Vector2i(5, -2), Vector2i(6, -2)]
-	]
-	for trilha in trilhas:
-		for indice in range(trilha.size() - 1):
-			_ligar(trilha[indice], trilha[indice + 1])
+	var inicio: Vector2i = Vector2i.ZERO
+	_adicionar(inicio, "inicio")
 
-	# Ramos opcionais SOMENTE de salas comuns. Nunca conectamos duas
-	# células só porque são adjacentes: todas as arestas são explícitas.
+	# TRILHA 1: oeste, saindo do inicio em direcao ao Ice Age Sid.
+	# A cena do boss1 possui apenas a saida para a direita.
+	for passo in range(1, salas_ate_boss1 + 1):
+		var posicao: Vector2i = Vector2i(-passo, 0)
+		var tipo: String = "boss1" if passo == salas_ate_boss1 else "normal"
+		_adicionar(posicao, tipo)
+		_ligar(posicao + Vector2i.RIGHT, posicao)
+
+	# TRILHA 2: sobe pelo inicio e segue a leste ate Woodbreaker.
+	# O bloqueio de pulo duplo deve ficar em trecho HORIZONTAL interior.
+	var subida: Vector2i = Vector2i(0, -1)
+	_adicionar(subida, "normal")
+	_ligar(inicio, subida)
+	var passo_pulo: int = clampi(roundi(float(salas_ate_boss2) * 0.6), 2, salas_ate_boss2 - 1)
+	for passo in range(2, salas_ate_boss2 + 1):
+		var posicao: Vector2i = Vector2i(passo - 1, -1)
+		var tipo: String = "normal"
+		if passo == salas_ate_boss2:
+			tipo = "boss2"
+		elif passo == passo_pulo:
+			tipo = "bloqueio_pulo"
+		_adicionar(posicao, tipo)
+		_ligar(posicao + Vector2i.LEFT, posicao)
+
+	# TRILHA 3: sobe a partir de Woodbreaker e segue a leste.
+	# O bloqueio do dash tambem exige entrada/saida horizontal.
+	var coluna_boss2: int = salas_ate_boss2 - 1
+	var subida_final: Vector2i = Vector2i(coluna_boss2, -2)
+	_adicionar(subida_final, "normal")
+	_ligar(Vector2i(coluna_boss2, -1), subida_final)
+	var passo_dash: int = clampi(roundi(float(salas_entre_boss2_boss3) * 0.6), 2, salas_entre_boss2_boss3 - 1)
+	for passo in range(2, salas_entre_boss2_boss3 + 1):
+		var posicao: Vector2i = Vector2i(coluna_boss2 + passo - 1, -2)
+		var tipo: String = "normal"
+		if passo == salas_entre_boss2_boss3:
+			tipo = "boss3"
+		elif passo == passo_dash:
+			tipo = "bloqueio_dash"
+		_adicionar(posicao, tipo)
+		_ligar(posicao + Vector2i.LEFT, posicao)
+
+	# O altar final permanece depois de Stonemaker.
+	var posicao_boss3: Vector2i = Vector2i(coluna_boss2 + salas_entre_boss2_boss3 - 1, -2)
+	var posicao_final: Vector2i = posicao_boss3 + Vector2i.RIGHT
+	_adicionar(posicao_final, "final")
+	_ligar(posicao_boss3, posicao_final)
+
+	# Ramos opcionais sao sempre folhas anexadas a salas normais.
+	# Nao criamos arestas automaticas entre celulas adjacentes, para
+	# evitar atalhos que contornem os bloqueios das habilidades.
+	var limite_esquerdo: int = -salas_ate_boss1 - 4
+	var limite_direito: int = posicao_final.x + 4
+	var limite_superior: int = -7
+	var limite_inferior: int = 5
 	var tentativas: int = 0
 	var criadas: int = 0
-	while criadas < quantidade_ramos and tentativas < 900:
+	var max_tentativas: int = maxi(1200, quantidade_ramos * 100)
+	while criadas < quantidade_ramos and tentativas < max_tentativas:
 		tentativas += 1
 		var candidatos: Array = salas.keys()
 		var origem: Vector2i = candidatos[gerador.randi_range(0, candidatos.size() - 1)]
@@ -142,12 +180,15 @@ func gerar(quantidade_ramos: int = 12, semente_fixa: int = 0) -> void:
 			continue
 		var delta: Vector2i = DIRECOES[gerador.randi_range(0, DIRECOES.size() - 1)]
 		var destino: Vector2i = origem + delta
-		if salas.has(destino) or destino.x < -6 or destino.x > 8 or destino.y < -5 or destino.y > 4:
+		if salas.has(destino) or destino.x < limite_esquerdo or destino.x > limite_direito or destino.y < limite_superior or destino.y > limite_inferior:
 			continue
 		_adicionar(destino, "normal")
 		_ligar(origem, destino)
 		criadas += 1
+	if criadas < quantidade_ramos:
+		push_warning("Mapa: apenas %d/%d salas extras puderam ser geradas." % [criadas, quantidade_ramos])
 
+	# Escolha de modelos manuais compatíveis com a mascara de cada celula.
 	for posicao in salas:
 		var info: Dictionary = salas[posicao]
 		var tipo: String = info["tipo"]
