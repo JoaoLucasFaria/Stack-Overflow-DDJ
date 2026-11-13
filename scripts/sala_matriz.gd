@@ -14,6 +14,7 @@ const PISO_Y: float = 600.0
 const VAO_TOPO_X: float = 514.0
 const VAO_TOPO_L: float = 124.0
 const CENA_BOSS = preload("res://scripts/boss_provisorio.gd")
+const CENA_ENCONTRO_BOSS_1 = preload("res://scripts/bosses/encontro_boss_1.gd")
 
 @export_category("Conexoes do modulo")
 @export_flags("Esquerda", "Direita", "Cima", "Baixo") var mascara_saidas: int = 0
@@ -26,6 +27,9 @@ var grapple_realizado: bool = false
 var final_ativado: bool = false
 var ponto_retorno_abismo: Vector2 = Vector2(100, 540)
 var barreira_boss_final: StaticBody2D
+## Trava fisica das saidas dos bosses. Nao afeta salas comuns.
+var saidas_boss_bloqueadas: bool = false
+var portas_boss: Array[StaticBody2D] = []
 
 
 func configurar(posicao: Vector2i, informacoes: Dictionary, alvo: Jogador, derrotados: Dictionary) -> void:
@@ -44,16 +48,80 @@ func _ready() -> void:
 	if tipo.begins_with("boss"):
 		var identificador: int = tipo.substr(4).to_int()
 		if not chefes_derrotados.has(identificador):
-			var boss: BossProvisorio = CENA_BOSS.new() as BossProvisorio
-			boss.position = _marcador("PosicaoBoss").position
-			boss.configurar(identificador, jogador)
-			boss.derrotado.connect(_ao_derrotar_boss)
-			$Conteudo.add_child(boss)
+			_fechar_portas_boss()
+			if identificador == 1:
+				var encontro: Node2D = CENA_ENCONTRO_BOSS_1.new() as Node2D
+				encontro.call("configurar", jogador, self)
+				encontro.connect("derrotado", _ao_derrotar_boss)
+				$Conteudo.add_child(encontro)
+			else:
+				var boss: BossProvisorio = CENA_BOSS.new() as BossProvisorio
+				boss.position = _marcador("PosicaoBoss").position
+				boss.configurar(identificador, jogador)
+				boss.derrotado.connect(_ao_derrotar_boss)
+				$Conteudo.add_child(boss)
 	if tipo == "boss3":
 		barreira_boss_final = get_node_or_null("Contorno/Boss3Barrier") as StaticBody2D
 		if chefes_derrotados.has(3) and is_instance_valid(barreira_boss_final):
 			barreira_boss_final.queue_free()
 
+
+
+func _fechar_portas_boss() -> void:
+	# As cenas especiais ja definem exatamente quais passagens existem.
+	# A porta surge dentro da borda, sem bloquear o spawn de entrada.
+	saidas_boss_bloqueadas = true
+	var conexoes: Dictionary = dados.get("conexoes", {})
+	for direcao in conexoes:
+		_criar_porta_boss(direcao)
+
+
+func _criar_porta_boss(direcao: Vector2i) -> void:
+	var centro: Vector2 = Vector2.ZERO
+	var tamanho: Vector2 = Vector2.ZERO
+	match direcao:
+		Vector2i.LEFT:
+			centro = Vector2(37.0, 548.0)
+			tamanho = Vector2(22.0, 104.0)
+		Vector2i.RIGHT:
+			centro = Vector2(LARGURA - 37.0, 548.0)
+			tamanho = Vector2(22.0, 104.0)
+		Vector2i.UP:
+			centro = Vector2(576.0, 42.0)
+			tamanho = Vector2(124.0, 30.0)
+		Vector2i.DOWN:
+			centro = Vector2(576.0, ALTURA - 42.0)
+			tamanho = Vector2(124.0, 30.0)
+		_:
+			return
+	var porta: StaticBody2D = StaticBody2D.new()
+	porta.name = "PortaBoss_%s" % str(direcao)
+	porta.position = centro
+	porta.collision_layer = 1
+	porta.collision_mask = 0
+	$Contorno.add_child(porta)
+	var forma: RectangleShape2D = RectangleShape2D.new()
+	forma.size = tamanho
+	var colisao: CollisionShape2D = CollisionShape2D.new()
+	colisao.shape = forma
+	porta.add_child(colisao)
+	var visual: ColorRect = ColorRect.new()
+	visual.position = -tamanho * 0.5
+	visual.size = tamanho
+	visual.color = Color(0.92, 0.22, 0.42, 0.95)
+	visual.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	porta.add_child(visual)
+	portas_boss.append(porta)
+
+
+func _abrir_portas_boss() -> void:
+	saidas_boss_bloqueadas = false
+	for porta in portas_boss:
+		if is_instance_valid(porta):
+			# Remove a colisao imediatamente, antes do queue_free.
+			porta.collision_layer = 0
+			porta.queue_free()
+	portas_boss.clear()
 
 func _marcador(nome: String) -> Marker2D:
 	return get_node("Pontos/" + nome) as Marker2D
@@ -61,7 +129,7 @@ func _marcador(nome: String) -> Marker2D:
 
 func direcao_de_passagem_confirmada(alvo: Jogador) -> Vector2i:
 	## Não usa Area2D que dispare duas vezes: cruza a borda real da sala.
-	if not is_instance_valid(alvo):
+	if not is_instance_valid(alvo) or saidas_boss_bloqueadas:
 		return Vector2i.ZERO
 	var colisao: CollisionShape2D = alvo.get_node_or_null("CollisionShape2D") as CollisionShape2D
 	if colisao == null:
@@ -126,6 +194,7 @@ func _draw() -> void:
 
 
 func _ao_derrotar_boss(identificador: int) -> void:
+	_abrir_portas_boss()
 	if identificador == 3 and is_instance_valid(barreira_boss_final):
 		barreira_boss_final.queue_free()
 	boss_derrotado.emit(identificador)

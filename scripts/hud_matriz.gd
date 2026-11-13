@@ -167,6 +167,8 @@ func atualizar(mapa: MapaMatriz, posicao: Vector2i, jogador: Jogador, derrotados
 					simbolo = "✓" if derrotados.has(numero) else str(numero)
 				elif tipo == "inicio":
 					simbolo = "S"
+				elif tipo == "breakpoint":
+					simbolo = "B"
 				elif tipo == "bloqueio_pulo":
 					simbolo = "J"
 				elif tipo == "bloqueio_dash":
@@ -177,7 +179,7 @@ func atualizar(mapa: MapaMatriz, posicao: Vector2i, jogador: Jogador, derrotados
 					simbolo = "■"
 			linha += simbolo + " "
 		linhas.append(linha)
-	rotulo_mapa.text = "\n".join(linhas) + "\n@ Você | J Pulo | D Dash | F Final"
+	rotulo_mapa.text = "\n".join(linhas) + "\n@ Você | B Breakpoint | J Pulo | D Dash | F Final"
 	# Se o mapa ultrapassar a largura visível, acompanhe o jogador.
 	# As medidas são aproximadas e o ScrollContainer limita o deslocamento.
 	rolagem_mapa.scroll_horizontal = maxi(0, (posicao.x - min_x + 1) * 14 - 190)
