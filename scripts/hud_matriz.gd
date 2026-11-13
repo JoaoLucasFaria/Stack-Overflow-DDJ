@@ -9,6 +9,7 @@ var rotulo_debug: Label
 var rotulo_mensagem: Label
 var rotulo_dica: Label
 var painel_mapa: PanelContainer
+var rolagem_mapa: ScrollContainer
 var painel_fim: PanelContainer
 var painel_debug: PanelContainer
 var mapa_visivel: bool = false
@@ -24,8 +25,8 @@ func _ready() -> void:
 	rotulo_dica.add_theme_color_override("font_color", Color("b0ebd5"))
 
 	painel_mapa = PanelContainer.new()
-	painel_mapa.position = Vector2(810, 10)
-	painel_mapa.custom_minimum_size = Vector2(325, 0)
+	painel_mapa.position = Vector2(688, 10)
+	painel_mapa.custom_minimum_size = Vector2(448, 0)
 	painel_mapa.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	painel_mapa.visible = false
 	add_child(painel_mapa)
@@ -36,12 +37,17 @@ func _ready() -> void:
 	titulo.text = "MAPA DE MEMÓRIA [M]"
 	titulo.add_theme_font_size_override("font_size", 15)
 	coluna.add_child(titulo)
+	rolagem_mapa = ScrollContainer.new()
+	rolagem_mapa.custom_minimum_size = Vector2(425, 225)
+	rolagem_mapa.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	rolagem_mapa.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	coluna.add_child(rolagem_mapa)
 	rotulo_mapa = Label.new()
-	rotulo_mapa.add_theme_font_size_override("font_size", 15)
+	rotulo_mapa.add_theme_font_size_override("font_size", 12)
 	var fonte: SystemFont = SystemFont.new()
 	fonte.font_names = PackedStringArray(["Consolas", "Liberation Mono", "monospace"])
 	rotulo_mapa.add_theme_font_override("font", fonte)
-	coluna.add_child(rotulo_mapa)
+	rolagem_mapa.add_child(rotulo_mapa)
 
 	painel_debug = PanelContainer.new()
 	painel_debug.position = Vector2(15, 94)
@@ -135,10 +141,21 @@ func atualizar(mapa: MapaMatriz, posicao: Vector2i, jogador: Jogador, derrotados
 		rotulo_debug.text = "DEBUG [F3] | Sala %s | Seed %d | Chefes %s\nSetas mover | Espaço pular | J/clique atacar | E descansar | F boss teste | O +25 STACK | R reiniciar" % [str(posicao), mapa.semente, str(derrotados.keys())]
 	if not mapa_visivel:
 		return
+	# A grade antiga era fixa (-6..8, -5..4). Um mapa maior precisa
+	# ampliar o enquadramento conforme o jogador descobre novas salas.
+	var min_x: int = posicao.x
+	var max_x: int = posicao.x
+	var min_y: int = posicao.y
+	var max_y: int = posicao.y
+	for coordenada in mapa.visitadas.keys():
+		min_x = mini(min_x, coordenada.x)
+		max_x = maxi(max_x, coordenada.x)
+		min_y = mini(min_y, coordenada.y)
+		max_y = maxi(max_y, coordenada.y)
 	var linhas: PackedStringArray = []
-	for y in range(-5, 5):
+	for y in range(min_y - 1, max_y + 2):
 		var linha: String = ""
-		for x in range(-6, 9):
+		for x in range(min_x - 1, max_x + 2):
 			var c: Vector2i = Vector2i(x, y)
 			var simbolo: String = "·"
 			if c == posicao:
@@ -161,3 +178,7 @@ func atualizar(mapa: MapaMatriz, posicao: Vector2i, jogador: Jogador, derrotados
 			linha += simbolo + " "
 		linhas.append(linha)
 	rotulo_mapa.text = "\n".join(linhas) + "\n@ Você | J Pulo | D Dash | F Final"
+	# Se o mapa ultrapassar a largura visível, acompanhe o jogador.
+	# As medidas são aproximadas e o ScrollContainer limita o deslocamento.
+	rolagem_mapa.scroll_horizontal = maxi(0, (posicao.x - min_x + 1) * 14 - 190)
+	rolagem_mapa.scroll_vertical = maxi(0, (posicao.y - min_y + 1) * 15 - 95)

@@ -8,6 +8,13 @@ extends CharacterBody2D
 @export_range(1, 10, 1) var MAX_JUMPS: int = 2
 @export var jump_release_delay: float = 0.1
 
+@export_category("Wall Slide / Wall Jump (inicial)")
+@export var velocidade_maxima_wall_slide: float = 90.0
+@export var impulso_wall_jump_x: float = 330.0
+@export var impulso_wall_jump_y: float = -470.0
+@export var trava_direcao_wall_jump: float = 0.17
+var tempo_trava_wall_jump: float = 0.0
+
 @export_category("Dano e Knockback")
 @export var duracao_iframes: float = 0.8
 @export var forca_knockback_x: float = 300.0
@@ -51,6 +58,7 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	tempo_iframes = maxf(0.0, tempo_iframes - delta)
 	tempo_knockback = maxf(0.0, tempo_knockback - delta)
+	tempo_trava_wall_jump = maxf(0.0, tempo_trava_wall_jump - delta)
 
 	# Feedback visual durante a invencibilidade
 	$ColorRect.modulate = Color(
@@ -67,6 +75,16 @@ func _physics_process(delta: float) -> void:
 	
 	var no_chao: bool = is_on_floor()
 	var direcao: float = Input.get_axis("ui_left", "ui_right")
+	# W esta mapeado em ui_up neste projeto; Espaco/Enter usam ui_accept.
+	var pediu_pulo: bool = Input.is_action_just_pressed("ui_accept")
+	var soltou_pulo: bool = Input.is_action_just_released("ui_accept")
+	var normal_parede: Vector2 = get_wall_normal() if is_on_wall() else Vector2.ZERO
+	var segurando_parede: bool = (
+		not no_chao
+		and tempo_trava_wall_jump <= 0.0
+		and absf(normal_parede.x) > 0.7
+		and direcao * normal_parede.x < -0.5
+	)
 
 	if not is_zero_approx(direcao):
 		direcao_olhar = -1 if direcao < 0.0 else 1
@@ -83,13 +101,27 @@ func _physics_process(delta: float) -> void:
 	else:
 		jumps_remaining = quantidade_pulos_disponiveis()
 
-	if Input.is_action_just_pressed("ui_accept") and jumps_remaining > 0:
+	# Deslizamento: apenas enquanto cai e pressiona contra uma parede.
+	if segurando_parede and velocity.y > velocidade_maxima_wall_slide:
+		velocity.y = velocidade_maxima_wall_slide
+
+	# Wall Jump: nao consome os pulos aereos, sempre disponivel desde o inicio.
+	if pediu_pulo and segurando_parede:
+		velocity.x = normal_parede.x * impulso_wall_jump_x
+		velocity.y = impulso_wall_jump_y
+		tempo_trava_wall_jump = trava_direcao_wall_jump
+		jump_released = false
+		jump_release_timer = 0.0
+		move_and_slide()
+		return
+
+	if pediu_pulo and jumps_remaining > 0:
 		velocity.y = JUMP_VELOCITY
 		jumps_remaining -= 1
 		jump_released = false
 		jump_release_timer = 0.0
 
-	if Input.is_action_just_released("ui_accept") and velocity.y < 0.0:
+	if soltou_pulo and velocity.y < 0.0:
 		jump_released = true
 		jump_release_timer = jump_release_delay
 
@@ -100,11 +132,13 @@ func _physics_process(delta: float) -> void:
 			velocity.y = 0.0 if velocity.y < 0.0 else velocity.y
 			jump_released = false
 
-	if not is_zero_approx(direcao):
-		velocity.x = direcao * SPEED
-	else:
-		# Preserva a desaceleração do protótipo original.
-		velocity.x = move_toward(velocity.x, 0.0, SPEED)
+	# Durante alguns milissegundos o impulso horizontal do Wall Jump tem prioridade.
+	if tempo_trava_wall_jump <= 0.0:
+		if not is_zero_approx(direcao):
+			velocity.x = direcao * SPEED
+		else:
+			# Preserva a desaceleração do protótipo original.
+			velocity.x = move_toward(velocity.x, 0.0, SPEED)
 
 	move_and_slide()
 
@@ -137,9 +171,10 @@ func receber_dano(dano: int, origem_dano: Vector2 = Vector2.ZERO) -> void:
 	vida_atual = maxi(vida_atual - dano, 0)
 	vida_alterada.emit(vida_atual, vida_maxima)
 
-	# Ativa invencibilidade e knockback
+	# Ativa invencibilidade e knockback (interrompe a escalada).
 	tempo_iframes = duracao_iframes
 	tempo_knockback = duracao_knockback
+	tempo_trava_wall_jump = 0.0
 
 	# Empurra o jogador para longe da origem do dano
 	var lado: float = -float(direcao_olhar)
@@ -165,6 +200,7 @@ func preparar_para_nova_sala() -> void:
 	jumps_remaining = quantidade_pulos_disponiveis()
 	jump_release_timer = 0.0
 	jump_released = false
+	tempo_trava_wall_jump = 0.0
 	dash_component.cancelar_dash()
 
 

@@ -29,6 +29,8 @@ var tempo_aviso: float = 0.0
 var preparando_ataque: bool = false
 var encerrado: bool = false
 var tempo_flash: float = 0.0
+## Usado por inimigos fixos (ex.: torretas); nao altera os terrestres.
+var fixo_no_cenario: bool = false
 
 @onready var visual: ColorRect = $Visual
 @onready var rotulo: Label = $Nome
@@ -57,7 +59,9 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if encerrado:
 		return
-	if not is_on_floor():
+	if fixo_no_cenario:
+		velocity = Vector2.ZERO
+	elif not is_on_floor():
 		velocity += get_gravity() * delta
 	else:
 		velocity.y = 0.0
@@ -71,7 +75,8 @@ func _physics_process(delta: float) -> void:
 			_executar_ataque()
 	else:
 		_pensar(delta)
-	move_and_slide()
+	if not fixo_no_cenario:
+		move_and_slide()
 	visual.modulate = Color(1.0, 0.65, 0.65) if tempo_flash > 0.0 else (Color(1.0, 0.85, 0.55) if preparando_ataque else Color.WHITE)
 
 

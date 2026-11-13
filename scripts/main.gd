@@ -14,7 +14,10 @@ const CENAS_INIMIGOS: Dictionary = {
 }
 
 @export_category("Matriz procedural")
-@export_range(0, 40, 1) var quantidade_salas_extras: int = 12
+@export_range(3, 15, 1) var salas_ate_boss1: int = 7
+@export_range(4, 18, 1) var salas_ate_boss2: int = 11
+@export_range(3, 15, 1) var salas_entre_boss2_boss3: int = 7
+@export_range(0, 50, 1) var quantidade_salas_extras: int = 23
 ## Semente zero cria um mapa diferente a cada partida.
 @export var semente_fixa: int = 0
 
@@ -26,6 +29,8 @@ var hud: HUDMatriz
 var chefes_derrotados: Dictionary = {}
 ## Coordenada -> {nome do Marker2D: true}. Persistem até descansar no BREAKPOINT.
 var inimigos_derrotados: Dictionary = {}
+## Coordenada -> {nome do marcador: tipo sorteado}. Mantem a escolha ate descansar.
+var tipos_inimigos_sorteados: Dictionary = {}
 var mensagem: String = ""
 var tempo_mensagem: float = 0.0
 var em_transicao: bool = false
@@ -40,7 +45,13 @@ var partida_terminou: bool = false
 
 func _ready() -> void:
 	mapa = CENA_MAPA.new() as MapaMatriz
-	mapa.gerar(quantidade_salas_extras, semente_fixa)
+	mapa.gerar(
+		quantidade_salas_extras,
+		semente_fixa,
+		salas_ate_boss1,
+		salas_ate_boss2,
+		salas_entre_boss2_boss3
+	)
 	jogador = CENA_JOGADOR.instantiate() as Jogador
 	add_child(jogador)
 	jogador.pulo_duplo_liberado = false
@@ -242,13 +253,18 @@ func _povoar_sala() -> void:
 	if grupo == null:
 		return
 	var mortos: Dictionary = inimigos_derrotados.get(coordenada_atual, {})
+	var escolhas: Dictionary = tipos_inimigos_sorteados.get(coordenada_atual, {})
 	for ponto in grupo.get_children():
 		var marcador: PontoSpawnInimigo = ponto as PontoSpawnInimigo
 		if marcador == null or mortos.has(marcador.name):
 			continue
-		var cena: PackedScene = CENAS_INIMIGOS.get(marcador.tipo_inimigo) as PackedScene
+		var tipo_escolhido: String = String(escolhas.get(marcador.name, ""))
+		if tipo_escolhido.is_empty():
+			tipo_escolhido = marcador.sortear_tipo()
+			escolhas[marcador.name] = tipo_escolhido
+		var cena: PackedScene = CENAS_INIMIGOS.get(tipo_escolhido) as PackedScene
 		if cena == null:
-			push_warning("Tipo de inimigo desconhecido: " + marcador.tipo_inimigo)
+			push_warning("Tipo de inimigo desconhecido: " + tipo_escolhido)
 			continue
 		var inimigo: InimigoBase = cena.instantiate() as InimigoBase
 		inimigo.configurar(jogador)
@@ -258,6 +274,7 @@ func _povoar_sala() -> void:
 		sala_atual.get_node("Conteudo").add_child(inimigo)
 		inimigo.global_position = marcador.global_position
 		inimigo.derrotado.connect(_ao_inimigo_derrotado.bind(coordenada_atual, String(marcador.name)))
+	tipos_inimigos_sorteados[coordenada_atual] = escolhas
 
 
 func _ao_inimigo_derrotado(posicao: Vector2, item_id: StringName, caiu: bool, sala: Vector2i, id_spawn: String) -> void:
@@ -294,6 +311,7 @@ func _ao_descansar() -> void:
 	jogador.descansar()
 	# Reaparecem nas salas ao retornar; chefes derrotados não reaparecem.
 	inimigos_derrotados.clear()
+	tipos_inimigos_sorteados.clear()
 	if sala_atual != null:
 		for inimigo in get_tree().get_nodes_in_group("inimigos"):
 			if sala_atual.is_ancestor_of(inimigo):
