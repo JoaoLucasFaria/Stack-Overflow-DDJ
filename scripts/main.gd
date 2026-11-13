@@ -18,6 +18,9 @@ const CENAS_INIMIGOS: Dictionary = {
 @export_range(4, 18, 1) var salas_ate_boss2: int = 11
 @export_range(3, 15, 1) var salas_entre_boss2_boss3: int = 7
 @export_range(0, 50, 1) var quantidade_salas_extras: int = 23
+@export_category("BREAKPOINTS")
+@export_range(0, 12, 1) var breakpoints_adicionais: int = 4
+@export_range(2, 15, 1) var distancia_minima_breakpoints: int = 5
 ## Semente zero cria um mapa diferente a cada partida.
 @export var semente_fixa: int = 0
 
@@ -31,6 +34,8 @@ var chefes_derrotados: Dictionary = {}
 var inimigos_derrotados: Dictionary = {}
 ## Coordenada -> {nome do marcador: tipo sorteado}. Mantem a escolha ate descansar.
 var tipos_inimigos_sorteados: Dictionary = {}
+## Coordenada -> {nome do marcador: estado do Memory Leak}. Limpo no BREAKPOINT.
+var estados_inimigos: Dictionary = {}
 var mensagem: String = ""
 var tempo_mensagem: float = 0.0
 var em_transicao: bool = false
@@ -50,7 +55,9 @@ func _ready() -> void:
 		semente_fixa,
 		salas_ate_boss1,
 		salas_ate_boss2,
-		salas_entre_boss2_boss3
+		salas_entre_boss2_boss3,
+		breakpoints_adicionais,
+		distancia_minima_breakpoints
 	)
 	jogador = CENA_JOGADOR.instantiate() as Jogador
 	add_child(jogador)
@@ -61,7 +68,7 @@ func _ready() -> void:
 	hud = CENA_HUD.new() as HUDMatriz
 	add_child(hud)
 	_entrar_sala(Vector2i.ZERO, Vector2i.ZERO)
-	_aviso("Encontre Ice Age Sid. Explore atravessando as passagens.", 3.8)
+	_aviso("Encontre o Guardiao 1. Explore atravessando as passagens.", 3.8)
 
 
 func _process(delta: float) -> void:
@@ -130,7 +137,10 @@ func _atualizar_dica() -> void:
 	elif tipo.begins_with("boss"):
 		var numero: int = tipo.substr(4).to_int()
 		if not chefes_derrotados.has(numero):
-			hud.definir_dica("Guardião provisório: ataque com J ou clique (F ainda funciona).")
+			if numero == 1:
+				hud.definir_dica("Guardiao 1: escale, acerte o nucleo 3 vezes e ataque o corpo!")
+			else:
+				hud.definir_dica("Guardiao provisorio: ataque com J ou clique (F ainda funciona).")
 		else:
 			hud.definir_dica("")
 	else:
@@ -141,6 +151,10 @@ func _ao_atravessar_saida(direcao: Vector2i) -> void:
 	if em_transicao or partida_terminou or sala_atual == null:
 		return
 	if not is_instance_valid(jogador):
+		return
+	# Trava logica adicional: mesmo se atravessar a colisao da porta, nao
+	# permite abandonar a batalha antes de derrotar o guardiao.
+	if sala_atual.saidas_boss_bloqueadas:
 		return
 	var destino: Vector2i = mapa.vizinho(coordenada_atual, direcao)
 	if destino == coordenada_atual:
@@ -180,6 +194,9 @@ func _entrar_sala(destino: Vector2i, direcao: Vector2i) -> void:
 		em_transicao = false
 		return
 	var nova: SalaMatriz = recurso.instantiate() as SalaMatriz
+	# Sala especial unica: a geometria das bordas se adapta a mascara sorteada.
+	if nova != null and String(info.get("tipo", "")) == "breakpoint":
+		nova.mascara_saidas = int(info.get("mascara", 0))
 	if nova == null or nova.mascara_saidas != int(info.get("mascara", 0)):
 		push_error("Cena incompatível com a matriz: " + caminho)
 		if nova != null:
@@ -188,6 +205,7 @@ func _entrar_sala(destino: Vector2i, direcao: Vector2i) -> void:
 		return
 	nova.configurar(destino, info, jogador, chefes_derrotados)
 	if sala_atual != null:
+		_salvar_estado_inimigos_da_sala()
 		remove_child(sala_atual)
 		sala_atual.queue_free()
 	sala_atual = nova
@@ -215,7 +233,7 @@ func _ao_derrotar_boss(identificador: int) -> void:
 	match identificador:
 		1:
 			jogador.desbloquear_pulo_duplo()
-			_aviso("ICE AGE SID derrotado: pulo duplo liberado!", 5.0)
+			_aviso("GUARDIAO 1 derrotado: pulo duplo liberado!", 5.0)
 		2:
 			jogador.desbloquear_dash()
 			_aviso("WOODBREAKER derrotado: malloc() / dash liberado!", 5.0)
@@ -245,6 +263,25 @@ func _aviso(texto: String, segundos: float) -> void:
 	tempo_mensagem = segundos
 
 
+func _salvar_estado_inimigos_da_sala() -> void:
+	if sala_atual == null:
+		return
+	var estados_sala: Dictionary = estados_inimigos.get(coordenada_atual, {})
+	for inimigo in get_tree().get_nodes_in_group("inimigos"):
+		if not is_instance_valid(inimigo) or inimigo.is_queued_for_deletion():
+			continue
+		if not sala_atual.is_ancestor_of(inimigo):
+			continue
+		if not inimigo.has_method("exportar_estado_persistente"):
+			continue
+		var id_spawn: String = String(inimigo.get_meta("id_spawn", ""))
+		if id_spawn.is_empty():
+			continue
+		estados_sala[id_spawn] = inimigo.call("exportar_estado_persistente")
+	if not estados_sala.is_empty():
+		estados_inimigos[coordenada_atual] = estados_sala
+
+
 func _povoar_sala() -> void:
 	## Somente marcadores manuais das cenas participam do spawn.
 	if sala_atual == null:
@@ -254,6 +291,7 @@ func _povoar_sala() -> void:
 		return
 	var mortos: Dictionary = inimigos_derrotados.get(coordenada_atual, {})
 	var escolhas: Dictionary = tipos_inimigos_sorteados.get(coordenada_atual, {})
+	var estados_sala: Dictionary = estados_inimigos.get(coordenada_atual, {})
 	for ponto in grupo.get_children():
 		var marcador: PontoSpawnInimigo = ponto as PontoSpawnInimigo
 		if marcador == null or mortos.has(marcador.name):
@@ -268,12 +306,16 @@ func _povoar_sala() -> void:
 			continue
 		var inimigo: InimigoBase = cena.instantiate() as InimigoBase
 		inimigo.configurar(jogador)
+		var id_spawn: String = String(marcador.name)
+		inimigo.set_meta("id_spawn", id_spawn)
 		inimigo.position = marcador.position
 		# O ponto é filho de Conteudo/SpawnsInimigos (ambos sem deslocamento).
 		# Adicioná-lo sob o mesmo Conteudo preserva a posição local do módulo.
 		sala_atual.get_node("Conteudo").add_child(inimigo)
 		inimigo.global_position = marcador.global_position
-		inimigo.derrotado.connect(_ao_inimigo_derrotado.bind(coordenada_atual, String(marcador.name)))
+		if estados_sala.has(id_spawn) and inimigo.has_method("restaurar_estado_persistente"):
+			inimigo.call("restaurar_estado_persistente", estados_sala[id_spawn])
+		inimigo.derrotado.connect(_ao_inimigo_derrotado.bind(coordenada_atual, id_spawn))
 	tipos_inimigos_sorteados[coordenada_atual] = escolhas
 
 
@@ -281,6 +323,12 @@ func _ao_inimigo_derrotado(posicao: Vector2, item_id: StringName, caiu: bool, sa
 	var mortos: Dictionary = inimigos_derrotados.get(sala, {})
 	mortos[id_spawn] = true
 	inimigos_derrotados[sala] = mortos
+	var estados_sala: Dictionary = estados_inimigos.get(sala, {})
+	estados_sala.erase(id_spawn)
+	if not estados_sala.is_empty():
+		estados_inimigos[sala] = estados_sala
+	else:
+		estados_inimigos.erase(sala)
 	if not caiu or sala != coordenada_atual or sala_atual == null:
 		return
 	var recompensa: Area2D = CENA_DROP.instantiate() as Area2D
@@ -312,6 +360,7 @@ func _ao_descansar() -> void:
 	# Reaparecem nas salas ao retornar; chefes derrotados não reaparecem.
 	inimigos_derrotados.clear()
 	tipos_inimigos_sorteados.clear()
+	estados_inimigos.clear()
 	if sala_atual != null:
 		for inimigo in get_tree().get_nodes_in_group("inimigos"):
 			if sala_atual.is_ancestor_of(inimigo):

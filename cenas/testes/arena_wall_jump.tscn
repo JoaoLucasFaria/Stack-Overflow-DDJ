@@ -1,6 +1,6 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=4 format=3 uid="uid://b2rk27qryaa0o"]
 
-[ext_resource type="Script" path="res://scripts/teste_wall_jump.gd" id="1_teste"]
+[ext_resource type="Script" uid="uid://c2soyr4jyo20x" path="res://scripts/teste_wall_jump.gd" id="1_teste"]
 
 [sub_resource type="RectangleShape2D" id="piso_shape"]
 size = Vector2(1152, 48)
