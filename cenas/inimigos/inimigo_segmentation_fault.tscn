@@ -12,6 +12,7 @@ item_id = &"segmentation_fault"
 nome_visivel = "Segmentation Fault"
 velocidade = 0.0
 alcance_ataque = 50.0
+intervalo_ataque = 0.85
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("shape_enemy")

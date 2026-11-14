@@ -7,7 +7,9 @@ const CENA_PROJETIL: PackedScene = preload("res://cenas/inimigos/projetil_corrom
 @export_category("Torreta de Parede")
 @export_range(20.0, 120.0, 1.0) var alcance_fixacao: float = 64.0
 @export_range(1.0, 20.0, 1.0) var afastamento_parede: float = 3.0
-@export_range(50.0, 1200.0, 10.0) var alcance_disparo: float = 520.0
+## Zero = alcance ilimitado dentro da sala atual. A linha de tiro continua
+## bloqueada por paredes/plataformas e pela face da parede de fixacao.
+@export_range(5000.0, 5000.0, 5000.0) var alcance_disparo: float = 0.0
 
 const MEIA_LARGURA: float = 15.0
 const RAIO_PROJETIL: float = 8.0
@@ -57,7 +59,7 @@ func _fixar_na_parede() -> void:
 
 func _pensar(_delta: float) -> void:
 	velocity = Vector2.ZERO
-	if _alvo_visivel(alcance_disparo) and tempo_ate_ataque <= 0.0:
+	if _alvo_visivel() and tempo_ate_ataque <= 0.0:
 		_iniciar_ataque()
 
 
@@ -71,8 +73,10 @@ func _origem_projetil() -> Vector2:
 	return global_position + saida * (MEIA_LARGURA + RAIO_PROJETIL + afastamento_parede + 2.0)
 
 
-func _alvo_visivel(distancia: float) -> bool:
-	if not _alvo_proximo(distancia):
+func _alvo_visivel() -> bool:
+	if not is_instance_valid(jogador) or jogador.vida_atual <= 0:
+		return false
+	if alcance_disparo > 0.0 and not _alvo_proximo(alcance_disparo):
 		return false
 	var origem_tiro: Vector2 = _origem_projetil()
 	# O centro do jogador, nao a origem do Node2D no canto superior esquerdo.
@@ -91,7 +95,7 @@ func _alvo_visivel(distancia: float) -> bool:
 
 
 func _executar_ataque() -> void:
-	if not _alvo_visivel(alcance_disparo + 60.0):
+	if not _alvo_visivel():
 		return
 	var tiro: Area2D = CENA_PROJETIL.instantiate() as Area2D
 	get_parent().add_child(tiro)
@@ -99,6 +103,13 @@ func _executar_ataque() -> void:
 	if tiro.has_method("configurar"):
 		var destino: Vector2 = jogador.global_position + Vector2(20.0, 20.0)
 		tiro.call("configurar", (destino - tiro.global_position).normalized(), dano)
+		if alcance_disparo <= 0.0:
+			# O projetil comum durava 3,5s (aprox. 857 px): poderia sumir
+			# antes de cruzar uma sala completa. Ajusta apenas os tiros
+			# das torretas comuns com alcance ilimitado.
+			var velocidade_tiro: float = maxf(1.0, float(tiro.get("velocidade")))
+			var tempo_necessario: float = tiro.global_position.distance_to(destino) / velocidade_tiro + 0.6
+			tiro.set("duracao", maxf(float(tiro.get("duracao")), tempo_necessario))
 
 
 func _alvo_proximo(distancia: float) -> bool:
