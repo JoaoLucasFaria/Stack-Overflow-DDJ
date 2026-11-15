@@ -1,0 +1,79 @@
+[gd_scene load_steps=3 format=3 uid="uid://d1yk1r4tgdpus"]
+
+[ext_resource type="Script" uid="uid://lxh876puaye1" path="res://scripts/bosses/stonemaker.gd" id="1_stonemaker"]
+
+[sub_resource type="RectangleShape2D" id="FormaCorpo"]
+size = Vector2(66, 112)
+
+[node name="Stonemaker" type="StaticBody2D"]
+script = ExtResource("1_stonemaker")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -56)
+shape = SubResource("FormaCorpo")
+
+[node name="AreaDanoContato" type="Area2D" parent="."]
+collision_layer = 0
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaDanoContato"]
+position = Vector2(0, -56)
+shape = SubResource("FormaCorpo")
+
+[node name="CorpoVisual" type="ColorRect" parent="."]
+offset_left = -33.0
+offset_top = -112.0
+offset_right = 33.0
+mouse_filter = 2
+color = Color(0.64, 0.55, 0.3, 1)
+
+[node name="Elmo" type="ColorRect" parent="CorpoVisual"]
+layout_mode = 0
+offset_left = 7.0
+offset_top = 9.0
+offset_right = 59.0
+offset_bottom = 28.0
+mouse_filter = 2
+color = Color(0.24, 0.31, 0.38, 1)
+
+[node name="Visor" type="ColorRect" parent="CorpoVisual"]
+layout_mode = 0
+offset_left = 15.0
+offset_top = 20.0
+offset_right = 53.0
+offset_bottom = 26.0
+mouse_filter = 2
+color = Color(0.44, 0.91, 0.99, 1)
+
+[node name="PlacasArmadura" type="ColorRect" parent="CorpoVisual"]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 42.0
+offset_right = 62.0
+offset_bottom = 62.0
+mouse_filter = 2
+color = Color(0.27, 0.35, 0.42, 1)
+
+[node name="Lanca" type="Node2D" parent="."]
+
+[node name="Cabo" type="ColorRect" parent="Lanca"]
+offset_left = 43.0
+offset_top = -106.0
+offset_right = 54.0
+offset_bottom = -2.0
+mouse_filter = 2
+color = Color(0.6, 0.69, 0.73, 1)
+
+[node name="Ponta" type="Polygon2D" parent="Lanca"]
+position = Vector2(-125, -23)
+color = Color(0.68, 0.97, 1, 1)
+polygon = PackedVector2Array(162, -83, 174, -106, 186, -83)
+
+[node name="Rotulo" type="Label" parent="."]
+offset_left = -113.0
+offset_top = -146.0
+offset_right = 113.0
+offset_bottom = -124.0
+theme_override_font_sizes/font_size = 12
+text = "STONEMAKER"
+horizontal_alignment = 1
