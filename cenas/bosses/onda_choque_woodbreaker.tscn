@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/bosses/onda_choque_woodbreaker.gd" id="1_onda"]
+
+[node name="OndaChoqueWoodbreaker" type="Area2D"]
+script = ExtResource("1_onda")

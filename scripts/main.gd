@@ -75,6 +75,8 @@ func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("reiniciar_partida"):
 		get_tree().reload_current_scene()
 		return
+	if partida_terminou or not is_instance_valid(jogador):
+		return
 	if Input.is_action_just_pressed("alternar_mapa"):
 		hud.alternar_mapa()
 	if Input.is_action_just_pressed("alternar_debug"):
@@ -139,8 +141,10 @@ func _atualizar_dica() -> void:
 		if not chefes_derrotados.has(numero):
 			if numero == 1:
 				hud.definir_dica("Guardiao 1: escale, acerte o nucleo 3 vezes e ataque o corpo!")
+			elif numero == 2:
+				hud.definir_dica("WOODBREAKER: desvie dos impactos usando o pulo duplo!")
 			else:
-				hud.definir_dica("Guardiao provisorio: ataque com J ou clique (F ainda funciona).")
+				hud.definir_dica("STONEMAKER: use o dash no sentido contrario a investida para causar um Dash Clash!")
 		else:
 			hud.definir_dica("")
 	else:

@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/bosses/lanca_energia_stonemaker.gd" id="1_lanca"]
+
+[sub_resource type="RectangleShape2D" id="FormaLanca"]
+size = Vector2(65, 16)
+
+[node name="LancaEnergia" type="Area2D"]
+script = ExtResource("1_lanca")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("FormaLanca")
+
+[node name="Brilho" type="ColorRect" parent="."]
+offset_left = -34.0
+offset_top = -9.0
+offset_right = 34.0
+offset_bottom = 9.0
+color = Color(0.25, 0.87, 0.99, 0.74)
+mouse_filter = 2
+
+[node name="Ponta" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(30, -13, 52, 0, 30, 13)
+color = Color(0.81, 1, 1, 1)

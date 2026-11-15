@@ -1,0 +1,91 @@
+[gd_scene load_steps=3 format=3 uid="uid://6w2pwhpd4g03"]
+
+[ext_resource type="Script" uid="uid://bx0avtqysmkb4" path="res://scripts/bosses/woodbreaker.gd" id="1_wood"]
+
+[sub_resource type="RectangleShape2D" id="Shape2D_wood"]
+size = Vector2(116, 154)
+
+[node name="Woodbreaker" type="StaticBody2D"]
+script = ExtResource("1_wood")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -77)
+shape = SubResource("Shape2D_wood")
+
+[node name="AreaDanoContato" type="Area2D" parent="."]
+collision_layer = 0
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaDanoContato"]
+position = Vector2(0, -77)
+shape = SubResource("Shape2D_wood")
+
+[node name="Visual" type="ColorRect" parent="."]
+offset_left = -58.0
+offset_top = -154.0
+offset_right = 58.0
+mouse_filter = 2
+color = Color(0.44, 0.35, 0.41, 1)
+
+[node name="Capacete" type="ColorRect" parent="Visual"]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 8.0
+offset_right = 103.0
+offset_bottom = 39.0
+mouse_filter = 2
+color = Color(0.24, 0.27, 0.33, 1)
+
+[node name="Olhos" type="ColorRect" parent="Visual"]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 26.0
+offset_right = 86.0
+offset_bottom = 32.0
+mouse_filter = 2
+color = Color(0.95, 0.28, 0.2, 1)
+
+[node name="Armadura" type="ColorRect" parent="Visual"]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 65.0
+offset_right = 108.0
+offset_bottom = 85.0
+mouse_filter = 2
+color = Color(0.27, 0.32, 0.4, 1)
+
+[node name="Martelo" type="Node2D" parent="."]
+
+[node name="Cabo" type="ColorRect" parent="Martelo"]
+offset_left = 75.0
+offset_top = -124.0
+offset_right = 90.0
+offset_bottom = -16.0
+mouse_filter = 2
+color = Color(0.57, 0.42, 0.28, 1)
+
+[node name="Cabeca" type="ColorRect" parent="Martelo"]
+offset_left = 54.0
+offset_top = -155.0
+offset_right = 111.0
+offset_bottom = -104.0
+mouse_filter = 2
+color = Color(0.67, 0.67, 0.73, 1)
+
+[node name="Fissura" type="ColorRect" parent="Martelo/Cabeca"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 4.0
+offset_right = 29.0
+offset_bottom = 43.0
+mouse_filter = 2
+color = Color(0.96, 0.25, 0.24, 1)
+
+[node name="Rotulo" type="Label" parent="."]
+offset_left = -120.0
+offset_top = -194.0
+offset_right = 120.0
+offset_bottom = -170.0
+theme_override_font_sizes/font_size = 12
+text = "WOODBREAKER"
+horizontal_alignment = 1

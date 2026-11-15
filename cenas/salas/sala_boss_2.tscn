@@ -238,4 +238,4 @@ color = Color(0.28, 0.76, 0.71, 1)
 mouse_filter = 2
 
 [node name="PosicaoBoss" type="Marker2D" parent="Pontos"]
-position = Vector2(575, 600)
+position = Vector2(825, 600)

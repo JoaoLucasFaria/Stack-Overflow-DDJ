@@ -15,6 +15,8 @@ const VAO_TOPO_X: float = 514.0
 const VAO_TOPO_L: float = 124.0
 const CENA_BOSS = preload("res://scripts/boss_provisorio.gd")
 const CENA_ENCONTRO_BOSS_1 = preload("res://scripts/bosses/encontro_boss_1.gd")
+const CENA_ENCONTRO_BOSS_2 = preload("res://scripts/bosses/encontro_boss_2.gd")
+const CENA_ENCONTRO_BOSS_3 = preload("res://scripts/bosses/encontro_boss_3.gd")
 
 @export_category("Conexoes do modulo")
 @export_flags("Esquerda", "Direita", "Cima", "Baixo") var mascara_saidas: int = 0
@@ -26,7 +28,6 @@ var chefes_derrotados: Dictionary = {}
 var grapple_realizado: bool = false
 var final_ativado: bool = false
 var ponto_retorno_abismo: Vector2 = Vector2(100, 540)
-var barreira_boss_final: StaticBody2D
 ## Trava fisica das saidas dos bosses. Nao afeta salas comuns.
 var saidas_boss_bloqueadas: bool = false
 var portas_boss: Array[StaticBody2D] = []
@@ -47,6 +48,10 @@ func _ready() -> void:
 	var tipo: String = dados.get("tipo", "normal")
 	if tipo.begins_with("boss"):
 		var identificador: int = tipo.substr(4).to_int()
+		if identificador == 2 or identificador == 3:
+			# Arenas livres durante a luta. As plataformas da cena
+			# voltam depois da derrota, preservando o layout editavel.
+			_configurar_plataformas_de_arena(chefes_derrotados.has(identificador))
 		if not chefes_derrotados.has(identificador):
 			_fechar_portas_boss()
 			if identificador == 1:
@@ -54,17 +59,36 @@ func _ready() -> void:
 				encontro.call("configurar", jogador, self)
 				encontro.connect("derrotado", _ao_derrotar_boss)
 				$Conteudo.add_child(encontro)
-			else:
-				var boss: BossProvisorio = CENA_BOSS.new() as BossProvisorio
-				boss.position = _marcador("PosicaoBoss").position
-				boss.configurar(identificador, jogador)
-				boss.derrotado.connect(_ao_derrotar_boss)
-				$Conteudo.add_child(boss)
-	if tipo == "boss3":
-		barreira_boss_final = get_node_or_null("Contorno/Boss3Barrier") as StaticBody2D
-		if chefes_derrotados.has(3) and is_instance_valid(barreira_boss_final):
-			barreira_boss_final.queue_free()
+			elif identificador == 2:
+				var encontro: Node2D = CENA_ENCONTRO_BOSS_2.new() as Node2D
+				encontro.call("configurar", jogador, self)
+				encontro.connect("derrotado", _ao_derrotar_boss)
+				$Conteudo.add_child(encontro)
+			elif identificador == 3:
+				var encontro: Node2D = CENA_ENCONTRO_BOSS_3.new() as Node2D
+				encontro.call("configurar", jogador, self)
+				encontro.connect("derrotado", _ao_derrotar_boss)
+				$Conteudo.add_child(encontro)
 
+
+
+func _configurar_plataformas_de_arena(ativas: bool) -> void:
+	# Preserva a escada editavel na cena para o Lustosa. Durante a luta,
+	# fica invisivel e sem colisao, como na arena de testes F6.
+	var plataformas: Node2D = get_node_or_null("Plataformas") as Node2D
+	if plataformas == null:
+		return
+	plataformas.visible = ativas
+	for filho in plataformas.get_children():
+		var corpo: StaticBody2D = filho as StaticBody2D
+		if corpo == null:
+			continue
+		# Desabilita a camada imediatamente e a forma fora do passo fisico.
+		corpo.set_deferred("collision_layer", 1 if ativas else 0)
+		for neto in corpo.get_children():
+			var hitbox: CollisionShape2D = neto as CollisionShape2D
+			if hitbox != null:
+				hitbox.set_deferred("disabled", not ativas)
 
 
 func _fechar_portas_boss() -> void:
@@ -195,6 +219,6 @@ func _draw() -> void:
 
 func _ao_derrotar_boss(identificador: int) -> void:
 	_abrir_portas_boss()
-	if identificador == 3 and is_instance_valid(barreira_boss_final):
-		barreira_boss_final.queue_free()
+	if identificador == 2 or identificador == 3:
+		_configurar_plataformas_de_arena(true)
 	boss_derrotado.emit(identificador)
