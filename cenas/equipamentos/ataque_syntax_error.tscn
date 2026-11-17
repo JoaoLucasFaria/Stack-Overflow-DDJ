@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://pf4r3tnyaff6"]
+
+[ext_resource type="Script" uid="uid://c7odseyl4cvci" path="res://scripts/equipamentos/ataque_syntax_error.gd" id="1_item"]
+
+[node name="AtaqueSyntaxError" type="Node2D"]
+script = ExtResource("1_item")

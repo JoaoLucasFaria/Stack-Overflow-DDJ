@@ -1,173 +1,390 @@
 extends Node2D
 
-@export var lista_cenas: Array[String] = [
-	"res://cenas/sala_padrao.tscn",
-	"res://cenas/sala_plataforma.tscn",
-	"res://cenas/sala_queda.tscn",
-	"res://cenas/sala_topo_1.tscn",
-	"res://cenas/sala_esq_alta.tscn",
-	"res://cenas/sala_esq_alta_trapfall.tscn"
-]
+## Mundo persistente em matriz. Um único Jogador atravessa passagens físicas;
+## somente o módulo atual é instanciado. Chefes e habilidades são permanentes.
+const CENA_JOGADOR: PackedScene = preload("res://cenas/player.tscn")
+const CENA_HUD = preload("res://scripts/hud_matriz.gd")
+const CENA_MAPA = preload("res://scripts/mapa_matriz.gd")
+const CENA_DROP: PackedScene = preload("res://cenas/inimigos/drop_provisorio.tscn")
+const CENAS_INIMIGOS: Dictionary = {
+	"syntax_error": preload("res://cenas/inimigos/inimigo_syntax_error.tscn"),
+	"null_pointer": preload("res://cenas/inimigos/inimigo_null_pointer.tscn"),
+	"memory_leak": preload("res://cenas/inimigos/inimigo_memory_leak.tscn"),
+	"segmentation_fault": preload("res://cenas/inimigos/inimigo_segmentation_fault.tscn")
+}
 
-@export var cena_chefe: String = "res://cenas/sala_chefe.tscn"
-@export var limite_salas_para_chefe: int = 4
+@export_category("Matriz procedural")
+@export_range(3, 15, 1) var salas_ate_boss1: int = 7
+@export_range(4, 18, 1) var salas_ate_boss2: int = 11
+@export_range(3, 15, 1) var salas_entre_boss2_boss3: int = 7
+@export_range(0, 50, 1) var quantidade_salas_extras: int = 23
+@export_category("BREAKPOINTS")
+@export_range(0, 12, 1) var breakpoints_adicionais: int = 4
+@export_range(2, 15, 1) var distancia_minima_breakpoints: int = 5
+## Semente zero cria um mapa diferente a cada partida.
+@export var semente_fixa: int = 0
 
-var sala_atual: Node = null
-var historico_salas: Array[String] = []
-var indice_historico: int = -1
-var direcao_chegada: String = "direita"
+var mapa: MapaMatriz
+var coordenada_atual: Vector2i = Vector2i.ZERO
+var sala_atual: SalaMatriz
+var jogador: Jogador
+var hud: HUDMatriz
+var chefes_derrotados: Dictionary = {}
+## Coordenada -> {nome do Marker2D: true}. Persistem até descansar no BREAKPOINT.
+var inimigos_derrotados: Dictionary = {}
+## Coordenada -> {nome do marcador: tipo sorteado}. Mantem a escolha ate descansar.
+var tipos_inimigos_sorteados: Dictionary = {}
+## Coordenada -> {nome do marcador: estado do Memory Leak}. Limpo no BREAKPOINT.
+var estados_inimigos: Dictionary = {}
+var mensagem: String = ""
+var tempo_mensagem: float = 0.0
+var em_transicao: bool = false
+## Bloqueia uma segunda transição logo após a entrada em um módulo.
+## O disparo real exige também atravessar o limite físico da sala.
+const TEMPO_PROTECAO_ENTRADA: float = 0.30
+const MARGEM_RECUPERACAO: float = 115.0
+var protecao_entrada_restante: float = 0.0
+var posicao_segura_atual: Vector2 = Vector2(100, 540)
+var partida_terminou: bool = false
 
-# Guarda o requisito que a sala ATUAL exige para a PRÓXIMA sala
-var proxima_entrada_requerida: String = "esq_baixo" # Valor inicial padrão
 
 func _ready() -> void:
-	randomize()
-	
-	# Define obrigatoriamente a sala padrão como a primeira cena do jogo
-	var caminho_inicial = "res://cenas/sala_padrao.tscn"
-	
-	historico_salas.append(caminho_inicial)
-	indice_historico = 0
-	
-	direcao_chegada = "direita"
-	carregar_sala(caminho_inicial)
+	mapa = CENA_MAPA.new() as MapaMatriz
+	mapa.gerar(
+		quantidade_salas_extras,
+		semente_fixa,
+		salas_ate_boss1,
+		salas_ate_boss2,
+		salas_entre_boss2_boss3,
+		breakpoints_adicionais,
+		distancia_minima_breakpoints
+	)
+	jogador = CENA_JOGADOR.instantiate() as Jogador
+	add_child(jogador)
+	jogador.pulo_duplo_liberado = false
+	jogador.dash_component.dash_desbloqueado = false
+	jogador.grapple_liberado = false
+	jogador.morreu.connect(_ao_morrer)
+	jogador.overflow_estourou.connect(_ao_overflow_estourou)
+	var inventario: EquipamentosAtivos = jogador.get_node("EquipamentosAtivos") as EquipamentosAtivos
+	inventario.aviso.connect(_ao_aviso_equipamento)
+	hud = CENA_HUD.new() as HUDMatriz
+	add_child(hud)
+	_entrar_sala(Vector2i.ZERO, Vector2i.ZERO)
+	_aviso("Encontre o Guardiao 1. Explore atravessando as passagens.", 3.8)
 
-func avancar_para_nova_sala() -> void:
-	var caminho_sala = ""
-	
-	if indice_historico == historico_salas.size() - 1:
-		# Verifica se atingiu o limite para tentar o chefe
-		if historico_salas.size() >= limite_salas_para_chefe:
-			var temp_chefe = load(cena_chefe).instantiate()
-			var entrada_chefe = ""
-			
-			if temp_chefe.has_method("get_tipo_entrada"):
-				entrada_chefe = temp_chefe.get_tipo_entrada()
-			elif "tipo_entrada" in temp_chefe:
-				entrada_chefe = temp_chefe.tipo_entrada
-			
-			temp_chefe.queue_free()
-			
-			# Se encaixar perfeitamente, define o chefe
-			if proxima_entrada_requerida == entrada_chefe:
-				caminho_sala = cena_chefe
-				print("Chegou na sala do chefe com encaixe perfeito!")
+
+func _process(delta: float) -> void:
+	if Input.is_action_just_pressed("reiniciar_partida"):
+		get_tree().reload_current_scene()
+		return
+	if partida_terminou or not is_instance_valid(jogador):
+		return
+	if Input.is_action_just_pressed("alternar_mapa"):
+		hud.alternar_mapa()
+	if Input.is_action_just_pressed("alternar_debug"):
+		hud.alternar_debug()
+	# Com F3 ativo, O continua disponivel para diagnosticar a barra de STACK.
+	if hud.debug_visivel and Input.is_action_just_pressed("overflow_teste") and is_instance_valid(jogador):
+		jogador.adicionar_overflow(25.0)
+	if tempo_mensagem > 0.0:
+		tempo_mensagem -= delta
+		if tempo_mensagem <= 0.0:
+			mensagem = ""
+	_atualizar_dica()
+	hud.atualizar(mapa, coordenada_atual, jogador, chefes_derrotados, mensagem)
+
+
+func _physics_process(delta: float) -> void:
+	if partida_terminou or em_transicao or sala_atual == null or not is_instance_valid(jogador):
+		return
+	if protecao_entrada_restante > 0.0:
+		protecao_entrada_restante = maxf(0.0, protecao_entrada_restante - delta)
+		return
+
+	# ÚNICO ponto responsável pelas trocas de sala. Os gatilhos antigos
+	# detectavam sobreposição perto da porta e podiam disparar duas vezes.
+	var direcao: Vector2i = sala_atual.direcao_de_passagem_confirmada(jogador)
+	if direcao != Vector2i.ZERO:
+		_ao_atravessar_saida(direcao)
+		return
+
+	# Recuperação excepcional: se alguma física/colisão empurrar o jogador
+	# para fora do módulo sem atravessar uma saída válida, evitar softlock.
+	var colisao: CollisionShape2D = jogador.get_node_or_null("CollisionShape2D") as CollisionShape2D
+	if colisao == null:
+		return
+	var centro: Vector2 = sala_atual.to_local(colisao.global_position)
+	if centro.x < -MARGEM_RECUPERACAO or centro.x > SalaMatriz.LARGURA + MARGEM_RECUPERACAO or centro.y < -MARGEM_RECUPERACAO or centro.y > SalaMatriz.ALTURA + MARGEM_RECUPERACAO:
+		_recuperar_posicao_segura()
+
+
+func _recuperar_posicao_segura() -> void:
+	if not is_instance_valid(jogador):
+		return
+	jogador.preparar_para_nova_sala()
+	jogador.global_position = posicao_segura_atual
+	protecao_entrada_restante = TEMPO_PROTECAO_ENTRADA
+	push_warning("Jogador recuperado após sair dos limites do módulo sem conexão válida.")
+
+
+
+func _atualizar_dica() -> void:
+	if partida_terminou or sala_atual == null or not is_instance_valid(jogador):
+		hud.definir_dica("")
+		return
+	var tipo: String = sala_atual.dados.get("tipo", "normal")
+	if tipo == "final":
+		if sala_atual.grapple_realizado:
+			hud.definir_dica("Aproxime-se do altar luminoso para encerrar o loop.")
+		else:
+			hud.definir_dica("G: conecte-se ao ponto de ancoragem azul.")
+	elif tipo.begins_with("boss"):
+		var numero: int = tipo.substr(4).to_int()
+		if not chefes_derrotados.has(numero):
+			if numero == 1:
+				hud.definir_dica("Guardiao 1: escale, acerte o nucleo 3 vezes e ataque o corpo!")
+			elif numero == 2:
+				hud.definir_dica("WOODBREAKER: desvie dos impactos usando o pulo duplo!")
 			else:
-				print("Limite atingido, mas incompatível com o chefe. Gerando sala normal para continuar...")
-		
-		# Se ainda não for o chefe (ou se o chefe falhou no encaixe), escolhe uma sala normal
-		if caminho_sala == "":
-			var cenas_compativeis: Array[String] = []
-			
-			var ultima_sala = ""
-			if historico_salas.size() > 0:
-				ultima_sala = historico_salas[historico_salas.size() - 1]
-			
-			# Lê o que a sala atual estipula como "proxima_entrada"
-			if sala_atual != null:
-				if sala_atual.has_method("get_proxima_entrada"):
-					proxima_entrada_requerida = sala_atual.get_proxima_entrada()
-				elif "proxima_entrada" in sala_atual:
-					proxima_entrada_requerida = sala_atual.proxima_entrada
-			
-			print("--------------------------------------------------")
-			print("Próxima entrada exigida pela sala atual: ", proxima_entrada_requerida)
-			
-			# Percorre todas as cenas para verificar a compatibilidade
-			for caminho in lista_cenas:
-				if caminho == ultima_sala:
-					print("-> Ignorada (é a última sala): ", caminho)
-					continue
-				
-				var temp_cena = load(caminho).instantiate()
-				var aceita: bool = true
-				var tipo_entrada_candidata = ""
-				
-				if temp_cena.has_method("get_tipo_entrada"):
-					tipo_entrada_candidata = temp_cena.get_tipo_entrada()
-				elif "tipo_entrada" in temp_cena:
-					tipo_entrada_candidata = temp_cena.tipo_entrada
-				
-				print("Testando sala: ", caminho, " | Tem Entrada: [", tipo_entrada_candidata, "] vs Exigido: [", proxima_entrada_requerida, "]")
-				
-				if tipo_entrada_candidata != "":
-					if tipo_entrada_candidata != proxima_entrada_requerida:
-						aceita = false
-				else:
-					aceita = false
-				
-				temp_cena.queue_free()
-				
-				if aceita:
-					print("   -> ACEITE! Adicionada aos compatíveis.")
-					cenas_compativeis.append(caminho)
-				else:
-					print("   -> REJEITADA por incompatibilidade.")
-			
-			print("Cenas compatíveis encontradas: ", cenas_compativeis)
-			
-			# Fallback caso nenhuma sala cumpra a regra estrita
-			if cenas_compativeis.size() == 0:
-				print("AVISO: Nenhuma sala compatível encontrada! Usando fallback.")
-				for caminho in lista_cenas:
-					if caminho != ultima_sala:
-						cenas_compativeis.append(caminho)
-			
-			var indice_aleatorio_escolha = randi() % cenas_compativeis.size()
-			caminho_sala = cenas_compativeis[indice_aleatorio_escolha]
-			print(">>> SALA ESCOLHIDA PARA AVANÇAR: ", caminho_sala)
-			print("--------------------------------------------------")
-			
-		historico_salas.append(caminho_sala)
-		indice_historico += 1
+				hud.definir_dica("STONEMAKER: use o dash no sentido contrario a investida para causar um Dash Clash!")
+		else:
+			hud.definir_dica("")
 	else:
-		indice_historico += 1
-		caminho_sala = historico_salas[indice_historico]
-		
-	direcao_chegada = "direita"
-	carregar_sala(caminho_sala)
+		hud.definir_dica("")
 
 
-func voltar_para_sala_anterior() -> void:
-	if indice_historico > 0:
-		indice_historico -= 1
-		var caminho_sala = historico_salas[indice_historico]
-		direcao_chegada = "esquerda"
-		carregar_sala(caminho_sala)
-		print("Voltando para a sala anterior: ", caminho_sala)
-	else:
-		print("Você está na primeira sala da masmorra, não dá para voltar mais!")
+func _ao_atravessar_saida(direcao: Vector2i) -> void:
+	if em_transicao or partida_terminou or sala_atual == null:
+		return
+	if not is_instance_valid(jogador):
+		return
+	# Trava logica adicional: mesmo se atravessar a colisao da porta, nao
+	# permite abandonar a batalha antes de derrotar o guardiao.
+	if sala_atual.saidas_boss_bloqueadas:
+		return
+	var destino: Vector2i = mapa.vizinho(coordenada_atual, direcao)
+	if destino == coordenada_atual:
+		return
+	if not mapa.pode_atravessar(
+		coordenada_atual, destino,
+		jogador.pulo_duplo_liberado,
+		jogador.dash_component.dash_desbloqueado,
+		jogador.grapple_liberado
+	):
+		# Requisitos lógicos são proteção extra; a geometria deve continuar
+		# sendo o bloqueio principal. Reposicione antes da borda para não travar.
+		_aviso("Caminho ainda inacessível.", 2.0)
+		jogador.preparar_para_nova_sala()
+		jogador.global_position = sala_atual.spawn_para_entrada(-direcao)
+		posicao_segura_atual = jogador.global_position
+		protecao_entrada_restante = TEMPO_PROTECAO_ENTRADA
+		return
+	em_transicao = true
+	# A troca acontece após o frame físico, evitando remover colisões no meio da simulação.
+	call_deferred("_entrar_sala", destino, direcao)
 
-func carregar_sala(caminho: String) -> void:
+
+func _entrar_sala(destino: Vector2i, direcao: Vector2i) -> void:
+	if not is_instance_valid(jogador):
+		em_transicao = false
+		return
+	var info: Dictionary = mapa.obter(destino)
+	if info.is_empty():
+		push_error("A coordenada não tem sala no mapa: " + str(destino))
+		em_transicao = false
+		return
+	var caminho: String = info.get("modelo", "")
+	var recurso: PackedScene = load(caminho) as PackedScene
+	if recurso == null:
+		push_error("Sala manual não encontrada: " + caminho)
+		em_transicao = false
+		return
+	var nova: SalaMatriz = recurso.instantiate() as SalaMatriz
+	# Sala especial unica: a geometria das bordas se adapta a mascara sorteada.
+	if nova != null and String(info.get("tipo", "")) == "breakpoint":
+		nova.mascara_saidas = int(info.get("mascara", 0))
+	if nova == null or nova.mascara_saidas != int(info.get("mascara", 0)):
+		push_error("Cena incompatível com a matriz: " + caminho)
+		if nova != null:
+			nova.free()
+		em_transicao = false
+		return
+	nova.configurar(destino, info, jogador, chefes_derrotados)
 	if sala_atual != null:
+		_salvar_estado_inimigos_da_sala()
+		remove_child(sala_atual)
 		sala_atual.queue_free()
-	
-	var cena_sala = load(caminho)
-	sala_atual = cena_sala.instantiate()
-	
-	# Atualiza o requisito da sala recém-carregada
-	if sala_atual.has_method("get_proxima_entrada"):
-		proxima_entrada_requerida = sala_atual.get_proxima_entrada()
-	elif "proxima_entrada" in sala_atual:
-		proxima_entrada_requerida = sala_atual.proxima_entrada
-	else:
-		proxima_entrada_requerida = "esq_baixo" # Padrão de segurança
-	
-	if sala_atual.has_method("configurar_spawn"):
-		sala_atual.configurar_spawn(direcao_chegada)
-	
+	sala_atual = nova
+	coordenada_atual = destino
 	add_child(sala_atual)
-	
-	var porta_saida = sala_atual.get_node_or_null("PortaSaida")
-	if porta_saida != null:
-		porta_saida.connect("jogador_entrou", Callable(self, "_on_porta_saida_ativada"))
-		
-	var porta_entrada = sala_atual.get_node_or_null("PortaEntrada")
-	if porta_entrada != null:
-		porta_entrada.connect("jogador_entrou", Callable(self, "_on_porta_entrada_ativada"))
+	move_child(jogador, get_child_count() - 1)
+	jogador.preparar_para_nova_sala()
+	jogador.global_position = sala_atual.spawn_para_entrada(direcao)
+	posicao_segura_atual = jogador.global_position
+	# Ignora qualquer sobreposição residual do quadro de física anterior.
+	protecao_entrada_restante = TEMPO_PROTECAO_ENTRADA
+	sala_atual.boss_derrotado.connect(_ao_derrotar_boss)
+	sala_atual.altar_ativado.connect(_ao_vencer)
+	_povoar_sala()
+	_conectar_terminais()
+	mapa.visitar(destino)
+	em_transicao = false
+	print("[MAPA] ", destino, " / ", info["tipo"], " / ", info["modelo"])
 
-func _on_porta_saida_ativada() -> void:
-	avancar_para_nova_sala()
 
-func _on_porta_entrada_ativada() -> void:
-	voltar_para_sala_anterior()
+func _ao_derrotar_boss(identificador: int) -> void:
+	if chefes_derrotados.has(identificador):
+		return
+	chefes_derrotados[identificador] = true
+	match identificador:
+		1:
+			jogador.desbloquear_pulo_duplo()
+			_aviso("GUARDIAO 1 derrotado: pulo duplo liberado!", 5.0)
+		2:
+			jogador.desbloquear_dash()
+			_aviso("WOODBREAKER derrotado: malloc() / dash liberado!", 5.0)
+		3:
+			jogador.desbloquear_grapple()
+			_aviso("STONEMAKER derrotado: grapple final liberado!", 5.0)
+
+
+func _ao_morrer() -> void:
+	partida_terminou = true
+	_aviso("Processo encerrado. Pressione R para reiniciar.", 999.0)
+	hud.mostrar_morte()
+
+
+func _ao_vencer() -> void:
+	if partida_terminou:
+		return
+	partida_terminou = true
+	if is_instance_valid(jogador):
+		jogador.set_physics_process(false)
+	_aviso("return();  Loop infinito encerrado!", 999.0)
+	hud.mostrar_vitoria()
+
+
+func _aviso(texto: String, segundos: float) -> void:
+	mensagem = texto
+	tempo_mensagem = segundos
+
+
+func _salvar_estado_inimigos_da_sala() -> void:
+	if sala_atual == null:
+		return
+	var estados_sala: Dictionary = estados_inimigos.get(coordenada_atual, {})
+	for inimigo in get_tree().get_nodes_in_group("inimigos"):
+		if not is_instance_valid(inimigo) or inimigo.is_queued_for_deletion():
+			continue
+		if not sala_atual.is_ancestor_of(inimigo):
+			continue
+		if not inimigo.has_method("exportar_estado_persistente"):
+			continue
+		var id_spawn: String = String(inimigo.get_meta("id_spawn", ""))
+		if id_spawn.is_empty():
+			continue
+		estados_sala[id_spawn] = inimigo.call("exportar_estado_persistente")
+	if not estados_sala.is_empty():
+		estados_inimigos[coordenada_atual] = estados_sala
+
+
+func _povoar_sala() -> void:
+	## Somente marcadores manuais das cenas participam do spawn.
+	if sala_atual == null:
+		return
+	var grupo: Node = sala_atual.get_node_or_null("Conteudo/SpawnsInimigos")
+	if grupo == null:
+		return
+	var mortos: Dictionary = inimigos_derrotados.get(coordenada_atual, {})
+	var escolhas: Dictionary = tipos_inimigos_sorteados.get(coordenada_atual, {})
+	var estados_sala: Dictionary = estados_inimigos.get(coordenada_atual, {})
+	for ponto in grupo.get_children():
+		var marcador: PontoSpawnInimigo = ponto as PontoSpawnInimigo
+		if marcador == null or mortos.has(marcador.name):
+			continue
+		var tipo_escolhido: String = String(escolhas.get(marcador.name, ""))
+		if tipo_escolhido.is_empty():
+			tipo_escolhido = marcador.sortear_tipo()
+			escolhas[marcador.name] = tipo_escolhido
+		var cena: PackedScene = CENAS_INIMIGOS.get(tipo_escolhido) as PackedScene
+		if cena == null:
+			push_warning("Tipo de inimigo desconhecido: " + tipo_escolhido)
+			continue
+		var inimigo: InimigoBase = cena.instantiate() as InimigoBase
+		inimigo.configurar(jogador)
+		var id_spawn: String = String(marcador.name)
+		inimigo.set_meta("id_spawn", id_spawn)
+		inimigo.position = marcador.position
+		# O ponto é filho de Conteudo/SpawnsInimigos (ambos sem deslocamento).
+		# Adicioná-lo sob o mesmo Conteudo preserva a posição local do módulo.
+		sala_atual.get_node("Conteudo").add_child(inimigo)
+		inimigo.global_position = marcador.global_position
+		if estados_sala.has(id_spawn) and inimigo.has_method("restaurar_estado_persistente"):
+			inimigo.call("restaurar_estado_persistente", estados_sala[id_spawn])
+		inimigo.derrotado.connect(_ao_inimigo_derrotado.bind(coordenada_atual, id_spawn))
+	tipos_inimigos_sorteados[coordenada_atual] = escolhas
+
+
+func _ao_inimigo_derrotado(posicao: Vector2, item_id: StringName, caiu: bool, sala: Vector2i, id_spawn: String) -> void:
+	var mortos: Dictionary = inimigos_derrotados.get(sala, {})
+	mortos[id_spawn] = true
+	inimigos_derrotados[sala] = mortos
+	var estados_sala: Dictionary = estados_inimigos.get(sala, {})
+	estados_sala.erase(id_spawn)
+	if not estados_sala.is_empty():
+		estados_inimigos[sala] = estados_sala
+	else:
+		estados_inimigos.erase(sala)
+	if not caiu or sala != coordenada_atual or sala_atual == null:
+		return
+	var recompensa: Area2D = CENA_DROP.instantiate() as Area2D
+	recompensa.call("configurar", item_id)
+	sala_atual.get_node("Conteudo").add_child(recompensa)
+	recompensa.global_position = posicao + Vector2(0, -25)
+	recompensa.connect("coletado", _ao_coletar_drop)
+
+
+func _ao_coletar_drop(item_id: StringName) -> void:
+	if not is_instance_valid(jogador):
+		return
+	var inventario: EquipamentosAtivos = jogador.get_node("EquipamentosAtivos") as EquipamentosAtivos
+	_aviso(inventario.equipar(item_id), 3.0)
+
+
+func _ao_aviso_equipamento(texto: String) -> void:
+	_aviso(texto, 2.8)
+
+
+func _ao_overflow_estourou() -> void:
+	_aviso("STACK OVERFLOW! -1 HP e 0,5 s de travamento. Acerte ataques basicos para reduzir STACK.", 3.2)
+
+
+func _conectar_terminais() -> void:
+	if sala_atual == null:
+		return
+	for terminal in get_tree().get_nodes_in_group("terminais_breakpoint"):
+		# Grupo ligado só no nó do módulo atual, não nos nós antigos em queue_free().
+		var callback: Callable = Callable(self, "_ao_descansar")
+		if sala_atual.is_ancestor_of(terminal) and terminal.has_signal("descansou") and not terminal.is_connected("descansou", callback):
+			terminal.connect("descansou", callback)
+
+
+func _ao_descansar() -> void:
+	if partida_terminou or not is_instance_valid(jogador):
+		return
+	jogador.descansar()
+	# Reaparecem nas salas ao retornar; chefes derrotados não reaparecem.
+	inimigos_derrotados.clear()
+	tipos_inimigos_sorteados.clear()
+	estados_inimigos.clear()
+	if sala_atual != null:
+		for inimigo in get_tree().get_nodes_in_group("inimigos"):
+			if sala_atual.is_ancestor_of(inimigo):
+				inimigo.queue_free()
+		for drop in sala_atual.get_node("Conteudo").get_children():
+			if drop is Area2D and drop.is_in_group("drops_provisorios"):
+				drop.queue_free()
+		# Recria depois que os anteriores forem removidos.
+		call_deferred("_povoar_sala")
+	_aviso("BREAKPOINT: HP restaurado. Equipamentos e STACK mantidos. Inimigos reiniciados.", 4.0)

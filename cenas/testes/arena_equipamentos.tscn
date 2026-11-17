@@ -1,0 +1,28 @@
+[gd_scene load_steps=3 format=3 uid="uid://bjiwpemuktisx"]
+
+[ext_resource type="Script" uid="uid://b6m83c1qewhmt" path="res://scripts/teste_equipamentos.gd" id="1_test"]
+
+[sub_resource type="RectangleShape2D" id="shape_piso"]
+size = Vector2(1152, 48)
+
+[node name="ArenaTesteEquipamentos" type="Node2D"]
+script = ExtResource("1_test")
+
+[node name="Fundo" type="ColorRect" parent="."]
+offset_right = 1152.0
+offset_bottom = 648.0
+mouse_filter = 2
+color = Color(0.065, 0.1, 0.15, 1)
+
+[node name="Piso" type="StaticBody2D" parent="."]
+position = Vector2(0, 600)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Piso"]
+position = Vector2(576, 24)
+shape = SubResource("shape_piso")
+
+[node name="Visual" type="ColorRect" parent="Piso"]
+offset_right = 1152.0
+offset_bottom = 48.0
+mouse_filter = 2
+color = Color(0.26, 0.36, 0.47, 1)

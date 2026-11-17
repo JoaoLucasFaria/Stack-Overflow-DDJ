@@ -1,0 +1,96 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/equipamentos/hud_coleta_item.gd" id="1_hud"]
+
+[node name="HUDColetaItem" type="CanvasLayer"]
+layer = 30
+process_mode = 3
+script = ExtResource("1_hud")
+
+[node name="Fundo" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0.012, 0.021, 0.038, 0.82)
+
+[node name="Painel" type="ColorRect" parent="Fundo"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -355.0
+offset_top = -204.0
+offset_right = 355.0
+offset_bottom = 204.0
+mouse_filter = 2
+color = Color(0.07, 0.1, 0.16, 1)
+
+[node name="Cabecalho" type="Label" parent="Fundo/Painel"]
+offset_left = 25.0
+offset_top = 16.0
+offset_right = 665.0
+offset_bottom = 48.0
+theme_override_font_sizes/font_size = 22
+text = "NOVO EQUIPAMENTO ENCONTRADO"
+modulate = Color(0.38, 0.89, 1, 1)
+
+[node name="TituloItem" type="Label" parent="Fundo/Painel"]
+offset_left = 25.0
+offset_top = 67.0
+offset_right = 671.0
+offset_bottom = 105.0
+theme_override_font_sizes/font_size = 26
+text = "NOME DO EQUIPAMENTO"
+
+[node name="EfeitoItem" type="Label" parent="Fundo/Painel"]
+offset_left = 25.0
+offset_top = 120.0
+offset_right = 675.0
+offset_bottom = 172.0
+theme_override_font_sizes/font_size = 17
+autowrap_mode = 3
+text = "EFEITO"
+
+[node name="DescricaoItem" type="Label" parent="Fundo/Painel"]
+offset_left = 25.0
+offset_top = 184.0
+offset_right = 665.0
+offset_bottom = 221.0
+theme_override_font_sizes/font_size = 15
+autowrap_mode = 3
+modulate = Color(0.69, 0.75, 0.85, 1)
+text = "DESCRICAO"
+
+[node name="Escolha" type="Label" parent="Fundo/Painel"]
+offset_left = 25.0
+offset_top = 241.0
+offset_right = 665.0
+offset_bottom = 266.0
+theme_override_font_sizes/font_size = 17
+text = "EQUIPAR / SUBSTITUIR:"
+
+[node name="OpcaoQ" type="Label" parent="Fundo/Painel"]
+offset_left = 30.0
+offset_top = 274.0
+offset_right = 668.0
+offset_bottom = 305.0
+theme_override_font_sizes/font_size = 18
+text = "[Q] Vazio"
+
+[node name="OpcaoE" type="Label" parent="Fundo/Painel"]
+offset_left = 30.0
+offset_top = 310.0
+offset_right = 668.0
+offset_bottom = 341.0
+theme_override_font_sizes/font_size = 18
+text = "[E] Vazio"
+
+[node name="Rodape" type="Label" parent="Fundo/Painel"]
+offset_left = 25.0
+offset_top = 369.0
+offset_right = 681.0
+offset_bottom = 397.0
+theme_override_font_sizes/font_size = 14
+text = "TAB  Alternar      F  Confirmar      ESC  Cancelar"
+modulate = Color(0.63, 0.9, 0.78, 1)
