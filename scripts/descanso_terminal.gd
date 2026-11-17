@@ -1,7 +1,8 @@
 extends Area2D
 
-## BREAKPOINT: descanso voluntario via G; E ativa o equipamento do slot 2.
+## BREAKPOINT: G recupera HP; H abre viagem para terminais conhecidos.
 signal descansou
+signal teleporte_solicitado
 var jogador_proximo: bool = false
 
 
@@ -15,8 +16,12 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-	if jogador_proximo and Input.is_action_just_pressed("descansar"):
+	if not jogador_proximo:
+		return
+	if Input.is_action_just_pressed("descansar"):
 		descansou.emit()
+	elif Input.is_action_just_pressed("teleportar_breakpoint"):
+		teleporte_solicitado.emit()
 
 
 func _ao_entrar(corpo: Node2D) -> void:
