@@ -210,6 +210,9 @@ func receber_dano(quantidade: int) -> void:
 
 func _morrer() -> void:
 	encerrado = true
+	# Child Process invocado nao concede cura nem limpeza infinita de STACK.
+	if nome_visivel != "Child Process" and is_instance_valid(jogador) and is_instance_valid(jogador.patches):
+		jogador.patches.registrar_abate_comum()
 	var caiu: bool = randi_range(1, 100) <= chance_drop_percentual
 	derrotado.emit(global_position, item_id, caiu)
 	queue_free()
