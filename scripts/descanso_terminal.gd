@@ -1,6 +1,6 @@
 extends Area2D
 
-## BREAKPOINT: descanso voluntário via E, sem botão nas passagens das salas.
+## BREAKPOINT: descanso voluntario via G; E ativa o equipamento do slot 2.
 signal descansou
 var jogador_proximo: bool = false
 

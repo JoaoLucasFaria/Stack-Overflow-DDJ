@@ -31,6 +31,9 @@ var encerrado: bool = false
 var tempo_flash: float = 0.0
 ## Usado por inimigos fixos (ex.: torretas); nao altera os terrestres.
 var fixo_no_cenario: bool = false
+## Recuo sem dano, acionado por equipamentos defensivos.
+var tempo_empurrao: float = 0.0
+var velocidade_empurrao: float = 0.0
 
 @onready var visual: ColorRect = $Visual
 @onready var rotulo: Label = $Nome
@@ -67,7 +70,12 @@ func _physics_process(delta: float) -> void:
 		velocity.y = 0.0
 	tempo_ate_ataque = maxf(0.0, tempo_ate_ataque - delta)
 	tempo_flash = maxf(0.0, tempo_flash - delta)
-	if preparando_ataque:
+	if tempo_empurrao > 0.0 and not fixo_no_cenario:
+		# Durante o empurrao, suspende a IA por alguns frames e usa a
+		# propria fisica do inimigo para respeitar paredes e plataformas.
+		tempo_empurrao = maxf(0.0, tempo_empurrao - delta)
+		velocity.x = velocidade_empurrao
+	elif preparando_ataque:
 		velocity.x = 0.0
 		tempo_aviso -= delta
 		if tempo_aviso <= 0.0:
@@ -78,6 +86,17 @@ func _physics_process(delta: float) -> void:
 	if not fixo_no_cenario:
 		move_and_slide()
 	visual.modulate = Color(1.0, 0.65, 0.65) if tempo_flash > 0.0 else (Color(1.0, 0.85, 0.55) if preparando_ataque else Color.WHITE)
+
+
+func aplicar_empurrao(origem: Vector2, forca: float = 480.0, duracao: float = 0.22) -> void:
+	## Afasta sem modificar HP. Inimigos fixos, como torretas, nao saem do lugar.
+	if encerrado or fixo_no_cenario or duracao <= 0.0:
+		return
+	var lado: float = 1.0 if global_position.x >= origem.x else -1.0
+	velocidade_empurrao = lado * absf(forca)
+	tempo_empurrao = duracao
+	preparando_ataque = false
+	tempo_aviso = 0.0
 
 
 func _pensar(_delta: float) -> void:

@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://df7che8m2vnat"]
+
+[ext_resource type="Script" uid="uid://6eqll35bwqon" path="res://scripts/equipamentos/escudo_memory_leak.gd" id="1_item"]
+
+[node name="EscudoMemoryLeak" type="Node2D"]
+script = ExtResource("1_item")

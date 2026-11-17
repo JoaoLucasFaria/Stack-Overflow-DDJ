@@ -65,6 +65,9 @@ func _ready() -> void:
 	jogador.dash_component.dash_desbloqueado = false
 	jogador.grapple_liberado = false
 	jogador.morreu.connect(_ao_morrer)
+	jogador.overflow_estourou.connect(_ao_overflow_estourou)
+	var inventario: EquipamentosAtivos = jogador.get_node("EquipamentosAtivos") as EquipamentosAtivos
+	inventario.aviso.connect(_ao_aviso_equipamento)
 	hud = CENA_HUD.new() as HUDMatriz
 	add_child(hud)
 	_entrar_sala(Vector2i.ZERO, Vector2i.ZERO)
@@ -81,7 +84,7 @@ func _process(delta: float) -> void:
 		hud.alternar_mapa()
 	if Input.is_action_just_pressed("alternar_debug"):
 		hud.alternar_debug()
-	# Simula consumo de stack enquanto itens ativos ainda não existem.
+	# Com F3 ativo, O continua disponivel para diagnosticar a barra de STACK.
 	if hud.debug_visivel and Input.is_action_just_pressed("overflow_teste") and is_instance_valid(jogador):
 		jogador.adicionar_overflow(25.0)
 	if tempo_mensagem > 0.0:
@@ -343,8 +346,18 @@ func _ao_inimigo_derrotado(posicao: Vector2, item_id: StringName, caiu: bool, sa
 
 
 func _ao_coletar_drop(item_id: StringName) -> void:
-	## Futuro: encaminhar ao inventário de dois slots criado pelo Torugo.
-	_aviso("Fragmento recuperado: %s (item ainda não equipável)." % String(item_id).replace("_", " "), 3.0)
+	if not is_instance_valid(jogador):
+		return
+	var inventario: EquipamentosAtivos = jogador.get_node("EquipamentosAtivos") as EquipamentosAtivos
+	_aviso(inventario.equipar(item_id), 3.0)
+
+
+func _ao_aviso_equipamento(texto: String) -> void:
+	_aviso(texto, 2.8)
+
+
+func _ao_overflow_estourou() -> void:
+	_aviso("STACK OVERFLOW! -1 HP e 0,5 s de travamento. Acerte ataques basicos para reduzir STACK.", 3.2)
 
 
 func _conectar_terminais() -> void:
@@ -374,4 +387,4 @@ func _ao_descansar() -> void:
 				drop.queue_free()
 		# Recria depois que os anteriores forem removidos.
 		call_deferred("_povoar_sala")
-	_aviso("BREAKPOINT: HP e STACK restaurados. Inimigos reiniciados.", 4.0)
+	_aviso("BREAKPOINT: HP restaurado. Equipamentos e STACK mantidos. Inimigos reiniciados.", 4.0)
