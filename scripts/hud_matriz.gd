@@ -250,6 +250,8 @@ func _desenhar_destinos_teleporte(mapa: MapaMatriz, derrotados: Dictionary) -> v
 						simbolo = "D"
 					elif tipo == "final":
 						simbolo = "F"
+					elif tipo == "exception":
+						simbolo = "P"
 					else:
 						simbolo = "■"
 				var celula: Label = Label.new()
@@ -398,11 +400,13 @@ func atualizar(mapa: MapaMatriz, posicao: Vector2i, jogador: Jogador, derrotados
 					simbolo = "D"
 				elif tipo == "final":
 					simbolo = "F"
+				elif tipo == "exception":
+					simbolo = "P"
 				else:
 					simbolo = "■"
 			linha += simbolo + " "
 		linhas.append(linha)
-	rotulo_mapa.text = "\n".join(linhas) + "\n@ Você | B Breakpoint | J Pulo | D Dash | F Final"
+	rotulo_mapa.text = "\n".join(linhas) + "\n@ Você | P Patch | B Breakpoint | J Pulo | D Dash | F Final"
 	# Ajustar tamanho conforme o mapa descoberto.
 	if not teleporte_ativo:
 		var tamanho_texto: Vector2 = rotulo_mapa.get_combined_minimum_size()

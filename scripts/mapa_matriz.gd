@@ -73,6 +73,7 @@ const ESPECIAIS: Dictionary = {
 	"boss2": "res://cenas/salas/sala_boss_2.tscn",
 	"boss3": "res://cenas/salas/sala_boss_3.tscn",
 	"final": "res://cenas/salas/sala_altar_final.tscn",
+	"exception": "res://cenas/salas/sala_exception_handler.tscn",
 	"breakpoint": "res://cenas/salas/sala_breakpoint.tscn"
 }
 
@@ -95,7 +96,7 @@ static func mascara_das_conexoes(conexoes: Dictionary) -> int:
 	return mascara
 
 
-func gerar(quantidade_ramos: int = 23, semente_fixa: int = 0, salas_ate_boss1: int = 7, salas_ate_boss2: int = 11, salas_entre_boss2_boss3: int = 7, quantidade_breakpoints: int = 4, distancia_minima_breakpoints: int = 5) -> void:
+func gerar(quantidade_ramos: int = 23, semente_fixa: int = 0, salas_ate_boss1: int = 10, salas_ate_boss2: int = 11, salas_entre_boss2_boss3: int = 7, quantidade_breakpoints: int = 4, distancia_minima_breakpoints: int = 5, exceptions_por_trecho: int = 3) -> void:
 	salas.clear()
 	visitadas.clear()
 	if semente_fixa == 0:
@@ -106,9 +107,9 @@ func gerar(quantidade_ramos: int = 23, semente_fixa: int = 0, salas_ate_boss1: i
 
 	# Uma transicao = uma aresta entre duas salas. O inicio, os chefes, os
 	# bloqueios e o altar mantem as mascaras exigidas por suas cenas manuais.
-	salas_ate_boss1 = maxi(3, salas_ate_boss1)
+	salas_ate_boss1 = maxi(4, salas_ate_boss1)
 	salas_ate_boss2 = maxi(4, salas_ate_boss2)
-	salas_entre_boss2_boss3 = maxi(3, salas_entre_boss2_boss3)
+	salas_entre_boss2_boss3 = maxi(4, salas_entre_boss2_boss3)
 	quantidade_ramos = maxi(0, quantidade_ramos)
 	var passo_pulo: int = clampi(roundi(float(salas_ate_boss2) * 0.6), 2, salas_ate_boss2 - 1)
 	var passo_dash: int = clampi(roundi(float(salas_entre_boss2_boss3) * 0.6), 2, salas_entre_boss2_boss3 - 1)
@@ -141,6 +142,7 @@ func gerar(quantidade_ramos: int = 23, semente_fixa: int = 0, salas_ate_boss1: i
 		_ligar(trilha3[-1], posicao_final)
 		gerou_trilhas = true
 		break
+
 
 	if not gerou_trilhas:
 		# Fallback conservador para casos extremos de tamanhos/colisoes.
@@ -182,6 +184,10 @@ func gerar(quantidade_ramos: int = 23, semente_fixa: int = 0, salas_ate_boss1: i
 	if criadas < quantidade_ramos:
 		push_warning("Mapa: apenas %d/%d salas extras puderam ser geradas." % [criadas, quantidade_ramos])
 
+	# V14.2: gera salas opcionais de Patches POR REGIAO, sem substituir
+	# o caminho dos chefes nem criar ligacoes que contornem bloqueios.
+	_distribuir_exceptions(exceptions_por_trecho)
+
 	# Troca apenas o modelo de algumas salas normais por salas de descanso.
 	# A matriz e suas ligacoes continuam exatamente iguais.
 	_distribuir_breakpoints(quantidade_breakpoints, distancia_minima_breakpoints)
@@ -200,6 +206,185 @@ func gerar(quantidade_ramos: int = 23, semente_fixa: int = 0, salas_ate_boss1: i
 			info["modelo"] = possibilidades[gerador.randi_range(0, possibilidades.size() - 1)]
 		else:
 			info["modelo"] = ESPECIAIS.get(tipo, "")
+
+
+# -----------------------------------------------------------------------------
+# V14.2 - Ramificacoes opcionais de Exception Handler
+# -----------------------------------------------------------------------------
+func _distribuir_exceptions(quantidade_por_trecho: int) -> void:
+	## Setores: 0 = Oeste/Boss1; 1 = apos pulo/Boss2;
+	## 2 = apos dash/Boss3. Cada desafio e opcional e tem pelo
+	## menos uma sala comum ANTES e uma DEPOIS do altar.
+	quantidade_por_trecho = clampi(quantidade_por_trecho, 0, 5)
+	if quantidade_por_trecho == 0:
+		return
+	for regiao in range(3):
+		var total: int = 0
+		for _indice in range(quantidade_por_trecho):
+			# Recalcula: as salas comuns dos ramos anteriores podem servir
+			# como ancoras alternativas quando o setor fica apertado.
+			var candidatos: Array[Vector2i] = _candidatos_exception(regiao)
+			_embaralhar_coordenadas(candidatos)
+			var encontrou: bool = false
+			for tentativa in range(2):
+				for ancora in candidatos:
+					# Evita concentrar todas as arenas em um mesmo ponto.
+					if tentativa == 0 and _tem_ramo_exception(ancora):
+						continue
+					if _tentar_criar_ramo_exception(ancora):
+						total += 1
+						encontrou = true
+						break
+				if encontrou:
+					break
+			if not encontrou:
+				break
+		if total < quantidade_por_trecho:
+			push_warning("Exception Handler: trecho %d ficou com %d/%d arenas. Seed: %d." % [regiao + 1, total, quantidade_por_trecho, semente])
+		print("[EXCEPTION] Trecho %d: %d/%d arenas opcionais" % [regiao + 1, total, quantidade_por_trecho])
+
+
+func _candidatos_exception(regiao: int) -> Array[Vector2i]:
+	var oeste: Dictionary = _salas_da_trilha_oeste()
+	var sem_habilidades: Dictionary = alcancaveis(false, false, false)
+	var com_pulo: Dictionary = alcancaveis(true, false, false)
+	var com_dash: Dictionary = alcancaveis(true, true, false)
+	var depois_boss2: Dictionary = _salas_apos_boss2()
+	var distancia_inicio: Dictionary = _distancias_da_sala(Vector2i.ZERO)
+	var candidatos: Array[Vector2i] = []
+	for posicao in salas.keys():
+		if salas[posicao]["tipo"] != "normal":
+			continue
+		var elegivel: bool = false
+		match regiao:
+			0:
+				# Apenas a rota OESTE do Boss 1; nunca encostado no spawn.
+				elegivel = oeste.has(posicao) and int(distancia_inicio.get(posicao, 0)) >= 2
+			1:
+				# Acessivel somente depois de adquirir o pulo duplo.
+				elegivel = com_pulo.has(posicao) and not sem_habilidades.has(posicao) and not depois_boss2.has(posicao)
+			2:
+				# Acessivel somente depois de adquirir o dash.
+				elegivel = com_dash.has(posicao) and not com_pulo.has(posicao)
+		if elegivel:
+			candidatos.append(posicao)
+	return candidatos
+
+
+func _salas_da_trilha_oeste() -> Dictionary:
+	## O mapa eh uma arvore; isolando a aresta do inicio para a esquerda,
+	## encontramos a regiao do Boss 1 sem confundir com o outro caminho.
+	var primeiro: Vector2i = salas[Vector2i.ZERO]["conexoes"].get(Vector2i.LEFT, Vector2i.ZERO)
+	if primeiro == Vector2i.ZERO:
+		return {}
+	var encontradas: Dictionary = {primeiro: true}
+	var fila: Array[Vector2i] = [primeiro]
+	var indice: int = 0
+	while indice < fila.size():
+		var posicao: Vector2i = fila[indice]
+		indice += 1
+		for proximo in salas[posicao]["conexoes"].values():
+			if proximo == Vector2i.ZERO or encontradas.has(proximo):
+				continue
+			encontradas[proximo] = true
+			fila.append(proximo)
+	return encontradas
+
+
+func _salas_apos_boss2() -> Dictionary:
+	## Evita que os Patches destinados ao Boss 2 sejam sorteados
+	## depois da arena desse chefe (que bloqueia a passagem ate a derrota).
+	var boss2: Vector2i = Vector2i.ZERO
+	var achou: bool = false
+	for posicao in salas.keys():
+		if salas[posicao]["tipo"] == "boss2":
+			boss2 = posicao
+			achou = true
+			break
+	if not achou:
+		return {}
+	var saida: Vector2i = salas[boss2]["conexoes"].get(Vector2i.UP, boss2)
+	if saida == boss2:
+		return {}
+	var encontradas: Dictionary = {saida: true}
+	var fila: Array[Vector2i] = [saida]
+	var indice: int = 0
+	while indice < fila.size():
+		var atual: Vector2i = fila[indice]
+		indice += 1
+		for proximo in salas[atual]["conexoes"].values():
+			if proximo == boss2 or encontradas.has(proximo):
+				continue
+			encontradas[proximo] = true
+			fila.append(proximo)
+	return encontradas
+
+
+func _tem_ramo_exception(ancora: Vector2i) -> bool:
+	## Os ramos novos carregam uma marca de origem: evita aglomera-los.
+	for sala in salas.values():
+		if sala.get("origem_exception", Vector2i(99999, 99999)) == ancora:
+			return true
+	return false
+
+
+func _embaralhar_coordenadas(valores: Array[Vector2i]) -> void:
+	for i in range(valores.size() - 1, 0, -1):
+		var j: int = gerador.randi_range(0, i)
+		var auxiliar: Vector2i = valores[i]
+		valores[i] = valores[j]
+		valores[j] = auxiliar
+
+
+func _tentar_criar_ramo_exception(ancora: Vector2i) -> bool:
+	var visitados: Dictionary = {ancora: true}
+	var anteriores: Array[Vector2i] = []
+	var rota: Array[Vector2i] = _buscar_rota_exception(ancora, anteriores, visitados)
+	if rota.is_empty():
+		return false
+	var anterior: Vector2i = ancora
+	for i in range(rota.size()):
+		var destino: Vector2i = rota[i]
+		# Penultima sala: corredor horizontal reservado ao altar.
+		_adicionar(destino, "exception" if i == rota.size() - 2 else "normal")
+		salas[destino]["origem_exception"] = ancora
+		_ligar(anterior, destino)
+		anterior = destino
+	return true
+
+
+func _buscar_rota_exception(posicao: Vector2i, comuns: Array[Vector2i], usados: Dictionary) -> Array[Vector2i]:
+	## Procura um corredor horizontal com duas saidas para o altar.
+	## Se o terreno estiver cheio, faz ate quatro salas comuns de desvio,
+	## sempre usando somente coordenadas vazias, sem criar atalhos.
+	if not comuns.is_empty():
+		var horizontais: Array[Vector2i] = [Vector2i.LEFT, Vector2i.RIGHT]
+		_embaralhar_coordenadas(horizontais)
+		for horizontal in horizontais:
+			var altar: Vector2i = posicao + horizontal
+			var ponta: Vector2i = altar + horizontal
+			if salas.has(altar) or salas.has(ponta) or usados.has(altar) or usados.has(ponta):
+				continue
+			var encontrada: Array[Vector2i] = comuns.duplicate()
+			encontrada.append(altar)
+			encontrada.append(ponta)
+			return encontrada
+	if comuns.size() >= 4:
+		return []
+	var direcoes: Array[Vector2i] = [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]
+	_embaralhar_coordenadas(direcoes)
+	for direcao in direcoes:
+		var seguinte: Vector2i = posicao + direcao
+		if salas.has(seguinte) or usados.has(seguinte):
+			continue
+		comuns.append(seguinte)
+		usados[seguinte] = true
+		var tentativa: Array[Vector2i] = _buscar_rota_exception(seguinte, comuns, usados)
+		comuns.pop_back()
+		usados.erase(seguinte)
+		if not tentativa.is_empty():
+			return tentativa
+	return []
 
 
 func _distancias_da_sala(origem: Vector2i) -> Dictionary:

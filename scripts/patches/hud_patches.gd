@@ -8,6 +8,7 @@ var rotulo: Label
 
 
 func _ready() -> void:
+	hide()
 	layer = 2
 	var raiz: Control = Control.new()
 	raiz.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)

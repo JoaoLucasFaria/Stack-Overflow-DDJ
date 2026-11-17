@@ -14,29 +14,29 @@ signal dash_clash
 @export_category("Vida e dano")
 @export_range(15, 150, 1) var hp_stonemaker: int = 43
 @export_range(1, 5, 1) var dano_comum: int = 1
-@export_range(1, 5, 1) var dano_pesado: int = 3
+@export_range(1, 5, 1) var dano_pesado: int = 2
 @export_range(1, 5, 1) var dano_contato: int = 1
 
 @export_category("Movimentacao")
-@export var velocidade_fase_1: float = 200.0
-@export var velocidade_fase_2: float = 275.0
-@export var velocidade_fase_3: float = 320.0
+@export var velocidade_fase_1: float = 239.0
+@export var velocidade_fase_2: float = 287.0
+@export var velocidade_fase_3: float = 297.0
 @export var velocidade_investida_fase_1: float = 680.0
 @export var velocidade_investida_fase_2: float = 820.0
-@export var velocidade_investida_fase_3: float = 875.0
+@export var velocidade_investida_fase_3: float = 900.0
 @export var limite_esquerdo: float = 85.0
 @export var limite_direito: float = 1065.0
 @export var linha_do_chao: float = 600.0
 
 @export_category("Ritmo")
-@export_range(0.2, 1.5, 0.05) var aviso_fase_1: float = 0.58
-@export_range(0.2, 1.5, 0.05) var aviso_fase_2: float = 0.47
-@export_range(0.2, 1.5, 0.05) var aviso_fase_3: float = 0.4
-@export_range(0.1, 2.0, 0.05) var recuperacao_fase_1: float = 0.8
-@export_range(0.1, 2.0, 0.05) var recuperacao_fase_2: float = 0.57
-@export_range(0.1, 2.0, 0.05) var recuperacao_fase_3: float = 0.43
-@export_range(0.5, 2.0, 0.05) var atordoamento_dash_clash: float = 4.0
-@export_range(0.1, 0.9, 0.05) var limiar_terceira_fase: float = 0.30
+@export_range(0.2, 1.5, 0.05) var aviso_fase_1: float = 0.50
+@export_range(0.2, 1.5, 0.05) var aviso_fase_2: float = 0.42
+@export_range(0.2, 1.5, 0.05) var aviso_fase_3: float = 0.38
+@export_range(0.1, 2.0, 0.05) var recuperacao_fase_1: float = 0.75
+@export_range(0.1, 2.0, 0.05) var recuperacao_fase_2: float = 0.52
+@export_range(0.1, 2.0, 0.05) var recuperacao_fase_3: float = 0.38
+@export_range(0.5, 2.0, 0.05) var atordoamento_dash_clash: float = 3.0
+@export_range(0.1, 0.9, 0.05) var limiar_terceira_fase: float = 0.3
 
 var estado: int = Estado.PERSEGUINDO
 var ataque_atual: int = Ataque.ESTOCADA

@@ -9,6 +9,8 @@ const MAX_NIVEL: int = 5
 
 var inventario
 var processava_inventario: bool = false
+var pausa_antes_do_menu: bool = false
+var permitir_abertura_pausada: bool = false
 var texto_resumo: Label
 var coluna_equipamentos: VBoxContainer
 var coluna_patches: VBoxContainer
@@ -45,12 +47,23 @@ func _input(evento: InputEvent) -> void:
 	get_viewport().set_input_as_handled()
 
 
+## Usado apenas pela escolha obrigatoria do Exception Handler.
+## O BUILD pode abrir mesmo com a partida pausada pela recompensa.
+func abrir_durante_recompensa() -> void:
+	permitir_abertura_pausada = true
+	abrir()
+	permitir_abertura_pausada = false
+
+
 func abrir() -> void:
-	if visible or get_tree().paused or not is_instance_valid(gerenciador):
+	if visible or not is_instance_valid(gerenciador):
+		return
+	if get_tree().paused and not permitir_abertura_pausada:
 		return
 	var jogador = gerenciador.jogador
 	if not is_instance_valid(jogador) or jogador.vida_atual <= 0:
 		return
+	pausa_antes_do_menu = get_tree().paused
 	inventario = jogador.get_node_or_null("EquipamentosAtivos")
 	# EquipamentosAtivos processa em PROCESS_MODE_ALWAYS para permitir a
 	# confirmacao da coleta; evita usar Q/E enquanto inspeciona a build.
@@ -66,7 +79,8 @@ func fechar() -> void:
 	if not visible:
 		return
 	visible = false
-	get_tree().paused = false
+	# Se o BUILD foi aberto sobre uma recompensa, retorna a essa pausa.
+	get_tree().paused = pausa_antes_do_menu
 	if is_instance_valid(inventario):
 		inventario.set_physics_process(processava_inventario)
 	inventario = null
@@ -150,7 +164,7 @@ func _criar_interface() -> void:
 	coluna_patches.add_theme_constant_override("separation", 9)
 	conteudo.add_child(coluna_patches)
 
-	var rodape: Label = _rotulo("ESC: voltar ao jogo   |   Os Patches permanecem ate a morte da run.", 12, Color(0.56, 0.77, 0.83))
+	var rodape: Label = _rotulo("ESC: fechar BUILD   |   Os Patches permanecem ate a morte da run.", 12, Color(0.56, 0.77, 0.83))
 	coluna.add_child(rodape)
 
 
