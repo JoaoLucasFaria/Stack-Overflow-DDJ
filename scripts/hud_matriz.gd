@@ -1,5 +1,7 @@
 class_name HUDMatriz
 extends CanvasLayer
+const CENA_HUD_VISUAL = preload("res://cenas/hud.tscn")
+var hud_visual_instancia: CanvasLayer
 
 ## Sinais da selecao de viagem; quem troca a sala e o Main.
 signal teleporte_confirmado(destino: Vector2i)
@@ -8,6 +10,7 @@ signal teleporte_cancelado
 ## HUD limpa. M abre o mapa; F3 revela informações técnicas.
 ## O mapa mostra só salas exploradas. Não há instruções de portas na tela.
 var rotulo_estado: Label
+var rotulo_atalho_mapa: Label
 var rotulo_mapa: Label
 var rotulo_debug: Label
 var rotulo_mensagem: Label
@@ -34,7 +37,12 @@ var fonte_mapa: SystemFont
 func _ready() -> void:
 	# Quando o mundo pausa durante a escolha, o HUD deve receber clique e teclado.
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	hud_visual_instancia = CENA_HUD_VISUAL.instantiate() as CanvasLayer
+	add_child(hud_visual_instancia)
 	rotulo_estado = _rotulo(Vector2(18, 10), Vector2(735, 28), 17)
+	rotulo_atalho_mapa = _rotulo(Vector2(980, 10), Vector2(150, 28), 17)
+	rotulo_atalho_mapa.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	rotulo_atalho_mapa.text = "[M] Mapa"
 	rotulo_mensagem = _rotulo(Vector2(180, 60), Vector2(795, 42), 19)
 	rotulo_mensagem.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	rotulo_mensagem.add_theme_color_override("font_color", Color("f4df9d"))
@@ -327,17 +335,31 @@ func _input(evento: InputEvent) -> void:
 
 func atualizar(mapa: MapaMatriz, posicao: Vector2i, jogador: Jogador, derrotados: Dictionary, mensagem: String) -> void:
 	rotulo_mensagem.text = mensagem
+
 	if not is_instance_valid(jogador):
 		rotulo_estado.text = "PROCESSO ENCERRADO     R: reiniciar"
+		rotulo_atalho_mapa.visible = false
+		if is_instance_valid(hud_visual_instancia):
+			hud_visual_instancia.visible = false
 		return
-	var habilidades: String = ""
-	if jogador.pulo_duplo_liberado:
-		habilidades += "  •  2× PULO"
-	if jogador.dash_component.dash_desbloqueado:
-		habilidades += "  •  MALLOC"
-	if jogador.grapple_liberado:
-		habilidades += "  •  GRAPPLE"
-	rotulo_estado.text = "HP %d/%d   STACK %.0f/%.0f%s     [M] Mapa" % [jogador.vida_atual, jogador.vida_maxima, jogador.overflow_atual, jogador.overflow_maximo, habilidades]
+
+	rotulo_estado.text = ""
+	rotulo_atalho_mapa.visible = true
+
+	if is_instance_valid(hud_visual_instancia):
+		hud_visual_instancia.visible = true
+		hud_visual_instancia.call("atualizar_barras", jogador)
+
+		var texto_hab: String = "Nenhuma"
+
+		if jogador.grapple_liberado:
+			texto_hab = "GRAPPLE"
+		elif jogador.dash_component.dash_desbloqueado:
+			texto_hab = "MALLOC (Dash)"
+		elif jogador.pulo_duplo_liberado:
+			texto_hab = "PULO DUPLO"
+
+		hud_visual_instancia.call("atualizar_habilidade", texto_hab)
 	if debug_visivel:
 		rotulo_debug.text = "DEBUG [F3] | Sala %s | Seed %d | Chefes %s\nSetas mover | Espaço pular | J/clique atacar | G descansar | F boss teste | O +25 STACK | R reiniciar" % [str(posicao), mapa.semente, str(derrotados.keys())]
 	if not mapa_visivel:
