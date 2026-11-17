@@ -1,0 +1,30 @@
+[gd_scene load_steps=3 format=3 uid="uid://cdbn2pbxuap1u"]
+
+[ext_resource type="Script" uid="uid://dlhyabytw1qbf" path="res://scripts/inimigos/drop_provisorio.gd" id="1_drop"]
+
+[sub_resource type="CircleShape2D" id="shape_drop"]
+radius = 22.0
+
+[node name="DropProvisorio" type="Area2D"]
+collision_layer = 0
+script = ExtResource("1_drop")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("shape_drop")
+
+[node name="Visual" type="ColorRect" parent="."]
+offset_left = -12.0
+offset_top = -12.0
+offset_right = 12.0
+offset_bottom = 12.0
+mouse_filter = 2
+color = Color(0.7, 1, 0.8, 1)
+
+[node name="Nome" type="Label" parent="."]
+offset_left = -130.0
+offset_top = -48.0
+offset_right = 130.0
+offset_bottom = -20.0
+theme_override_font_sizes/font_size = 13
+text = "DROP provisório"
+horizontal_alignment = 1

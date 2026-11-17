@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://fey121tua34i"]
+
+[ext_resource type="Script" uid="uid://c4px6u63evl3w" path="res://scripts/teste_boss_2.gd" id="1_teste"]
+
+[node name="ArenaBoss2" type="Node2D"]
+script = ExtResource("1_teste")

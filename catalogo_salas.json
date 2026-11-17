@@ -1,0 +1,170 @@
+[
+  {
+    "path": "res://cenas/salas/sala_01.tscn",
+    "mask": 1,
+    "kind": "normal",
+    "shapes": 7
+  },
+  {
+    "path": "res://cenas/salas/sala_02.tscn",
+    "mask": 2,
+    "kind": "normal",
+    "shapes": 8
+  },
+  {
+    "path": "res://cenas/salas/sala_03.tscn",
+    "mask": 3,
+    "kind": "normal",
+    "shapes": 8
+  },
+  {
+    "path": "res://cenas/salas/sala_04.tscn",
+    "mask": 4,
+    "kind": "normal",
+    "shapes": 10
+  },
+  {
+    "path": "res://cenas/salas/sala_05.tscn",
+    "mask": 5,
+    "kind": "normal",
+    "shapes": 11
+  },
+  {
+    "path": "res://cenas/salas/sala_06.tscn",
+    "mask": 6,
+    "kind": "normal",
+    "shapes": 11
+  },
+  {
+    "path": "res://cenas/salas/sala_07.tscn",
+    "mask": 7,
+    "kind": "normal",
+    "shapes": 12
+  },
+  {
+    "path": "res://cenas/salas/sala_08.tscn",
+    "mask": 8,
+    "kind": "normal",
+    "shapes": 6
+  },
+  {
+    "path": "res://cenas/salas/sala_09.tscn",
+    "mask": 9,
+    "kind": "normal",
+    "shapes": 8
+  },
+  {
+    "path": "res://cenas/salas/sala_10.tscn",
+    "mask": 10,
+    "kind": "normal",
+    "shapes": 8
+  },
+  {
+    "path": "res://cenas/salas/sala_11.tscn",
+    "mask": 11,
+    "kind": "normal",
+    "shapes": 9
+  },
+  {
+    "path": "res://cenas/salas/sala_12.tscn",
+    "mask": 12,
+    "kind": "normal",
+    "shapes": 11
+  },
+  {
+    "path": "res://cenas/salas/sala_13.tscn",
+    "mask": 13,
+    "kind": "normal",
+    "shapes": 12
+  },
+  {
+    "path": "res://cenas/salas/sala_14.tscn",
+    "mask": 14,
+    "kind": "normal",
+    "shapes": 12
+  },
+  {
+    "path": "res://cenas/salas/sala_15.tscn",
+    "mask": 15,
+    "kind": "normal",
+    "shapes": 13
+  },
+  {
+    "path": "res://cenas/salas/corredor_aberto.tscn",
+    "mask": 3,
+    "kind": "normal",
+    "shapes": 8
+  },
+  {
+    "path": "res://cenas/salas/corredor_degraus.tscn",
+    "mask": 3,
+    "kind": "normal",
+    "shapes": 9
+  },
+  {
+    "path": "res://cenas/salas/curva_esquerda_cima.tscn",
+    "mask": 5,
+    "kind": "normal",
+    "shapes": 11
+  },
+  {
+    "path": "res://cenas/salas/curva_direita_cima.tscn",
+    "mask": 6,
+    "kind": "normal",
+    "shapes": 11
+  },
+  {
+    "path": "res://cenas/salas/poco_vertical.tscn",
+    "mask": 12,
+    "kind": "normal",
+    "shapes": 11
+  },
+  {
+    "path": "res://cenas/salas/sala_inicio.tscn",
+    "mask": 5,
+    "kind": "inicio",
+    "shapes": 12
+  },
+  {
+    "path": "res://cenas/salas/sala_pulo_duplo.tscn",
+    "mask": 3,
+    "kind": "bloqueio_pulo",
+    "shapes": 7
+  },
+  {
+    "path": "res://cenas/salas/sala_abismo_dash.tscn",
+    "mask": 3,
+    "kind": "bloqueio_dash",
+    "shapes": 7
+  },
+  {
+    "path": "res://cenas/salas/sala_boss_1.tscn",
+    "mask": 2,
+    "kind": "boss1",
+    "shapes": 7
+  },
+  {
+    "path": "res://cenas/salas/sala_boss_2.tscn",
+    "mask": 5,
+    "kind": "boss2",
+    "shapes": 13
+  },
+  {
+    "path": "res://cenas/salas/sala_boss_3.tscn",
+    "mask": 3,
+    "kind": "boss3",
+    "shapes": 9
+  },
+  {
+    "path": "res://cenas/salas/sala_altar_final.tscn",
+    "mask": 1,
+    "kind": "final",
+    "shapes": 7
+  },
+  {
+    "path": "res://cenas/salas/sala_armadilha_horizontal.tscn",
+    "mask": 3,
+    "kind": "normal",
+    "shapes": 8
+  }
+]
