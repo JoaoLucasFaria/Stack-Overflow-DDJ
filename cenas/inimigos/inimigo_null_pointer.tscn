@@ -11,7 +11,7 @@ script = ExtResource("1_enemy")
 vida_maxima = 2
 item_id = &"null_pointer"
 nome_visivel = "Null Pointer"
-velocidade = 72.0
+velocidade = 0.0
 alcance_ataque = 50.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

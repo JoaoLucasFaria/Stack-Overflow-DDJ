@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/inimigos/onda_wifi_null_pointer.gd" id="1_onda"]
+
+[node name="OndaWifiNullPointer" type="Area2D"]
+script = ExtResource("1_onda")

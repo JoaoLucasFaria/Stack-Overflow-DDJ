@@ -1,0 +1,64 @@
+[gd_scene load_steps=7 format=3 uid="uid://10x6377ngmur"]
+
+[ext_resource type="PackedScene" uid="uid://0a5evneeqmok" path="res://cenas/player.tscn" id="1_jogador"]
+[ext_resource type="PackedScene" uid="uid://na8yu61jedh3" path="res://cenas/inimigos/inimigo_memory_leak.tscn" id="2_memory"]
+[ext_resource type="PackedScene" uid="uid://by3xtdf8ue0ls" path="res://cenas/inimigos/inimigo_null_pointer.tscn" id="3_null"]
+
+[sub_resource type="RectangleShape2D" id="1_piso"]
+size = Vector2(1152, 48)
+
+[sub_resource type="RectangleShape2D" id="2_parede"]
+size = Vector2(24, 648)
+
+[sub_resource type="RectangleShape2D" id="3_plataforma"]
+size = Vector2(190, 16)
+
+[node name="TesteInimigosV8" type="Node2D"]
+
+[node name="Piso" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Piso"]
+position = Vector2(576, 624)
+shape = SubResource("1_piso")
+
+[node name="Visual" type="ColorRect" parent="Piso"]
+offset_top = 600.0
+offset_right = 1152.0
+offset_bottom = 648.0
+color = Color(0.12, 0.22, 0.29, 1)
+
+[node name="ParedeEsquerda" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ParedeEsquerda"]
+position = Vector2(12, 324)
+shape = SubResource("2_parede")
+
+[node name="ParedeDireita" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ParedeDireita"]
+position = Vector2(1140, 324)
+shape = SubResource("2_parede")
+
+[node name="Plataforma" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataforma"]
+position = Vector2(830, 420)
+shape = SubResource("3_plataforma")
+one_way_collision = true
+
+[node name="Visual" type="ColorRect" parent="Plataforma"]
+offset_left = 735.0
+offset_top = 412.0
+offset_right = 925.0
+offset_bottom = 428.0
+color = Color(0.26, 0.33, 0.41, 1)
+
+[node name="Player" parent="." instance=ExtResource("1_jogador")]
+position = Vector2(520, 559)
+vida_maxima = 50
+
+[node name="MemoryLeak" parent="." instance=ExtResource("2_memory")]
+position = Vector2(230, 585)
+
+[node name="NullPointer" parent="." instance=ExtResource("3_null")]
+position = Vector2(940, 585)
