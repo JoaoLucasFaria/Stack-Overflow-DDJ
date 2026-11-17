@@ -1,11 +1,13 @@
 class_name HUDMatriz
 extends CanvasLayer
+
 const CENA_HUD_VISUAL = preload("res://cenas/hud.tscn")
 var hud_visual_instancia: CanvasLayer
 
 ## HUD limpa. M abre o mapa; F3 revela informações técnicas.
 ## O mapa mostra só salas exploradas. Não há instruções de portas na tela.
 var rotulo_estado: Label
+var rotulo_atalho_mapa: Label
 var rotulo_mapa: Label
 var rotulo_debug: Label
 var rotulo_mensagem: Label
@@ -21,10 +23,18 @@ var debug_visivel: bool = false
 func _ready() -> void:
 	hud_visual_instancia = CENA_HUD_VISUAL.instantiate() as CanvasLayer
 	add_child(hud_visual_instancia)
+
 	rotulo_estado = _rotulo(Vector2(18, 10), Vector2(735, 28), 17)
+
+	# Label próprio para o atalho do mapa (substituindo os espaços em branco)
+	rotulo_atalho_mapa = _rotulo(Vector2(980, 10), Vector2(150, 28), 17)
+	rotulo_atalho_mapa.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	rotulo_atalho_mapa.text = "[M] Mapa"
+
 	rotulo_mensagem = _rotulo(Vector2(180, 60), Vector2(795, 42), 19)
 	rotulo_mensagem.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	rotulo_mensagem.add_theme_color_override("font_color", Color("f4df9d"))
+
 	rotulo_dica = _rotulo(Vector2(24, 565), Vector2(900, 28), 16)
 	rotulo_dica.add_theme_color_override("font_color", Color("b0ebd5"))
 
@@ -34,18 +44,22 @@ func _ready() -> void:
 	painel_mapa.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	painel_mapa.visible = false
 	add_child(painel_mapa)
+
 	var coluna: VBoxContainer = VBoxContainer.new()
 	coluna.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	painel_mapa.add_child(coluna)
+
 	var titulo: Label = Label.new()
 	titulo.text = "MAPA DE MEMÓRIA [M]"
 	titulo.add_theme_font_size_override("font_size", 15)
 	coluna.add_child(titulo)
+
 	rolagem_mapa = ScrollContainer.new()
 	rolagem_mapa.custom_minimum_size = Vector2(425, 225)
 	rolagem_mapa.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	rolagem_mapa.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	coluna.add_child(rolagem_mapa)
+
 	rotulo_mapa = Label.new()
 	rotulo_mapa.add_theme_font_size_override("font_size", 12)
 	var fonte: SystemFont = SystemFont.new()
@@ -59,6 +73,7 @@ func _ready() -> void:
 	painel_debug.visible = false
 	painel_debug.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(painel_debug)
+
 	rotulo_debug = Label.new()
 	rotulo_debug.add_theme_font_size_override("font_size", 13)
 	painel_debug.add_child(rotulo_debug)
@@ -68,15 +83,18 @@ func _ready() -> void:
 	painel_fim.custom_minimum_size = Vector2(622, 246)
 	painel_fim.visible = false
 	add_child(painel_fim)
+
 	var coluna_fim: VBoxContainer = VBoxContainer.new()
 	coluna_fim.name = "ConteudoFim"
 	coluna_fim.alignment = BoxContainer.ALIGNMENT_CENTER
 	painel_fim.add_child(coluna_fim)
+
 	var titulo_fim: Label = Label.new()
 	titulo_fim.name = "Titulo"
 	titulo_fim.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	titulo_fim.add_theme_font_size_override("font_size", 33)
 	coluna_fim.add_child(titulo_fim)
+
 	var subtitulo: Label = Label.new()
 	subtitulo.name = "Subtitulo"
 	subtitulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -127,13 +145,16 @@ func alternar_debug() -> void:
 	debug_visivel = not debug_visivel
 	painel_debug.visible = debug_visivel
 
+
 func atualizar(mapa: MapaMatriz, posicao: Vector2i, jogador: Jogador, derrotados: Dictionary, mensagem: String) -> void:
 	rotulo_mensagem.text = mensagem
 	if not is_instance_valid(jogador):
-		rotulo_estado.text = ""
+		rotulo_estado.text = "PROCESSO ENCERRADO      R: reiniciar"
+		rotulo_atalho_mapa.visible = false
 		return
 
-	rotulo_estado.text = "                                                                                      [M] Mapa"
+	rotulo_estado.text = ""
+	rotulo_atalho_mapa.visible = true
 
 	if is_instance_valid(hud_visual_instancia):
 		hud_visual_instancia.atualizar_barras(jogador)
@@ -149,8 +170,10 @@ func atualizar(mapa: MapaMatriz, posicao: Vector2i, jogador: Jogador, derrotados
 
 	if debug_visivel:
 		rotulo_debug.text = "DEBUG [F3] | Sala %s | Seed %d | Chefes %s\nSetas mover | Espaço pular | J/clique atacar | E descansar | F boss teste | O +25 STACK | R reiniciar" % [str(posicao), mapa.semente, str(derrotados.keys())]
+
 	if not mapa_visivel:
 		return
+
 	# A grade antiga era fixa (-6..8, -5..4). Um mapa maior precisa
 	# ampliar o enquadramento conforme o jogador descobre novas salas.
 	var min_x: int = posicao.x
@@ -162,6 +185,7 @@ func atualizar(mapa: MapaMatriz, posicao: Vector2i, jogador: Jogador, derrotados
 		max_x = maxi(max_x, coordenada.x)
 		min_y = mini(min_y, coordenada.y)
 		max_y = maxi(max_y, coordenada.y)
+
 	var linhas: PackedStringArray = []
 	for y in range(min_y - 1, max_y + 2):
 		var linha: String = ""
@@ -187,5 +211,9 @@ func atualizar(mapa: MapaMatriz, posicao: Vector2i, jogador: Jogador, derrotados
 					simbolo = "■"
 			linha += simbolo + " "
 		linhas.append(linha)
+
 	rotulo_mapa.text = "\n".join(linhas) + "\n@ Você | J Pulo | D Dash | F Final"
-	# Mantenha aqui no final as duas linhas originais do rolagem_mapa da main
+	# Se o mapa ultrapassar a largura visível, acompanhe o jogador.
+	# As medidas são aproximadas e o ScrollContainer limita o deslocamento.
+	rolagem_mapa.scroll_horizontal = maxi(0, (posicao.x - min_x + 1) * 14 - 190)
+	rolagem_mapa.scroll_vertical = maxi(0, (posicao.y - min_y + 1) * 15 - 95)
