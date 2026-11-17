@@ -96,3 +96,6 @@ position = Vector2(71, 555)
 
 [node name="PosicaoNucleo" type="Marker2D" parent="Pontos" index="6"]
 position = Vector2(504, 97)
+
+[node name="PosicaoBreakpointBoss" type="Marker2D" parent="Pontos" index="7"]
+position = Vector2(790, 600)
