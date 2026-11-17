@@ -1,6 +1,9 @@
 class_name Jogador
 extends CharacterBody2D
 
+const SCRIPT_PATCHES = preload("res://scripts/patches/gerenciador_patches.gd")
+var patches: GerenciadorPatches
+
 ## Movimentação básica. Mantemos os nomes exportados para preservar ajustes nas cenas.
 @export_category("Movimentação")
 @export var SPEED: float = 300.0
@@ -64,6 +67,10 @@ var grapple_liberado: bool = false
 func _ready() -> void:
 	add_to_group("jogador")
 	vida_atual = vida_maxima
+	patches = SCRIPT_PATCHES.new() as GerenciadorPatches
+	patches.name = "GerenciadorPatches"
+	patches.configurar(self)
+	add_child(patches)
 	jumps_remaining = quantidade_pulos_disponiveis()
 	vida_alterada.emit(vida_atual, vida_maxima)
 	overflow_alterado.emit(overflow_atual, overflow_maximo)
@@ -164,12 +171,13 @@ func _physics_process(delta: float) -> void:
 			jump_released = false
 
 	# Durante alguns milissegundos o impulso horizontal do Wall Jump tem prioridade.
+	var velocidade_efetiva: float = SPEED * (patches.multiplicador_velocidade() if is_instance_valid(patches) else 1.0)
 	if tempo_trava_wall_jump <= 0.0:
 		if not is_zero_approx(direcao):
-			velocity.x = direcao * SPEED * fator_lentidao_deadlock
+			velocity.x = direcao * velocidade_efetiva * fator_lentidao_deadlock
 		else:
 			# Preserva a desaceleração do protótipo original.
-			velocity.x = move_toward(velocity.x, 0.0, SPEED)
+			velocity.x = move_toward(velocity.x, 0.0, velocidade_efetiva)
 
 	move_and_slide()
 
@@ -376,13 +384,18 @@ func receber_dano(dano: int, origem_dano: Vector2 = Vector2.ZERO) -> void:
 	if tempo_iframes > 0.0 or dash_component.e_invencivel:
 		return
 
-	# Item Memory Leak trata a protecao; o Jogador nao conhece seu efeito.
+	# Preserva a prioridade do escudo Memory Leak, depois tenta try_catch.
 	var equipamentos: EquipamentosAtivos = get_node_or_null("EquipamentosAtivos") as EquipamentosAtivos
 	if equipamentos != null and equipamentos.absorver_dano(origem_dano):
+		return
+	if is_instance_valid(patches) and patches.tentar_absorver_dano():
+		tempo_iframes = maxf(tempo_iframes, 0.25)
 		return
 
 	vida_atual = maxi(vida_atual - dano, 0)
 	vida_alterada.emit(vida_atual, vida_maxima)
+	if is_instance_valid(patches) and vida_atual > 0:
+		patches.registrar_dano_recebido()
 
 	# Ativa invencibilidade e knockback (interrompe a escalada).
 	tempo_iframes = duracao_iframes

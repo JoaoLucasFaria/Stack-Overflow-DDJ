@@ -36,7 +36,8 @@ func _atacar() -> void:
 	if not is_instance_valid(jogador) or jogador.vida_atual <= 0 or jogador.dash_component.esta_dashing or jogador.esta_travado_por_overflow():
 		return
 
-	recarga = cooldown
+	var patches: GerenciadorPatches = jogador.patches
+	recarga = cooldown / (patches.multiplicador_ataque() if is_instance_valid(patches) else 1.0)
 	flash_ataque = 0.12
 	sentido_flash = float(jogador.direcao_olhar)
 
@@ -46,6 +47,9 @@ func _atacar() -> void:
 	if equipamentos != null:
 		modificadores = equipamentos.consumir_modificador_ataque()
 	var dano_golpe: int = dano + int(modificadores.get("dano_extra", 0))
+	if is_instance_valid(patches):
+		dano_golpe += patches.bonus_dano_proximo_ataque()
+		dano_golpe += patches.dano_critico_extra(dano_golpe)
 	var alcance_extra: float = float(modificadores.get("alcance_extra", 0.0))
 	var alcance_horizontal_golpe: float = alcance_horizontal + alcance_extra
 	var alcance_vertical_golpe: float = alcance_vertical + alcance_extra
@@ -88,6 +92,7 @@ func _atacar() -> void:
 	consulta.exclude = [jogador.get_rid()]
 
 	var atingidos: Dictionary = {}
+	var registrou_patch_acerto: bool = false
 
 	for resultado in get_world_2d().direct_space_state.intersect_shape(consulta, 24):
 		var alvo: Object = resultado.get("collider")
@@ -109,6 +114,9 @@ func _atacar() -> void:
 				var vida_depois: Variant = alvo_unico.get("vida_atual")
 				if vida_depois != null and vida_depois < vida_antes and (alvo_unico is InimigoBase or alvo_unico is BossBase):
 					jogador.reduzir_overflow(stack_reduzido_por_acerto)
+					if is_instance_valid(patches) and not registrou_patch_acerto:
+						registrou_patch_acerto = true
+						patches.registrar_acerto_basico(alvo_unico, dano_golpe)
 
 
 func _draw() -> void:
