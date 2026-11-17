@@ -10,26 +10,38 @@ const CENAS: Dictionary = {
     &"memory_leak": preload("res://cenas/equipamentos/escudo_memory_leak.tscn"),
     &"segmentation_fault": preload("res://cenas/equipamentos/projetil_segmentation_fault.tscn"),
     &"null_pointer": preload("res://cenas/equipamentos/armadilha_null_pointer.tscn"),
-    &"syntax_error": preload("res://cenas/equipamentos/ataque_syntax_error.tscn")
+    &"syntax_error": preload("res://cenas/equipamentos/ataque_syntax_error.tscn"),
+    &"fork_bomb": preload("res://cenas/equipamentos/isca_fork.tscn"),
+    &"race_condition": preload("res://cenas/equipamentos/mutex_lock.tscn"),
+    &"deadlock": preload("res://cenas/equipamentos/interrupt.tscn")
 }
 const NOMES: Dictionary = {
     &"memory_leak": "Escudo Memory Leak",
     &"segmentation_fault": "Projetil Segmentation Fault",
     &"null_pointer": "Armadilha Null Pointer",
-    &"syntax_error": "Golpe Syntax Error"
+    &"syntax_error": "Golpe Syntax Error",
+    &"fork_bomb": "fork() - Processo Isca",
+    &"race_condition": "mutex.lock() - Exclusao Mutua",
+    &"deadlock": "interrupt() - Interrupcao"
 }
 const EFEITOS: Dictionary = {
     &"memory_leak": "Absorve uma instancia de dano e repele inimigos moveis proximos.",
     &"segmentation_fault": "Dispara um projetil horizontal na direcao do jogador.",
     &"null_pointer": "Armadilha que causa dano e teleporta o inimigo para tras.",
-    &"syntax_error": "Fortalece o alcance e o dano do proximo ataque basico."
+    &"syntax_error": "Fortalece o alcance e o dano do proximo ataque basico.",
+    &"fork_bomb": "Cria uma isca de 5s que distrai inimigos comuns proximos.",
+    &"race_condition": "Congela inimigos comuns 1,2s; desacelera chefes brevemente.",
+    &"deadlock": "Cancela ataques por 1s, inclusive chefes; nao causa dano. Recarga 40s."
 }
 ## Espaco reservado para descricoes narrativas, a definir pela equipe.
 const DESCRICOES: Dictionary = {
     &"memory_leak": "Descricao narrativa: a definir.",
     &"segmentation_fault": "Descricao narrativa: a definir.",
     &"null_pointer": "Descricao narrativa: a definir.",
-    &"syntax_error": "Descricao narrativa: a definir."
+    &"syntax_error": "Descricao narrativa: a definir.",
+    &"fork_bomb": "Descricao narrativa: a definir.",
+    &"race_condition": "Descricao narrativa: a definir.",
+    &"deadlock": "Descricao narrativa: a definir."
 }
 const CENA_HUD: PackedScene = preload("res://cenas/equipamentos/hud_equipamentos.tscn")
 const CENA_COLETA: PackedScene = preload("res://cenas/equipamentos/hud_coleta_item.tscn")

@@ -68,6 +68,9 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if encerrado or not is_instance_valid(jogador):
 		return
+	if _processar_interrupcao(delta):
+		return
+	delta = _tempo_com_lentidao(delta)
 
 	tempo_flash = maxf(0.0, tempo_flash - delta)
 	_atualizar_laser_rasteiro(delta)
@@ -201,6 +204,24 @@ func _limpar_projeteis() -> void:
 		if is_instance_valid(projetil):
 			projetil.queue_free()
 	projeteis_ativos.clear()
+
+
+func _pode_ser_interrompido() -> bool:
+	# Nao interrompe queda forcada, abertura/fechamento do nucleo nem exposicao.
+	return estado != Estado.IMPACTO and estado != Estado.EXPOSTO
+
+
+func _cancelar_ataque_para_interrupcao() -> void:
+	for projetil in projeteis_ativos:
+		if is_instance_valid(projetil):
+			projetil.queue_free()
+	projeteis_ativos.clear()
+	tiros_agendados.clear()
+	_parar_laser_rasteiro()
+	estado = Estado.ESPERA
+	temporizador = 0.0
+	tempo_rajada_ambiente = 0.75
+	mensagem = "INTERRUPT() - 1s SEM ATAQUE"
 
 
 func _atirar_no_jogador() -> void:

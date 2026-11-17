@@ -83,6 +83,7 @@ func _atacar() -> void:
 	consulta.shape = forma
 	consulta.transform = Transform2D(0.0, centro)
 	consulta.collide_with_bodies = true
+	consulta.collide_with_areas = true  # Correntes Deadlock sao zonas atravessaveis de 1 HP.
 	consulta.collision_mask = 2
 	consulta.exclude = [jogador.get_rid()]
 
@@ -91,17 +92,22 @@ func _atacar() -> void:
 	for resultado in get_world_2d().direct_space_state.intersect_shape(consulta, 24):
 		var alvo: Object = resultado.get("collider")
 
-		if alvo != null and alvo.has_method("receber_dano") and not atingidos.has(alvo):
-			atingidos[alvo] = true
+		if alvo != null and alvo.has_method("receber_dano"):
+			# Race Condition possui uma copia com HP compartilhado; um golpe
+			# que encontra as duas hitboxes deve registrar um unico acerto.
+			var alvo_unico: Object = alvo.call("alvo_compartilhado") if alvo.has_method("alvo_compartilhado") else alvo
+			if atingidos.has(alvo_unico):
+				continue
+			atingidos[alvo_unico] = true
 			# Nao recupera STACK se o golpe for bloqueado pelo escudo do
 			# Boss 1. Apenas dano realmente aplicado conta como acerto.
 			# O nucleo do Boss 1 recebe golpes, mas nao possui vida_atual.
 			# Nao converta null para int; STACK diminui somente com dano real.
-			var vida_antes: Variant = alvo.get("vida_atual")
+			var vida_antes: Variant = alvo_unico.get("vida_atual") if is_instance_valid(alvo_unico) else null
 			alvo.call("receber_dano", dano_golpe)
-			if vida_antes != null and is_instance_valid(alvo):
-				var vida_depois: Variant = alvo.get("vida_atual")
-				if vida_depois != null and vida_depois < vida_antes:
+			if vida_antes != null and is_instance_valid(alvo_unico):
+				var vida_depois: Variant = alvo_unico.get("vida_atual")
+				if vida_depois != null and vida_depois < vida_antes and (alvo_unico is InimigoBase or alvo_unico is BossBase):
 					jogador.reduzir_overflow(stack_reduzido_por_acerto)
 
 

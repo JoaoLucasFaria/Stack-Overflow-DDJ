@@ -1,0 +1,26 @@
+[gd_scene load_steps=3 format=3 uid="uid://byp4ayr1r3gtc"]
+
+[ext_resource type="Script" path="res://scripts/teste_interrupt_boss_v9.gd" id="1"]
+
+[sub_resource type="RectangleShape2D" id="piso"]
+size = Vector2(1152, 48)
+
+[node name="TesteInterruptBossV9" type="Node2D"]
+script = ExtResource("1")
+
+[node name="Fundo" type="ColorRect" parent="."]
+offset_right = 1152.0
+offset_bottom = 648.0
+color = Color(0.07, 0.11, 0.16, 1)
+
+[node name="Piso" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Piso"]
+position = Vector2(576, 624)
+shape = SubResource("piso")
+
+[node name="Visual" type="ColorRect" parent="Piso"]
+offset_top = 600.0
+offset_right = 1152.0
+offset_bottom = 648.0
+color = Color(0.22, 0.34, 0.43, 1)

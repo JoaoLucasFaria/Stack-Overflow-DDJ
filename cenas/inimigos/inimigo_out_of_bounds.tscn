@@ -1,0 +1,33 @@
+[gd_scene load_steps=3 format=3 uid="uid://bghvn6kldvqux"]
+
+[ext_resource type="Script" uid="uid://b8i545ybe6d4w" path="res://scripts/inimigos/out_of_bounds.gd" id="1"]
+
+[sub_resource type="RectangleShape2D" id="shape"]
+size = Vector2(28, 28)
+
+[node name="OutOfBounds" type="CharacterBody2D"]
+collision_layer = 2
+script = ExtResource("1")
+item_id = &"out_of_bounds"
+nome_visivel = "Out of Bounds"
+velocidade = 0.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("shape")
+
+[node name="Visual" type="ColorRect" parent="."]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+mouse_filter = 2
+color = Color(0.99, 0.26, 0.42, 1)
+
+[node name="Nome" type="Label" parent="."]
+offset_left = -95.0
+offset_top = -42.0
+offset_right = 95.0
+offset_bottom = -18.0
+theme_override_font_sizes/font_size = 12
+text = "Out of Bounds"
+horizontal_alignment = 1

@@ -1,0 +1,36 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/inimigos/race_condition.gd" id="1"]
+
+[sub_resource type="RectangleShape2D" id="shape"]
+size = Vector2(32, 32)
+
+[node name="RaceCondition" type="CharacterBody2D"]
+collision_layer = 2
+script = ExtResource("1")
+vida_maxima = 4
+dano = 1
+nome_visivel = "Race Condition"
+velocidade = 100.0
+item_id = &"race_condition"
+chance_drop_percentual = 35
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("shape")
+
+[node name="Visual" type="ColorRect" parent="."]
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = 16.0
+mouse_filter = 2
+color = Color(0.20, 0.84, 0.97, 1)
+
+[node name="Nome" type="Label" parent="."]
+offset_left = -95.0
+offset_top = -44.0
+offset_right = 95.0
+offset_bottom = -20.0
+theme_override_font_sizes/font_size = 12
+text = "Race Condition"
+horizontal_alignment = 1

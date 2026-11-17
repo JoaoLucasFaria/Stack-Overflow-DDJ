@@ -89,14 +89,15 @@ func _process(delta: float) -> void:
 
 	if not is_instance_valid(status):
 		return
-	if encerrado or not is_instance_valid(boss):
-		status.text = "STONEMAKER DERROTADO — GRAPPLING LIBERADO"
-	elif jogador.vida_atual <= 0:
+
+	if not is_instance_valid(jogador) or jogador.vida_atual <= 0:
 		status.text = "PROCESSO ENCERRADO"
+	elif encerrado or not is_instance_valid(boss):
+		status.text = "STONEMAKER DERROTADO — GRAPPLING LIBERADO"
 	else:
 		status.text = "STONEMAKER | FASE %d | %s | DASH CLASHES: %d" % [
 			boss.fase_atual, boss.texto_estado, total_clashes
-		]
+			]
 
 
 func _atualizar_barra(atual: int, maxima: int) -> void:

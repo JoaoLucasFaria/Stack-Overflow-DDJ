@@ -10,7 +10,11 @@ const CENAS_INIMIGOS: Dictionary = {
 	"syntax_error": preload("res://cenas/inimigos/inimigo_syntax_error.tscn"),
 	"null_pointer": preload("res://cenas/inimigos/inimigo_null_pointer.tscn"),
 	"memory_leak": preload("res://cenas/inimigos/inimigo_memory_leak.tscn"),
-	"segmentation_fault": preload("res://cenas/inimigos/inimigo_segmentation_fault.tscn")
+	"segmentation_fault": preload("res://cenas/inimigos/inimigo_segmentation_fault.tscn"),
+	"fork_bomb": preload("res://cenas/inimigos/inimigo_fork_bomb.tscn"),
+	"race_condition": preload("res://cenas/inimigos/inimigo_race_condition.tscn"),
+	"deadlock": preload("res://cenas/inimigos/inimigo_deadlock.tscn"),
+	"out_of_bounds": preload("res://cenas/inimigos/inimigo_out_of_bounds.tscn")
 }
 
 @export_category("Matriz procedural")
@@ -301,6 +305,9 @@ func _povoar_sala() -> void:
 	var grupo: Node = sala_atual.get_node_or_null("Conteudo/SpawnsInimigos")
 	if grupo == null:
 		return
+	# Fork Bomb somente em setores que exigem o pulo duplo para acesso.
+	# Mesmo apos derrotar Boss1, nao aparece em salas da regiao inicial.
+	var zona_pos_boss1: bool = jogador.pulo_duplo_liberado and not mapa.alcancaveis(false, false, false).has(coordenada_atual)
 	var mortos: Dictionary = inimigos_derrotados.get(coordenada_atual, {})
 	var escolhas: Dictionary = tipos_inimigos_sorteados.get(coordenada_atual, {})
 	var estados_sala: Dictionary = estados_inimigos.get(coordenada_atual, {})
@@ -310,8 +317,11 @@ func _povoar_sala() -> void:
 			continue
 		var tipo_escolhido: String = String(escolhas.get(marcador.name, ""))
 		if tipo_escolhido.is_empty():
-			tipo_escolhido = marcador.sortear_tipo()
+			tipo_escolhido = marcador.sortear_tipo(zona_pos_boss1)
 			escolhas[marcador.name] = tipo_escolhido
+		# Mesmo com estado de sala restaurado, o Fork Bomb exige duplo pulo.
+		if tipo_escolhido == "fork_bomb" and not zona_pos_boss1:
+			tipo_escolhido = "syntax_error"
 		var cena: PackedScene = CENAS_INIMIGOS.get(tipo_escolhido) as PackedScene
 		if cena == null:
 			push_warning("Tipo de inimigo desconhecido: " + tipo_escolhido)

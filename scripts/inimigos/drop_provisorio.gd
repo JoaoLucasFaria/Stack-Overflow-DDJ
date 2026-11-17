@@ -9,13 +9,19 @@ const NOMES: Dictionary = {
     &"syntax_error": "Syntax Error",
     &"null_pointer": "Null Pointer",
     &"memory_leak": "Memory Leak",
-    &"segmentation_fault": "Segmentation Fault"
+    &"segmentation_fault": "Segmentation Fault",
+    &"fork_bomb": "Fork Bomb",
+    &"race_condition": "Race Condition",
+    &"deadlock": "Deadlock"
 }
 const CORES: Dictionary = {
     &"syntax_error": Color("f27a63"),
     &"null_pointer": Color("b887ee"),
     &"memory_leak": Color("70d599"),
-    &"segmentation_fault": Color("f0c768")
+    &"segmentation_fault": Color("f0c768"),
+    &"fork_bomb": Color("bf72fb"),
+    &"race_condition": Color("49dcf5"),
+    &"deadlock": Color("f79a56")
 }
 
 

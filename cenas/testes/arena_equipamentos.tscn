@@ -1,9 +1,15 @@
-[gd_scene load_steps=3 format=3 uid="uid://bjiwpemuktisx"]
+[gd_scene load_steps=5 format=3 uid="uid://bjiwpemuktisx"]
 
 [ext_resource type="Script" uid="uid://b6m83c1qewhmt" path="res://scripts/teste_equipamentos.gd" id="1_test"]
 
 [sub_resource type="RectangleShape2D" id="shape_piso"]
 size = Vector2(1152, 48)
+
+[sub_resource type="RectangleShape2D" id="shape_andar"]
+size = Vector2(1100, 18)
+
+[sub_resource type="RectangleShape2D" id="shape_degrau"]
+size = Vector2(275, 18)
 
 [node name="ArenaTesteEquipamentos" type="Node2D"]
 script = ExtResource("1_test")
@@ -14,15 +20,47 @@ offset_bottom = 648.0
 mouse_filter = 2
 color = Color(0.065, 0.1, 0.15, 1)
 
-[node name="Piso" type="StaticBody2D" parent="."]
-position = Vector2(0, 600)
+[node name="PisoInferior" type="StaticBody2D" parent="."]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Piso"]
-position = Vector2(576, 24)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PisoInferior"]
+position = Vector2(576, 624)
 shape = SubResource("shape_piso")
 
-[node name="Visual" type="ColorRect" parent="Piso"]
+[node name="Visual" type="ColorRect" parent="PisoInferior"]
+offset_top = 600.0
 offset_right = 1152.0
-offset_bottom = 48.0
+offset_bottom = 648.0
 mouse_filter = 2
 color = Color(0.26, 0.36, 0.47, 1)
+
+[node name="PlataformaSuperior" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlataformaSuperior"]
+position = Vector2(576, 370)
+shape = SubResource("shape_andar")
+one_way_collision = true
+one_way_collision_margin = 3.0
+
+[node name="Visual" type="ColorRect" parent="PlataformaSuperior"]
+offset_left = 26.0
+offset_top = 361.0
+offset_right = 1126.0
+offset_bottom = 379.0
+mouse_filter = 2
+color = Color(0.26, 0.58, 0.65, 1)
+
+[node name="DegrauAcesso" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DegrauAcesso"]
+position = Vector2(178, 499)
+shape = SubResource("shape_degrau")
+one_way_collision = true
+one_way_collision_margin = 3.0
+
+[node name="Visual" type="ColorRect" parent="DegrauAcesso"]
+offset_left = 40.0
+offset_top = 490.0
+offset_right = 315.0
+offset_bottom = 508.0
+mouse_filter = 2
+color = Color(0.21, 0.44, 0.51, 1)
