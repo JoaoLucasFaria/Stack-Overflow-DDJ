@@ -19,7 +19,7 @@ var normal_da_parede: Vector2 = Vector2.ZERO
 func _ready() -> void:
 	fixo_no_cenario = true
 	super._ready()
-	# O Main posiciona o inimigo *depois* de add_child(). Aguarde isso ocorrer.
+	# O Main posiciona o inimigo depois de add_child(). Aguarde isso ocorrer.
 	call_deferred("_fixar_na_parede")
 
 

@@ -10,13 +10,13 @@ enum Estado { AGUARDANDO, AVISO_TELEPORTE, AVISO_DISPARO, RECUPERANDO }
 @export_category("Teleporte aereo")
 @export_range(100.0, 300.0, 5.0) var distancia_teleporte: float = 165.0
 @export_range(100.0, 1500.0, 10.0) var distancia_ativacao: float = 740.0
-@export_range(0.1, 1.5, 0.05) var aviso_antes_teleporte: float = 0.38
-@export_range(0.1, 1.5, 0.05) var aviso_antes_onda: float = 0.48
-@export_range(0.1, 3.0, 0.05) var pausa_apos_onda: float = 0.72
+@export_range(0.1, 1.5, 0.05) var aviso_antes_teleporte: float = 0.5
+@export_range(0.1, 1.5, 0.05) var aviso_antes_onda: float = 0.7
+@export_range(0.1, 3.0, 0.05) var pausa_apos_onda: float = 0.9
 
 @export_category("Onda de sinal")
-@export_range(100.0, 700.0, 10.0) var velocidade_onda: float = 330.0
-@export_range(100.0, 900.0, 10.0) var alcance_onda: float = 470.0
+@export_range(100.0, 700.0, 10.0) var velocidade_onda: float = 300.0
+@export_range(100.0, 900.0, 10.0) var alcance_onda: float = 400.0
 
 var estado: Estado = Estado.AGUARDANDO
 var temporizador: float = 0.20

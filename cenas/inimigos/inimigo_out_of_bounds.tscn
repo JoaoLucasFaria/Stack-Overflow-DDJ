@@ -1,6 +1,6 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=3 format=3 uid="uid://bghvn6kldvqux"]
 
-[ext_resource type="Script" path="res://scripts/inimigos/out_of_bounds.gd" id="1"]
+[ext_resource type="Script" uid="uid://b8i545ybe6d4w" path="res://scripts/inimigos/out_of_bounds.gd" id="1"]
 
 [sub_resource type="RectangleShape2D" id="shape"]
 size = Vector2(28, 28)
@@ -8,12 +8,9 @@ size = Vector2(28, 28)
 [node name="OutOfBounds" type="CharacterBody2D"]
 collision_layer = 2
 script = ExtResource("1")
-vida_maxima = 3
-dano = 1
+item_id = &"out_of_bounds"
 nome_visivel = "Out of Bounds"
 velocidade = 0.0
-item_id = &"out_of_bounds"
-chance_drop_percentual = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("shape")

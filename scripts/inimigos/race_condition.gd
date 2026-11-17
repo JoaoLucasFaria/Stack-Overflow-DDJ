@@ -5,7 +5,7 @@ const CENA_ECO: PackedScene = preload("res://cenas/inimigos/race_echo.tscn")
 enum Estado { PROCURANDO, AVISO, DIVIDIDOS, ABERTURA }
 
 @export var tempo_divididos: float = 2.7
-@export var tempo_abertura: float = 1.25
+@export var tempo_abertura: float = 2.0
 @export var altura_eco: float = 110.0
 var estado: Estado = Estado.PROCURANDO
 var relogio: float = 0.8
