@@ -70,6 +70,8 @@ func _ready() -> void:
 	inventario.aviso.connect(_ao_aviso_equipamento)
 	hud = CENA_HUD.new() as HUDMatriz
 	add_child(hud)
+	hud.teleporte_confirmado.connect(_ao_teleporte_confirmado)
+	hud.teleporte_cancelado.connect(_ao_teleporte_cancelado)
 	_entrar_sala(Vector2i.ZERO, Vector2i.ZERO)
 	_aviso("Encontre o Guardiao 1. Explore atravessando as passagens.", 3.8)
 
@@ -247,6 +249,9 @@ func _ao_derrotar_boss(identificador: int) -> void:
 		3:
 			jogador.desbloquear_grapple()
 			_aviso("STONEMAKER derrotado: grapple final liberado!", 5.0)
+	# A SalaMatriz adiciona o terminal de modo diferido apos a derrota.
+	# Conectamos seu sinal em seguida, fora da consulta fisica.
+	call_deferred("_conectar_terminais")
 
 
 func _ao_morrer() -> void:
@@ -366,9 +371,89 @@ func _conectar_terminais() -> void:
 	for terminal in get_tree().get_nodes_in_group("terminais_breakpoint"):
 		# Grupo ligado só no nó do módulo atual, não nos nós antigos em queue_free().
 		var callback: Callable = Callable(self, "_ao_descansar")
-		if sala_atual.is_ancestor_of(terminal) and terminal.has_signal("descansou") and not terminal.is_connected("descansou", callback):
+		if not sala_atual.is_ancestor_of(terminal):
+			continue
+		if terminal.has_signal("descansou") and not terminal.is_connected("descansou", callback):
 			terminal.connect("descansou", callback)
+		var callback_tp: Callable = Callable(self, "_ao_abrir_mapa_teleporte")
+		if terminal.has_signal("teleporte_solicitado") and not terminal.is_connected("teleporte_solicitado", callback_tp):
+			terminal.connect("teleporte_solicitado", callback_tp)
 
+
+
+func _breakpoints_descobertos() -> Array[Vector2i]:
+	## Somente coordenadas realmente visitadas nesta run (nao revela o mapa).
+	var destinos: Array[Vector2i] = []
+	for coord in mapa.visitadas.keys():
+		var posicao: Vector2i = coord
+		var info: Dictionary = mapa.obter(posicao)
+		var tipo: String = String(info.get("tipo", ""))
+		if tipo == "inicio" or tipo == "breakpoint":
+			destinos.append(posicao)
+		elif tipo.begins_with("boss") and chefes_derrotados.has(tipo.substr(4).to_int()):
+			destinos.append(posicao)
+	return destinos
+
+
+func _ao_abrir_mapa_teleporte() -> void:
+	if partida_terminou or em_transicao or not is_instance_valid(jogador) or hud.teleporte_ativo:
+		return
+	var destinos: Array[Vector2i] = _breakpoints_descobertos()
+	if destinos.is_empty():
+		_aviso("Nenhum BREAKPOINT conhecido para viajar.", 2.5)
+		return
+	hud.abrir_mapa_teleporte(mapa, coordenada_atual, chefes_derrotados, destinos)
+	# EquipamentosAtivos processa mesmo durante pause para permitir a HUD
+	# de coleta; nao deve coletar/usar itens durante a viagem.
+	var inventario: EquipamentosAtivos = jogador.get_node_or_null("EquipamentosAtivos") as EquipamentosAtivos
+	if inventario != null:
+		inventario.set_physics_process(false)
+	get_tree().paused = true
+
+
+func _finalizar_mapa_teleporte() -> void:
+	hud.fechar_mapa_teleporte()
+	get_tree().paused = false
+	if is_instance_valid(jogador):
+		var inventario: EquipamentosAtivos = jogador.get_node_or_null("EquipamentosAtivos") as EquipamentosAtivos
+		if inventario != null:
+			# Nao coleta um drop por acidente no mesmo F da confirmacao.
+			inventario.aguardar_soltar_f = true
+			inventario.set_physics_process(true)
+
+
+func _ao_teleporte_cancelado() -> void:
+	_finalizar_mapa_teleporte()
+
+
+func _ao_teleporte_confirmado(destino: Vector2i) -> void:
+	# Revalida destino no Main: o HUD so controla a selecao visual.
+	if partida_terminou or em_transicao or not _breakpoints_descobertos().has(destino):
+		_finalizar_mapa_teleporte()
+		return
+	_finalizar_mapa_teleporte()
+	if destino == coordenada_atual:
+		_aviso("Voce ja esta neste BREAKPOINT.", 2.0)
+		return
+	em_transicao = true
+	# Usa a mesma troca segura das portas, preservando estados da sala.
+	call_deferred("_realizar_teleporte", destino)
+
+
+func _realizar_teleporte(destino: Vector2i) -> void:
+	_entrar_sala(destino, Vector2i.ZERO)
+	if em_transicao or sala_atual == null or coordenada_atual != destino:
+		return
+	# Aparece exatamente ao lado do terminal, sobre a plataforma/piso.
+	var terminal: Area2D = sala_atual.get_node_or_null("Conteudo/TerminalBreakpoint") as Area2D
+	if terminal == null:
+		terminal = sala_atual.get_node_or_null("Conteudo/TerminalBreakpointAposBoss") as Area2D
+	if terminal != null:
+		jogador.preparar_para_nova_sala()
+		jogador.global_position = terminal.global_position + Vector2(-20.0, -41.0)
+		posicao_segura_atual = jogador.global_position
+	protecao_entrada_restante = TEMPO_PROTECAO_ENTRADA
+	_aviso("BREAKPOINT: viagem concluida. HP, equipamentos e STACK preservados.", 3.0)
 
 func _ao_descansar() -> void:
 	if partida_terminou or not is_instance_valid(jogador):

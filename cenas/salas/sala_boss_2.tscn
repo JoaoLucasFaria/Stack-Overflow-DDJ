@@ -239,3 +239,6 @@ mouse_filter = 2
 
 [node name="PosicaoBoss" type="Marker2D" parent="Pontos"]
 position = Vector2(825, 600)
+
+[node name="PosicaoBreakpointBoss" type="Marker2D" parent="Pontos"]
+position = Vector2(575, 600)

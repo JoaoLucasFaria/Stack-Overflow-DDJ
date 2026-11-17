@@ -43,5 +43,5 @@ offset_top = -130.0
 offset_right = 170.0
 offset_bottom = -104.0
 theme_override_font_sizes/font_size = 15
-text = "[G] Descansar / recuperar HP"
+text = "[G] Recuperar HP    [H] Viajar"
 horizontal_alignment = 1

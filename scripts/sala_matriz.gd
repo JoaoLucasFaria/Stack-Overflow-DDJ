@@ -17,6 +17,7 @@ const CENA_BOSS = preload("res://scripts/boss_provisorio.gd")
 const CENA_ENCONTRO_BOSS_1 = preload("res://scripts/bosses/encontro_boss_1.gd")
 const CENA_ENCONTRO_BOSS_2 = preload("res://scripts/bosses/encontro_boss_2.gd")
 const CENA_ENCONTRO_BOSS_3 = preload("res://scripts/bosses/encontro_boss_3.gd")
+const CENA_TERMINAL_APOS_BOSS: PackedScene = preload("res://cenas/descanso/terminal_breakpoint.tscn")
 
 @export_category("Conexoes do modulo")
 @export_flags("Esquerda", "Direita", "Cima", "Baixo") var mascara_saidas: int = 0
@@ -48,6 +49,9 @@ func _ready() -> void:
 	var tipo: String = dados.get("tipo", "normal")
 	if tipo.begins_with("boss"):
 		var identificador: int = tipo.substr(4).to_int()
+		# A cada visita, um chefe ja derrotado da run mantem seu BREAKPOINT.
+		if chefes_derrotados.has(identificador):
+			_criar_breakpoint_apos_boss()
 		if identificador == 2 or identificador == 3:
 			# Arenas livres durante a luta. As plataformas da cena
 			# voltam depois da derrota, preservando o layout editavel.
@@ -70,6 +74,22 @@ func _ready() -> void:
 				encontro.connect("derrotado", _ao_derrotar_boss)
 				$Conteudo.add_child(encontro)
 
+
+
+func _criar_breakpoint_apos_boss() -> void:
+	# Reaproveita o terminal existente: G descansa, sem resetar itens ou STACK.
+	# Posicao editavel individualmente em cada cena da sala de chefe.
+	var conteudo: Node2D = get_node_or_null("Conteudo") as Node2D
+	var marcador: Marker2D = get_node_or_null("Pontos/PosicaoBreakpointBoss") as Marker2D
+	if conteudo == null or marcador == null:
+		push_warning("Sala de chefe sem Conteudo ou PosicaoBreakpointBoss.")
+		return
+	if conteudo.has_node("TerminalBreakpointAposBoss"):
+		return
+	var terminal: Area2D = CENA_TERMINAL_APOS_BOSS.instantiate() as Area2D
+	terminal.name = "TerminalBreakpointAposBoss"
+	conteudo.add_child(terminal)
+	terminal.global_position = marcador.global_position
 
 
 func _configurar_plataformas_de_arena(ativas: bool) -> void:
@@ -221,4 +241,7 @@ func _ao_derrotar_boss(identificador: int) -> void:
 	_abrir_portas_boss()
 	if identificador == 2 or identificador == 3:
 		_configurar_plataformas_de_arena(true)
+	# Derrotas podem ocorrer durante uma consulta fisica (ataque basico).
+	# Cria o Area2D fora do passo de fisica para evitar alterar colisores ali.
+	call_deferred("_criar_breakpoint_apos_boss")
 	boss_derrotado.emit(identificador)

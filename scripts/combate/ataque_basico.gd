@@ -95,10 +95,14 @@ func _atacar() -> void:
 			atingidos[alvo] = true
 			# Nao recupera STACK se o golpe for bloqueado pelo escudo do
 			# Boss 1. Apenas dano realmente aplicado conta como acerto.
-			var vida_antes: int = int(alvo.get("vida_atual"))
+			# O nucleo do Boss 1 recebe golpes, mas nao possui vida_atual.
+			# Nao converta null para int; STACK diminui somente com dano real.
+			var vida_antes: Variant = alvo.get("vida_atual")
 			alvo.call("receber_dano", dano_golpe)
-			if is_instance_valid(alvo) and int(alvo.get("vida_atual")) < vida_antes:
-				jogador.reduzir_overflow(stack_reduzido_por_acerto)
+			if vida_antes != null and is_instance_valid(alvo):
+				var vida_depois: Variant = alvo.get("vida_atual")
+				if vida_depois != null and vida_depois < vida_antes:
+					jogador.reduzir_overflow(stack_reduzido_por_acerto)
 
 
 func _draw() -> void:
