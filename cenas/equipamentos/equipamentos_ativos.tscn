@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://b7ioo83a1vhlj"]
+
+[ext_resource type="Script" uid="uid://bibfsrhi02qx3" path="res://scripts/equipamentos/equipamentos_ativos.gd" id="1_inventario"]
+
+[node name="EquipamentosAtivos" type="Node"]
+script = ExtResource("1_inventario")

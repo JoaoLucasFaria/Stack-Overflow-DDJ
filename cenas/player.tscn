@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://0a5evneeqmok"]
+[gd_scene load_steps=6 format=3 uid="uid://0a5evneeqmok"]
 
 [ext_resource type="Script" uid="uid://bhw4bjid70u85" path="res://scripts/player.gd" id="1_8or6t"]
 [ext_resource type="Script" uid="uid://utw0bnafvuv1" path="res://scripts/dash_component.gd" id="2_dash"]
 
 [ext_resource type="Script" path="res://scripts/combate/ataque_basico.gd" id="3_ataque"]
+[ext_resource type="PackedScene" path="res://cenas/equipamentos/equipamentos_ativos.tscn" id="4_itens"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8ki28"]
 size = Vector2(42, 42)
@@ -27,3 +28,5 @@ script = ExtResource("2_dash")
 
 [node name="AtaqueBasico" type="Node2D" parent="."]
 script = ExtResource("3_ataque")
+
+[node name="EquipamentosAtivos" parent="." instance=ExtResource("4_itens")]

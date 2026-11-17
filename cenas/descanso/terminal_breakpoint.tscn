@@ -43,5 +43,5 @@ offset_top = -130.0
 offset_right = 170.0
 offset_bottom = -104.0
 theme_override_font_sizes/font_size = 15
-text = "[E] Descansar / restaurar processo"
+text = "[G] Descansar / recuperar HP"
 horizontal_alignment = 1

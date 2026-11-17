@@ -40,7 +40,7 @@ func _process(_delta: float) -> void:
 		return
 	if Input.is_action_just_pressed("overflow_teste"):
 		jogador.adicionar_overflow(25.0)
-	rotulo.text = "TESTE | J / clique: atacar | E: BREAKPOINT | O: +25 STACK | R: reiniciar\nHP %d/%d | STACK %.0f/%.0f | Drops: 35%% por inimigo (ajuste na cena)" % [jogador.vida_atual, jogador.vida_maxima, jogador.overflow_atual, jogador.overflow_maximo]
+	rotulo.text = "TESTE | J: atacar | F: coletar | Q/E: usar | TAB: escolher na coleta | G: descansar | R: reiniciar\nHP %d/%d | STACK %.0f/%.0f | Drops: 35%% por inimigo (ajuste na cena)" % [jogador.vida_atual, jogador.vida_maxima, jogador.overflow_atual, jogador.overflow_maximo]
 
 
 func _criar_inimigos() -> void:
@@ -59,6 +59,14 @@ func _ao_derrotado(posicao: Vector2, item_id: StringName, caiu: bool) -> void:
 	drop.call("configurar", item_id)
 	add_child(drop)
 	drop.global_position = posicao + Vector2(0, -30)
+	drop.coletado.connect(_ao_coletar_drop)
+
+
+func _ao_coletar_drop(item_id: StringName) -> void:
+	if not is_instance_valid(jogador):
+		return
+	var controle: EquipamentosAtivos = jogador.get_node("EquipamentosAtivos") as EquipamentosAtivos
+	print("[ITEM] ", controle.equipar(item_id))
 
 
 func _ao_descansar() -> void:
