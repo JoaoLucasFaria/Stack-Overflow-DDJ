@@ -1,0 +1,37 @@
+[gd_scene load_steps=4 format=3 uid="uid://ciwdva0qr2xub"]
+
+[ext_resource type="Script" uid="uid://cs5cl6yf8cw3x" path="res://scripts/hud.gd" id="1_kqorm"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_15dsx"]
+bg_color = Color(1, 0.262745, 0.207843, 0.984314)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_minlu"]
+bg_color = Color(0.160784, 0.556863, 0.835294, 1)
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("1_kqorm")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+offset_left = 42.0
+offset_top = 32.0
+offset_right = 360.0
+offset_bottom = 117.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="BarraVida" type="ProgressBar" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_15dsx")
+
+[node name="BarraSobrecarga" type="ProgressBar" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_minlu")
+
+[node name="Habilidades" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+
+[node name="HabAtual" type="Label" parent="MarginContainer/VBoxContainer/Habilidades"]
+layout_mode = 2
+text = "Habilidade: Nenhuma"

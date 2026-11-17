@@ -15,9 +15,9 @@ func _ready() -> void:
 	# Fixo abaixo da linha de status/comandos do canto superior esquerdo.
 	# Y=112 evita sobrepor as mensagens centradas no topo (HUDMatriz).
 	fundo.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	fundo.offset_left = 30.0
+	fundo.offset_left = 45.0
 	fundo.offset_right = 420.0
-	fundo.offset_top = 50.0
+	fundo.offset_top = 93.0
 	fundo.offset_bottom = 5.0
 	fundo.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(fundo)
