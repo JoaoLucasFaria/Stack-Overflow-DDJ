@@ -34,6 +34,10 @@ var fixo_no_cenario: bool = false
 ## Recuo sem dano, acionado por equipamentos defensivos.
 var tempo_empurrao: float = 0.0
 var velocidade_empurrao: float = 0.0
+## Controle nao letal de equipamentos. O tempo diminui por fisica.
+var interrupcao_restante: float = 0.0
+var isca_atual: Node2D
+
 
 @onready var visual: ColorRect = $Visual
 @onready var rotulo: Label = $Nome
@@ -61,6 +65,17 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	if encerrado:
+		return
+	if interrupcao_restante > 0.0:
+		interrupcao_restante = maxf(0.0, interrupcao_restante - delta)
+		preparando_ataque = false
+		if fixo_no_cenario:
+			velocity = Vector2.ZERO
+		else:
+			velocity.x = 0.0
+			if not is_on_floor():
+				velocity += get_gravity() * delta
+			move_and_slide()
 		return
 	if fixo_no_cenario:
 		velocity = Vector2.ZERO
@@ -99,12 +114,42 @@ func aplicar_empurrao(origem: Vector2, forca: float = 480.0, duracao: float = 0.
 	tempo_aviso = 0.0
 
 
+func interromper_ataques(duracao: float = 1.0) -> bool:
+	if encerrado or duracao <= 0.0:
+		return false
+	interrupcao_restante = maxf(interrupcao_restante, duracao)
+	preparando_ataque = false
+	tempo_aviso = 0.0
+	return true
+
+
+func definir_isca(isca: Node2D) -> void:
+	isca_atual = isca
+
+
+func _alvo_da_ia() -> Node2D:
+	if is_instance_valid(isca_atual) and not isca_atual.is_queued_for_deletion():
+		if global_position.distance_to(isca_atual.global_position) < 360.0:
+			return isca_atual
+	for nodo in get_tree().get_nodes_in_group("iscas_fork"):
+		var isca: Node2D = nodo as Node2D
+		if isca != null and not isca.is_queued_for_deletion() and global_position.distance_to(isca.global_position) < 350.0:
+			isca_atual = isca
+			return isca
+	return jogador
+
+
 func _pensar(_delta: float) -> void:
 	_patrulhar_ou_perseguir()
 
 
 func _alvo_proximo(distancia: float) -> bool:
-	return is_instance_valid(jogador) and jogador.vida_atual > 0 and absf(jogador.global_position.y - global_position.y) <= 100.0 and global_position.distance_to(jogador.global_position) <= distancia
+	var alvo: Node2D = _alvo_da_ia()
+	if not is_instance_valid(alvo):
+		return false
+	if alvo == jogador and jogador.vida_atual <= 0:
+		return false
+	return absf(alvo.global_position.y - global_position.y) <= 100.0 and global_position.distance_to(alvo.global_position) <= distancia
 
 
 func _pode_caminhar(sentido: float) -> bool:
@@ -119,7 +164,7 @@ func _pode_caminhar(sentido: float) -> bool:
 
 func _patrulhar_ou_perseguir() -> void:
 	if _alvo_proximo(distancia_deteccao):
-		var diferenca: float = jogador.global_position.x - global_position.x
+		var diferenca: float = _alvo_da_ia().global_position.x - global_position.x
 		if absf(diferenca) <= alcance_ataque and tempo_ate_ataque <= 0.0:
 			_iniciar_ataque()
 			return
@@ -147,7 +192,11 @@ func _iniciar_ataque() -> void:
 
 func _executar_ataque() -> void:
 	if _alvo_proximo(alcance_ataque + 18.0):
-		jogador.receber_dano(dano, global_position)
+		var alvo: Node2D = _alvo_da_ia()
+		if alvo != jogador and alvo.has_method("receber_impacto"):
+			alvo.call("receber_impacto")
+		elif is_instance_valid(jogador):
+			jogador.receber_dano(dano, global_position)
 
 
 func receber_dano(quantidade: int) -> void:

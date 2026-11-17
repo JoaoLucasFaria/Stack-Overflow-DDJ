@@ -39,6 +39,9 @@ var overflow_atual: float = 0.0
 @export_range(0.1, 2.0, 0.05) var segundos_travamento_overflow: float = 0.5
 @export_range(1, 10, 1) var dano_ao_estourar_overflow: int = 1
 var tempo_travamento_overflow_restante: float = 0.0
+## Correntes Deadlock reduzem o movimento, mas nao sao paredes.
+var lentidao_deadlock_restante: float = 0.0
+var fator_lentidao_deadlock: float = 1.0
 var jumps_remaining: int = 2
 var jump_release_timer: float = 0.0
 var jump_released: bool = false
@@ -68,6 +71,9 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	_atualizar_plataformas_ignoradas()
+	lentidao_deadlock_restante = maxf(0.0, lentidao_deadlock_restante - delta)
+	if lentidao_deadlock_restante <= 0.0:
+		fator_lentidao_deadlock = 1.0
 	tempo_iframes = maxf(0.0, tempo_iframes - delta)
 	tempo_knockback = maxf(0.0, tempo_knockback - delta)
 	tempo_trava_wall_jump = maxf(0.0, tempo_trava_wall_jump - delta)
@@ -111,7 +117,7 @@ func _physics_process(delta: float) -> void:
 	# Um único lugar controla o movimento físico (inclusive durante o dash).
 	dash_component.atualizar(delta, no_chao, direcao_olhar)
 	if dash_component.esta_dashing:
-		velocity = dash_component.obter_velocidade_dash()
+		velocity = dash_component.obter_velocidade_dash() * fator_lentidao_deadlock
 		move_and_slide()
 		return
 
@@ -160,12 +166,21 @@ func _physics_process(delta: float) -> void:
 	# Durante alguns milissegundos o impulso horizontal do Wall Jump tem prioridade.
 	if tempo_trava_wall_jump <= 0.0:
 		if not is_zero_approx(direcao):
-			velocity.x = direcao * SPEED
+			velocity.x = direcao * SPEED * fator_lentidao_deadlock
 		else:
 			# Preserva a desaceleração do protótipo original.
 			velocity.x = move_toward(velocity.x, 0.0, SPEED)
 
 	move_and_slide()
+
+
+func aplicar_lentidao_deadlock(fator: float = 0.45, duracao: float = 0.16) -> void:
+	## Varios campos de lentidao se acumulam por prioridade do mais forte,
+	## sem alterar permanentemente SPEED nem o movimento dos inimigos.
+	if vida_atual <= 0 or duracao <= 0.0:
+		return
+	fator_lentidao_deadlock = minf(fator_lentidao_deadlock, clampf(fator, 0.1, 1.0))
+	lentidao_deadlock_restante = maxf(lentidao_deadlock_restante, duracao)
 
 
 func _segurando_descida() -> bool:

@@ -77,6 +77,9 @@ func _physics_process(delta: float) -> void:
 		return
 	if jogador.vida_atual <= 0:
 		return
+	if _processar_interrupcao(delta):
+		return
+	delta = _tempo_com_lentidao(delta)
 
 	temporizador -= delta
 	tempo_contato = maxf(0.0, tempo_contato - delta)
@@ -119,6 +122,20 @@ func _physics_process(delta: float) -> void:
 
 	_atualizar_visual()
 	queue_redraw()
+
+
+func _cancelar_ataque_para_interrupcao() -> void:
+	# Interrompe inclusive a sequencia em execucao, sem resetar a fase.
+	for ameaca in ameacas:
+		if is_instance_valid(ameaca):
+			ameaca.queue_free()
+	ameacas.clear()
+	golpes_restantes = 0
+	ondas_restantes = 0
+	estado = Estado.PERSEGUINDO
+	temporizador = 0.0
+	global_position.y = linha_do_chao
+	texto_estado = "INTERRUPT() - 1s SEM ATAQUE"
 
 
 func _preparar_ataque() -> void:

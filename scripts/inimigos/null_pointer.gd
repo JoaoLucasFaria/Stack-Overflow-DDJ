@@ -105,6 +105,15 @@ func _pensar(delta: float) -> void:
 			temporizador = aviso_antes_teleporte
 
 
+func interromper_ataques(duracao: float = 1.0) -> bool:
+	if not super.interromper_ataques(duracao):
+		return false
+	# Onda em preparacao e cancelada, nao apenas adiada.
+	estado = Estado.AGUARDANDO
+	temporizador = 0.25
+	return true
+
+
 func _centro_jogador() -> Vector2:
 	# O personagem e desenhado a partir de seu canto superior esquerdo.
 	return jogador.global_position + Vector2(20.0, 20.0)

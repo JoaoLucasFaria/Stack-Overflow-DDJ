@@ -103,6 +103,15 @@ func _executar_ataque() -> void:
 	velocity.y = -impulso_salto
 
 
+func interromper_ataques(duracao: float = 1.0) -> bool:
+	if not super.interromper_ataques(duracao):
+		return false
+	# Cancela o salto/ondas pendentes e preserva o crescimento acumulado.
+	estado_ataque = EstadoAtaque.RECUPERANDO
+	tempo_recuperacao = 0.25
+	return true
+
+
 func _fracao_crescimento() -> float:
 	return clampf(tempo_vivo / maxf(0.1, segundos_para_crescer), 0.0, 1.0)
 

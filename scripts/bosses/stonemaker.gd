@@ -78,6 +78,9 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if encerrado or not is_instance_valid(jogador) or jogador.vida_atual <= 0:
 		return
+	if _processar_interrupcao(delta):
+		return
+	delta = _tempo_com_lentidao(delta)
 	temporizador -= delta
 	tempo_contato = maxf(0.0, tempo_contato - delta)
 	tempo_flash = maxf(0.0, tempo_flash - delta)
@@ -109,6 +112,19 @@ func _physics_process(delta: float) -> void:
 
 	_atualizar_visual()
 	queue_redraw()
+
+
+func _cancelar_ataque_para_interrupcao() -> void:
+	for ameaca in ameacas:
+		if is_instance_valid(ameaca):
+			ameaca.queue_free()
+	ameacas.clear()
+	ataques_restantes_na_sequencia = 0
+	estado = Estado.PERSEGUINDO
+	temporizador = 0.0
+	global_position.y = linha_do_chao
+	global_position.x = clampf(global_position.x, limite_esquerdo, limite_direito)
+	texto_estado = "INTERRUPT() - 1s SEM ATAQUE"
 
 
 func _perseguir(delta: float) -> void:
@@ -386,6 +402,7 @@ func _ao_receber_dano(_quantidade: int) -> void:
 	tempo_flash = 0.12
 	if fase_atual < 3 and vida_atual > 0 and float(vida_atual) <= float(vida_maxima) * limiar_terceira_fase:
 		fase_atual = 3
+		bloquear_interrupt_na_transicao(0.9)
 		texto_estado = "FASE 3: SOBRECARGA CRITICA!"
 		impacto.emit(11.0)
 		fase_alterada.emit(3)

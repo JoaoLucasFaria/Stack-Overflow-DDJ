@@ -17,6 +17,11 @@ var vida_atual: int = 0
 var fase_atual: int = 1
 var encerrado: bool = false
 var jogador: Jogador
+## O Interrupt nunca cancela uma mudanca de fase ou sua recuperacao.
+var interrupcao_restante: float = 0.0
+var protecao_fase_restante: float = 0.0
+var lentidao_mutex_restante: float = 0.0
+var fator_lentidao_mutex: float = 0.7
 
 
 func configurar(alvo: Jogador) -> void:
@@ -30,6 +35,53 @@ func _ready() -> void:
 	collision_mask = 0
 	vida_atual = vida_maxima
 	vida_alterada.emit(vida_atual, vida_maxima)
+	add_to_group("chefes")
+	fase_alterada.connect(_quando_fase_muda)
+
+
+func _quando_fase_muda(_fase: int) -> void:
+	bloquear_interrupt_na_transicao(0.9)
+
+
+func bloquear_interrupt_na_transicao(duracao: float = 0.9) -> void:
+	interrupcao_restante = 0.0
+	protecao_fase_restante = maxf(protecao_fase_restante, duracao)
+
+
+func aplicar_lentidao_mutex(duracao: float = 1.2) -> void:
+	if not encerrado:
+		lentidao_mutex_restante = maxf(lentidao_mutex_restante, duracao)
+
+
+func _tempo_com_lentidao(delta: float) -> float:
+	if lentidao_mutex_restante > 0.0:
+		lentidao_mutex_restante = maxf(0.0, lentidao_mutex_restante - delta)
+		return delta * fator_lentidao_mutex
+	return delta
+
+
+func _processar_interrupcao(delta: float) -> bool:
+	protecao_fase_restante = maxf(0.0, protecao_fase_restante - delta)
+	if interrupcao_restante > 0.0:
+		interrupcao_restante = maxf(0.0, interrupcao_restante - delta)
+		return true
+	return false
+
+
+func interromper_ataques(duracao: float = 1.0) -> bool:
+	if encerrado or protecao_fase_restante > 0.0 or not _pode_ser_interrompido():
+		return false
+	interrupcao_restante = maxf(interrupcao_restante, duracao)
+	_cancelar_ataque_para_interrupcao()
+	return true
+
+
+func _pode_ser_interrompido() -> bool:
+	return true
+
+
+func _cancelar_ataque_para_interrupcao() -> void:
+	pass
 
 
 func receber_dano(quantidade: int) -> void:
