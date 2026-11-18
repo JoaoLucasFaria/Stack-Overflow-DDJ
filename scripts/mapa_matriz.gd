@@ -14,46 +14,49 @@ const BAIXO: int = 8
 ## no Inspector e adicione o caminho somente na lista da máscara correta.
 const MODELOS: Dictionary = {
 	1: [
-		"res://cenas/salas/sala_01.tscn",
+		#"res://cenas/salas/sala_01.tscn",
+		"res://cenas/salas/sala_22.tscn", # Ponta esquerda (escadaria + altar do baú)
 	],
 	2: [
 		"res://cenas/salas/sala_02.tscn",
 	],
 	3: [
-		"res://cenas/salas/sala_03.tscn",
-		"res://cenas/salas/corredor_aberto.tscn",
-		"res://cenas/salas/corredor_degraus.tscn",
-		"res://cenas/salas/sala_armadilha_horizontal.tscn",
+		#"res://cenas/salas/sala_03.tscn",
+		"res://cenas/salas/sala_21.tscn", # Corredor horizontal com plataformas
 	],
 	4: [
-		"res://cenas/salas/sala_04.tscn",
+		#"res://cenas/salas/sala_04.tscn",
+		"res://cenas/salas/sala_23.tscn", # Poço dos monstros (entrada só por cima)
 	],
 	5: [
 		"res://cenas/salas/sala_05.tscn",
-		"res://cenas/salas/curva_esquerda_cima.tscn",
 	],
 	6: [
 		"res://cenas/salas/sala_06.tscn",
-		"res://cenas/salas/curva_direita_cima.tscn",
 	],
 	7: [
-		"res://cenas/salas/sala_07.tscn",
+		#"res://cenas/salas/sala_07.tscn",
+		"res://cenas/salas/sala_16.tscn",
+		"res://cenas/salas/sala_18.tscn",
+		"res://cenas/salas/sala_19.tscn",
 	],
 	8: [
 		"res://cenas/salas/sala_08.tscn",
 	],
 	9: [
-		"res://cenas/salas/sala_09.tscn",
+		#"res://cenas/salas/sala_09.tscn",
+		"res://cenas/salas/sala_25.tscn", # Loop em U invertido (esq alta + baixo esq)
 	],
 	10: [
 		"res://cenas/salas/sala_10.tscn",
 	],
 	11: [
-		"res://cenas/salas/sala_11.tscn",
+		#"res://cenas/salas/sala_11.tscn",
+		"res://cenas/salas/sala_17.tscn", # 3 saídas (esq, dir, baixo sem trava X)
 	],
 	12: [
-		"res://cenas/salas/sala_12.tscn",
-		"res://cenas/salas/poco_vertical.tscn",
+		#"res://cenas/salas/sala_12.tscn",
+		"res://cenas/salas/sala_20.tscn", # Torre vertical (cima + baixo)
 	],
 	13: [
 		"res://cenas/salas/sala_13.tscn",
@@ -62,7 +65,8 @@ const MODELOS: Dictionary = {
 		"res://cenas/salas/sala_14.tscn",
 	],
 	15: [
-		"res://cenas/salas/sala_15.tscn",
+		#"res://cenas/salas/sala_15.tscn",
+		"res://cenas/salas/sala_24.tscn", # Cruzamento completo (Caveira)
 	],
 }
 const ESPECIAIS: Dictionary = {

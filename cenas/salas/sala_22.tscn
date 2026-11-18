@@ -1,0 +1,230 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://scripts/sala_matriz.gd" id="1_base"]
+[ext_resource type="Script" path="res://scripts/inimigos/ponto_spawn_inimigo.gd" id="2_spawn"]
+
+[sub_resource type="RectangleShape2D" id="shape_parede_esq_cima"]
+size = Vector2(26, 496)
+
+[sub_resource type="RectangleShape2D" id="shape_parede_esq_baixo"]
+size = Vector2(26, 48)
+
+[sub_resource type="RectangleShape2D" id="shape_parede_dir"]
+size = Vector2(26, 648)
+
+[sub_resource type="RectangleShape2D" id="shape_teto"]
+size = Vector2(1152, 26)
+
+[sub_resource type="RectangleShape2D" id="shape_piso"]
+size = Vector2(1152, 48)
+
+[sub_resource type="RectangleShape2D" id="shape_degrau_1"]
+size = Vector2(180, 13)
+
+[sub_resource type="RectangleShape2D" id="shape_degrau_2"]
+size = Vector2(200, 13)
+
+[sub_resource type="RectangleShape2D" id="shape_altar"]
+size = Vector2(310, 26)
+
+[node name="sala_22" type="Node2D"]
+script = ExtResource("1_base")
+mascara_saidas = 1
+
+[node name="Fundo" type="ColorRect" parent="."]
+show_behind_parent = true
+offset_right = 1152.0
+offset_bottom = 648.0
+mouse_filter = 2
+color = Color(0.07, 0.13, 0.18, 1)
+
+[node name="Contorno" type="Node2D" parent="."]
+
+[node name="ParedeEsqAcima" type="StaticBody2D" parent="Contorno"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeEsqAcima"]
+position = Vector2(13, 248)
+shape = SubResource("shape_parede_esq_cima")
+
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeEsqAcima"]
+offset_right = 26.0
+offset_bottom = 496.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="ParedeEsqAbaixo" type="StaticBody2D" parent="Contorno"]
+position = Vector2(0, 600)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeEsqAbaixo"]
+position = Vector2(13, 24)
+shape = SubResource("shape_parede_esq_baixo")
+
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeEsqAbaixo"]
+offset_right = 26.0
+offset_bottom = 48.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="ParedeDir" type="StaticBody2D" parent="Contorno"]
+position = Vector2(1126, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeDir"]
+position = Vector2(13, 324)
+shape = SubResource("shape_parede_dir")
+
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeDir"]
+offset_right = 26.0
+offset_bottom = 648.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="Teto" type="StaticBody2D" parent="Contorno"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/Teto"]
+position = Vector2(576, 13)
+shape = SubResource("shape_teto")
+
+[node name="Visual" type="ColorRect" parent="Contorno/Teto"]
+offset_right = 1152.0
+offset_bottom = 26.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="Piso" type="StaticBody2D" parent="Contorno"]
+position = Vector2(0, 600)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/Piso"]
+position = Vector2(576, 24)
+shape = SubResource("shape_piso")
+
+[node name="Visual" type="ColorRect" parent="Contorno/Piso"]
+offset_right = 1152.0
+offset_bottom = 48.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="Plataformas" type="Node2D" parent="."]
+
+[node name="Degrau1" type="StaticBody2D" parent="Plataformas"]
+position = Vector2(240, 495)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/Degrau1"]
+position = Vector2(90, 6.5)
+shape = SubResource("shape_degrau_1")
+one_way_collision = true
+
+[node name="Visual" type="ColorRect" parent="Plataformas/Degrau1"]
+offset_right = 180.0
+offset_bottom = 13.0
+mouse_filter = 2
+color = Color(0.4, 0.66, 0.74, 1)
+
+[node name="Degrau2" type="StaticBody2D" parent="Plataformas"]
+position = Vector2(460, 385)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/Degrau2"]
+position = Vector2(100, 6.5)
+shape = SubResource("shape_degrau_2")
+one_way_collision = true
+
+[node name="Visual" type="ColorRect" parent="Plataformas/Degrau2"]
+offset_right = 200.0
+offset_bottom = 13.0
+mouse_filter = 2
+color = Color(0.4, 0.66, 0.74, 1)
+
+[node name="Degrau3" type="StaticBody2D" parent="Plataformas"]
+position = Vector2(610, 275)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/Degrau3"]
+position = Vector2(90, 6.5)
+shape = SubResource("shape_degrau_1")
+one_way_collision = true
+
+[node name="Visual" type="ColorRect" parent="Plataformas/Degrau3"]
+offset_right = 180.0
+offset_bottom = 13.0
+mouse_filter = 2
+color = Color(0.4, 0.66, 0.74, 1)
+
+[node name="AltarBau" type="StaticBody2D" parent="Plataformas"]
+position = Vector2(816, 220)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/AltarBau"]
+position = Vector2(155, 13)
+shape = SubResource("shape_altar")
+
+[node name="Visual" type="ColorRect" parent="Plataformas/AltarBau"]
+offset_right = 310.0
+offset_bottom = 26.0
+mouse_filter = 2
+color = Color(0.28, 0.76, 0.71, 1)
+
+[node name="Decoracao" type="Node2D" parent="."]
+
+[node name="BordaEsq" type="ColorRect" parent="Decoracao"]
+offset_top = 490.0
+offset_right = 26.0
+offset_bottom = 495.0
+mouse_filter = 2
+color = Color(0.28, 0.76, 0.71, 1)
+
+[node name="BaseAltarVisual" type="ColorRect" parent="Decoracao"]
+offset_left = 930.0
+offset_top = 246.0
+offset_right = 1126.0
+offset_bottom = 600.0
+mouse_filter = 2
+color = Color(0.14, 0.22, 0.29, 1)
+
+[node name="PlaceholderBau" type="ColorRect" parent="Decoracao"]
+offset_left = 965.0
+offset_top = 176.0
+offset_right = 1035.0
+offset_bottom = 220.0
+mouse_filter = 2
+color = Color(0.95, 0.76, 0.24, 1)
+
+[node name="TextoBau" type="Label" parent="Decoracao"]
+offset_left = 965.0
+offset_top = 148.0
+offset_right = 1035.0
+offset_bottom = 174.0
+text = "BAÚ"
+horizontal_alignment = 1
+
+[node name="Conteudo" type="Node2D" parent="."]
+
+[node name="SpawnsInimigos" type="Node2D" parent="Conteudo"]
+
+[node name="Inimigo_1" type="Marker2D" parent="Conteudo/SpawnsInimigos"]
+position = Vector2(460, 568)
+script = ExtResource("2_spawn")
+tipo_inimigo = "syntax_error"
+
+[node name="Inimigo_2" type="Marker2D" parent="Conteudo/SpawnsInimigos"]
+position = Vector2(560, 353)
+script = ExtResource("2_spawn")
+tipo_inimigo = "memory_leak"
+
+[node name="Inimigo_3" type="Marker2D" parent="Conteudo/SpawnsInimigos"]
+position = Vector2(880, 188)
+script = ExtResource("2_spawn")
+tipo_inimigo = "null_pointer"
+
+[node name="Pontos" type="Node2D" parent="."]
+
+[node name="SpawnInicio" type="Marker2D" parent="Pontos"]
+position = Vector2(105, 540)
+
+[node name="SpawnEsquerda" type="Marker2D" parent="Pontos"]
+position = Vector2(96, 540)
+
+[node name="SpawnDireita" type="Marker2D" parent="Pontos"]
+position = Vector2(1015, 540)
+
+[node name="SpawnCima" type="Marker2D" parent="Pontos"]
+position = Vector2(576, 540)
+
+[node name="SpawnBaixo" type="Marker2D" parent="Pontos"]
+position = Vector2(576, 125)

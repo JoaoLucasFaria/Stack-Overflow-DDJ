@@ -1,0 +1,307 @@
+[gd_scene format=3 uid="uid://cjh68kbhc36ng"]
+
+[ext_resource type="Script" uid="uid://dv2jt8kcp8u5y" path="res://scripts/sala_matriz.gd" id="1_base"]
+[ext_resource type="Script" uid="uid://0qbu5h1xwn6v" path="res://scripts/inimigos/ponto_spawn_inimigo.gd" id="2_spawn"]
+
+[sub_resource type="RectangleShape2D" id="shape_parede_lateral"]
+size = Vector2(26, 648)
+
+[sub_resource type="RectangleShape2D" id="shape_teto_lado"]
+size = Vector2(514, 26)
+
+[sub_resource type="RectangleShape2D" id="shape_piso"]
+size = Vector2(1152, 48)
+
+[sub_resource type="RectangleShape2D" id="shape_plat_topo_saida"]
+size = Vector2(150, 13)
+
+[sub_resource type="RectangleShape2D" id="shape_plat_mirante"]
+size = Vector2(260, 13)
+
+[sub_resource type="RectangleShape2D" id="qox6t"]
+size = Vector2(180, 13)
+
+[node name="sala_23" type="Node2D" unique_id=1084376404]
+script = ExtResource("1_base")
+mascara_saidas = 4
+
+[node name="Fundo" type="ColorRect" parent="." unique_id=688633347]
+show_behind_parent = true
+offset_right = 1152.0
+offset_bottom = 648.0
+mouse_filter = 2
+color = Color(0.07, 0.13, 0.18, 1)
+
+[node name="Contorno" type="Node2D" parent="." unique_id=737053386]
+
+[node name="ParedeEsq" type="StaticBody2D" parent="Contorno" unique_id=1746582285]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeEsq" unique_id=1235581310]
+position = Vector2(13, 324)
+shape = SubResource("shape_parede_lateral")
+
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeEsq" unique_id=814635051]
+offset_right = 26.0
+offset_bottom = 648.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="ParedeDir" type="StaticBody2D" parent="Contorno" unique_id=665061453]
+position = Vector2(1126, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeDir" unique_id=1211781103]
+position = Vector2(13, 324)
+shape = SubResource("shape_parede_lateral")
+
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeDir" unique_id=64605902]
+offset_right = 26.0
+offset_bottom = 648.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="TetoEsq" type="StaticBody2D" parent="Contorno" unique_id=1990961473]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/TetoEsq" unique_id=114560069]
+position = Vector2(257, 13)
+shape = SubResource("shape_teto_lado")
+
+[node name="Visual" type="ColorRect" parent="Contorno/TetoEsq" unique_id=4136884]
+offset_right = 514.0
+offset_bottom = 26.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="TetoDir" type="StaticBody2D" parent="Contorno" unique_id=1271128987]
+position = Vector2(638, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/TetoDir" unique_id=745369062]
+position = Vector2(257, 13)
+shape = SubResource("shape_teto_lado")
+
+[node name="Visual" type="ColorRect" parent="Contorno/TetoDir" unique_id=1779011970]
+offset_right = 514.0
+offset_bottom = 26.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="Piso" type="StaticBody2D" parent="Contorno" unique_id=709944900]
+position = Vector2(0, 600)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/Piso" unique_id=453472170]
+position = Vector2(576, 24)
+shape = SubResource("shape_piso")
+
+[node name="Visual" type="ColorRect" parent="Contorno/Piso" unique_id=365258799]
+offset_right = 1152.0
+offset_bottom = 48.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="Plataformas" type="Node2D" parent="." unique_id=1039530446]
+
+[node name="SaidaTeto" type="StaticBody2D" parent="Plataformas" unique_id=1218063330]
+position = Vector2(501, 75)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/SaidaTeto" unique_id=887345007]
+position = Vector2(75, 6.5)
+shape = SubResource("shape_plat_topo_saida")
+one_way_collision = true
+
+[node name="Visual" type="ColorRect" parent="Plataformas/SaidaTeto" unique_id=1928007496]
+offset_right = 150.0
+offset_bottom = 13.0
+mouse_filter = 2
+color = Color(0.4, 0.66, 0.74, 1)
+
+[node name="MiranteEntrada" type="StaticBody2D" parent="Plataformas" unique_id=1297900034]
+position = Vector2(446, 170)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/MiranteEntrada" unique_id=1448856085]
+position = Vector2(130, 6.5)
+shape = SubResource("shape_plat_mirante")
+one_way_collision = true
+
+[node name="Visual" type="ColorRect" parent="Plataformas/MiranteEntrada" unique_id=589289589]
+offset_right = 260.0
+offset_bottom = 13.0
+mouse_filter = 2
+color = Color(0.28, 0.76, 0.71, 1)
+
+[node name="EscaladaDirAlta" type="StaticBody2D" parent="Plataformas" unique_id=1197599812]
+position = Vector2(740, 275)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/EscaladaDirAlta" unique_id=1750997649]
+position = Vector2(90, 6.5)
+shape = SubResource("qox6t")
+one_way_collision = true
+
+[node name="Visual" type="ColorRect" parent="Plataformas/EscaladaDirAlta" unique_id=1290683144]
+offset_right = 180.0
+offset_bottom = 13.0
+mouse_filter = 2
+color = Color(0.4, 0.66, 0.74, 1)
+
+[node name="EscaladaDirAlta3" type="StaticBody2D" parent="Plataformas" unique_id=816541883]
+position = Vector2(740, 275)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/EscaladaDirAlta3" unique_id=133961665]
+position = Vector2(22, 120)
+shape = SubResource("qox6t")
+one_way_collision = true
+
+[node name="Visual" type="ColorRect" parent="Plataformas/EscaladaDirAlta3" unique_id=1822563444]
+offset_left = -73.0
+offset_top = 114.0
+offset_right = 105.0
+offset_bottom = 128.0
+mouse_filter = 2
+color = Color(0.4, 0.66, 0.74, 1)
+
+[node name="EscaladaDirAlta2" type="StaticBody2D" parent="Plataformas" unique_id=1283065967]
+position = Vector2(740, 275)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/EscaladaDirAlta2" unique_id=1053440336]
+position = Vector2(-440, -8)
+shape = SubResource("qox6t")
+one_way_collision = true
+
+[node name="Visual" type="ColorRect" parent="Plataformas/EscaladaDirAlta2" unique_id=2017975769]
+offset_left = -534.0
+offset_top = -12.0
+offset_right = -354.0
+offset_bottom = 1.0
+mouse_filter = 2
+color = Color(0.4, 0.66, 0.74, 1)
+
+[node name="EscaladaEsqMedia" type="StaticBody2D" parent="Plataformas" unique_id=586054194]
+position = Vector2(232, 385)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/EscaladaEsqMedia" unique_id=1333909119]
+position = Vector2(90, 6.5)
+shape = SubResource("qox6t")
+one_way_collision = true
+
+[node name="Visual" type="ColorRect" parent="Plataformas/EscaladaEsqMedia" unique_id=1323852818]
+offset_right = 180.0
+offset_bottom = 13.0
+mouse_filter = 2
+color = Color(0.4, 0.66, 0.74, 1)
+
+[node name="EscaladaDirBaixa" type="StaticBody2D" parent="Plataformas" unique_id=1785686484]
+position = Vector2(740, 495)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/EscaladaDirBaixa" unique_id=903363564]
+position = Vector2(90, 6.5)
+shape = SubResource("qox6t")
+one_way_collision = true
+
+[node name="Visual" type="ColorRect" parent="Plataformas/EscaladaDirBaixa" unique_id=89208536]
+offset_right = 180.0
+offset_bottom = 13.0
+mouse_filter = 2
+color = Color(0.4, 0.66, 0.74, 1)
+
+[node name="Decoracao" type="Node2D" parent="." unique_id=1891701743]
+
+[node name="BordaCima" type="ColorRect" parent="Decoracao" unique_id=1216667105]
+offset_left = 514.0
+offset_top = 21.0
+offset_right = 638.0
+offset_bottom = 25.0
+mouse_filter = 2
+color = Color(0.28, 0.76, 0.71, 1)
+
+[node name="Conteudo" type="Node2D" parent="." unique_id=424012476]
+
+[node name="SpawnsInimigos" type="Node2D" parent="Conteudo" unique_id=806853559]
+
+[node name="Inimigo_1" type="Marker2D" parent="Conteudo/SpawnsInimigos" unique_id=2107255698]
+position = Vector2(180, 568)
+script = ExtResource("2_spawn")
+
+[node name="Inimigo_2" type="Marker2D" parent="Conteudo/SpawnsInimigos" unique_id=1936309742]
+position = Vector2(360, 568)
+script = ExtResource("2_spawn")
+tipo_inimigo = "null_pointer"
+
+[node name="Inimigo_13" type="Marker2D" parent="Conteudo/SpawnsInimigos" unique_id=63380519]
+position = Vector2(773, 476)
+script = ExtResource("2_spawn")
+tipo_inimigo = "null_pointer"
+
+[node name="Inimigo_3" type="Marker2D" parent="Conteudo/SpawnsInimigos" unique_id=1051837356]
+position = Vector2(576, 568)
+script = ExtResource("2_spawn")
+tipo_inimigo = "segmentation_fault"
+
+[node name="Inimigo_14" type="Marker2D" parent="Conteudo/SpawnsInimigos" unique_id=1796313068]
+position = Vector2(821, 469)
+script = ExtResource("2_spawn")
+tipo_inimigo = "segmentation_fault"
+
+[node name="Inimigo_15" type="Marker2D" parent="Conteudo/SpawnsInimigos" unique_id=1488247048]
+position = Vector2(916, 562)
+script = ExtResource("2_spawn")
+tipo_inimigo = "segmentation_fault"
+
+[node name="Inimigo_4" type="Marker2D" parent="Conteudo/SpawnsInimigos" unique_id=1677106096]
+position = Vector2(780, 568)
+script = ExtResource("2_spawn")
+tipo_inimigo = "memory_leak"
+
+[node name="Inimigo_5" type="Marker2D" parent="Conteudo/SpawnsInimigos" unique_id=1180566450]
+position = Vector2(483, 556)
+script = ExtResource("2_spawn")
+tipo_inimigo = "segmentation_fault"
+
+[node name="Inimigo_6" type="Marker2D" parent="Conteudo/SpawnsInimigos" unique_id=95193099]
+position = Vector2(468, 488)
+script = ExtResource("2_spawn")
+tipo_inimigo = "segmentation_fault"
+
+[node name="Inimigo_11" type="Marker2D" parent="Conteudo/SpawnsInimigos" unique_id=2018404593]
+position = Vector2(274, 495)
+script = ExtResource("2_spawn")
+tipo_inimigo = "segmentation_fault"
+
+[node name="Inimigo_12" type="Marker2D" parent="Conteudo/SpawnsInimigos" unique_id=2106427630]
+position = Vector2(74, 314)
+script = ExtResource("2_spawn")
+tipo_inimigo = "segmentation_fault"
+
+[node name="Inimigo_7" type="Marker2D" parent="Conteudo/SpawnsInimigos" unique_id=355759497]
+position = Vector2(140, 439)
+script = ExtResource("2_spawn")
+tipo_inimigo = "segmentation_fault"
+
+[node name="Inimigo_8" type="Marker2D" parent="Conteudo/SpawnsInimigos" unique_id=329366239]
+position = Vector2(1053, 493)
+script = ExtResource("2_spawn")
+tipo_inimigo = "segmentation_fault"
+
+[node name="Inimigo_9" type="Marker2D" parent="Conteudo/SpawnsInimigos" unique_id=1339614764]
+position = Vector2(679, 561)
+script = ExtResource("2_spawn")
+tipo_inimigo = "segmentation_fault"
+
+[node name="Inimigo_10" type="Marker2D" parent="Conteudo/SpawnsInimigos" unique_id=718947079]
+position = Vector2(858, 563)
+script = ExtResource("2_spawn")
+tipo_inimigo = "segmentation_fault"
+
+[node name="Pontos" type="Node2D" parent="." unique_id=1027301013]
+
+[node name="SpawnInicio" type="Marker2D" parent="Pontos" unique_id=772498940]
+position = Vector2(694, 103)
+
+[node name="SpawnEsquerda" type="Marker2D" parent="Pontos" unique_id=1442735581]
+position = Vector2(96, 540)
+
+[node name="SpawnDireita" type="Marker2D" parent="Pontos" unique_id=297192870]
+position = Vector2(1001, 541)
+
+[node name="SpawnCima" type="Marker2D" parent="Pontos" unique_id=1908695840]
+position = Vector2(576, 540)
+
+[node name="SpawnBaixo" type="Marker2D" parent="Pontos" unique_id=90012223]
+position = Vector2(692, 108)

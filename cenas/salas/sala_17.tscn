@@ -1,0 +1,233 @@
+[gd_scene format=3 uid="uid://b4uklkipdmsgr"]
+
+[ext_resource type="Script" uid="uid://dv2jt8kcp8u5y" path="res://scripts/sala_matriz.gd" id="1_w06gj"]
+[ext_resource type="Script" uid="uid://0qbu5h1xwn6v" path="res://scripts/inimigos/ponto_spawn_inimigo.gd" id="2_4vmie"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_w06gj"]
+size = Vector2(216.875, 44.8125)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4vmie"]
+size = Vector2(36.21875, 467.00195)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_14260"]
+size = Vector2(222, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_co5i0"]
+size = Vector2(1133.6094, 61)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2lncs"]
+size = Vector2(36.4375, 387.80078)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3yakv"]
+size = Vector2(50.4375, 446)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hlavi"]
+size = Vector2(198, 13)
+
+[node name="SalaBase" type="Node2D" unique_id=870326625]
+script = ExtResource("1_w06gj")
+mascara_saidas = 11
+
+[node name="Fundo" type="ColorRect" parent="." unique_id=1376761610]
+show_behind_parent = true
+offset_right = 1152.0
+offset_bottom = 648.0
+mouse_filter = 2
+color = Color(0.07, 0.13, 0.18, 1)
+
+[node name="BordaCima" type="ColorRect" parent="Fundo" unique_id=1614036301]
+layout_mode = 0
+offset_left = -12.0
+offset_top = 340.0
+offset_right = 44.0
+offset_bottom = 366.0
+mouse_filter = 2
+color = Color(0.28, 0.76, 0.71, 1)
+
+[node name="BordaCima" type="ColorRect" parent="Fundo/BordaCima" unique_id=1384155554]
+layout_mode = 0
+offset_left = 1108.0
+offset_top = -303.0
+offset_right = 1164.0
+offset_bottom = -277.0
+mouse_filter = 2
+color = Color(0.28, 0.76, 0.71, 1)
+
+[node name="BordaCima2" type="ColorRect" parent="Fundo" unique_id=1311878144]
+layout_mode = 0
+offset_left = 1.0
+offset_top = 625.0
+offset_right = 1158.0
+offset_bottom = 632.0
+mouse_filter = 2
+color = Color(0.28, 0.76, 0.71, 1)
+
+[node name="TextEdit" type="TextEdit" parent="Fundo" unique_id=35000564]
+layout_mode = 0
+offset_left = 149.0
+offset_top = 121.0
+offset_right = 409.0
+offset_bottom = 218.0
+text = "a principio apenas possivel atarvesar com dash e pulo duplo"
+wrap_mode = 1
+
+[node name="Visual" type="ColorRect" parent="Fundo" unique_id=159247522]
+layout_mode = 0
+offset_right = 190.0
+offset_bottom = 13.0
+mouse_filter = 2
+color = Color(0.4, 0.66, 0.74, 1)
+
+[node name="Contorno" type="Node2D" parent="." unique_id=225926579]
+
+[node name="ParedeEsqAcima6" type="StaticBody2D" parent="Contorno" unique_id=1450402195]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeEsqAcima6" unique_id=573818160]
+position = Vector2(108.4375, 511)
+shape = SubResource("RectangleShape2D_w06gj")
+
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeEsqAcima6" unique_id=2066778102]
+offset_left = 2.0
+offset_top = 489.0
+offset_right = 217.0
+offset_bottom = 536.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="ParedeEsqAcima7" type="StaticBody2D" parent="Contorno" unique_id=268156833]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeEsqAcima7" unique_id=387493461]
+position = Vector2(590.8906, 240.49902)
+shape = SubResource("RectangleShape2D_4vmie")
+
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeEsqAcima7" unique_id=1863982593]
+offset_left = 565.0
+offset_top = -4.0
+offset_right = 616.0
+offset_bottom = 477.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="ParedeEsqAcima11" type="StaticBody2D" parent="Contorno" unique_id=1566660584]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeEsqAcima11" unique_id=439802948]
+position = Vector2(1054, 226)
+shape = SubResource("RectangleShape2D_14260")
+
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeEsqAcima11" unique_id=345726048]
+offset_left = 933.0
+offset_top = 199.0
+offset_right = 1169.0
+offset_bottom = 248.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="ParedeEsqAcima8" type="StaticBody2D" parent="Contorno" unique_id=1935506555]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeEsqAcima8" unique_id=990140551]
+position = Vector2(576.8047, 7.5)
+shape = SubResource("RectangleShape2D_co5i0")
+
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeEsqAcima8" unique_id=1352915553]
+offset_left = 18.0
+offset_top = -40.0
+offset_right = 1165.0
+offset_bottom = 40.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="ParedeEsqAcima9" type="StaticBody2D" parent="Contorno" unique_id=1146997384]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeEsqAcima9" unique_id=111803638]
+position = Vector2(7.21875, 154.90039)
+shape = SubResource("RectangleShape2D_2lncs")
+
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeEsqAcima9" unique_id=827128189]
+offset_left = -21.0
+offset_top = -74.0
+offset_right = 30.0
+offset_bottom = 352.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="ParedeEsqAcima10" type="StaticBody2D" parent="Contorno" unique_id=971590220]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeEsqAcima10" unique_id=541057487]
+position = Vector2(1163.7813, 422)
+shape = SubResource("RectangleShape2D_3yakv")
+
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeEsqAcima10" unique_id=477419729]
+offset_left = 1139.0
+offset_top = 201.0
+offset_right = 1190.0
+offset_bottom = 680.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="ParedeEsqAcima12" type="StaticBody2D" parent="Contorno" unique_id=1580211429]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeEsqAcima12" unique_id=363316537]
+position = Vector2(6, 127)
+shape = SubResource("RectangleShape2D_3yakv")
+
+[node name="EscadaParaTeto3" type="StaticBody2D" parent="Contorno" unique_id=1808217428]
+position = Vector2(330, 285)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/EscadaParaTeto3" unique_id=1621295671]
+position = Vector2(544, 118)
+shape = SubResource("RectangleShape2D_hlavi")
+one_way_collision = true
+
+[node name="Visual" type="ColorRect" parent="Contorno/EscadaParaTeto3" unique_id=1844183214]
+offset_left = 453.0
+offset_top = 113.0
+offset_right = 651.0
+offset_bottom = 126.0
+mouse_filter = 2
+color = Color(0.4, 0.66, 0.74, 1)
+
+[node name="EscadaParaTeto4" type="StaticBody2D" parent="Contorno" unique_id=632913760]
+position = Vector2(330, 285)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/EscadaParaTeto4" unique_id=1071473522]
+position = Vector2(16, 306)
+shape = SubResource("RectangleShape2D_hlavi")
+one_way_collision = true
+
+[node name="Visual" type="ColorRect" parent="Contorno/EscadaParaTeto4" unique_id=1088514717]
+offset_left = -84.0
+offset_top = 295.0
+offset_right = 114.0
+offset_bottom = 308.0
+mouse_filter = 2
+color = Color(0.4, 0.66, 0.74, 1)
+
+[node name="Plataformas" type="Node2D" parent="." unique_id=2064535425]
+
+[node name="Decoracao" type="Node2D" parent="." unique_id=1206246565]
+
+[node name="Conteudo" type="Node2D" parent="." unique_id=330861059]
+
+[node name="SpawnsInimigos" type="Node2D" parent="Conteudo" unique_id=1933583013]
+
+[node name="Inimigo_3" type="Marker2D" parent="Conteudo/SpawnsInimigos" unique_id=1486645113]
+position = Vector2(667, 100)
+script = ExtResource("2_4vmie")
+tipo_inimigo = "segmentation_fault"
+
+[node name="Pontos" type="Node2D" parent="." unique_id=1713463368]
+
+[node name="SpawnInicio" type="Marker2D" parent="Pontos" unique_id=1749516996]
+position = Vector2(78, 440)
+
+[node name="SpawnEsquerda" type="Marker2D" parent="Pontos" unique_id=942504179]
+position = Vector2(80, 437)
+
+[node name="SpawnDireita" type="Marker2D" parent="Pontos" unique_id=597925581]
+position = Vector2(1080, 147)
+
+[node name="SpawnCima" type="Marker2D" parent="Pontos" unique_id=137173614]
+position = Vector2(494, 523)
+
+[node name="SpawnBaixo" type="Marker2D" parent="Pontos" unique_id=635858967]
+position = Vector2(514, 104)
