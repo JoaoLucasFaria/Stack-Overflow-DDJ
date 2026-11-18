@@ -12,63 +12,40 @@ const BAIXO: int = 8
 
 ## Para criar uma sala nova: herde sala_base.tscn, configure mascara_saidas
 ## no Inspector e adicione o caminho somente na lista da máscara correta.
+## Sala 17 e o BLOQUEIO DE DASH, nao entra no sorteio normal.
+## Sala 22 e reservada em extremidade opcional apos pulo duplo.
+## As salas originais permanecem no catalogo: nenhuma foi removida.
 const MODELOS: Dictionary = {
-	1: [
-		"res://cenas/salas/sala_01.tscn",
-	],
-	2: [
-		"res://cenas/salas/sala_02.tscn",
-	],
+	1: ["res://cenas/salas/sala_01.tscn"],
+	2: ["res://cenas/salas/sala_02.tscn"],
 	3: [
 		"res://cenas/salas/sala_03.tscn",
 		"res://cenas/salas/corredor_aberto.tscn",
 		"res://cenas/salas/corredor_degraus.tscn",
 		"res://cenas/salas/sala_armadilha_horizontal.tscn",
+		"res://cenas/salas/sala_21.tscn",
 	],
-	4: [
-		"res://cenas/salas/sala_04.tscn",
-	],
-	5: [
-		"res://cenas/salas/sala_05.tscn",
-		"res://cenas/salas/curva_esquerda_cima.tscn",
-	],
-	6: [
-		"res://cenas/salas/sala_06.tscn",
-		"res://cenas/salas/curva_direita_cima.tscn",
-	],
+	4: ["res://cenas/salas/sala_04.tscn"],
+	5: ["res://cenas/salas/sala_05.tscn", "res://cenas/salas/curva_esquerda_cima.tscn"],
+	6: ["res://cenas/salas/sala_06.tscn", "res://cenas/salas/curva_direita_cima.tscn"],
 	7: [
 		"res://cenas/salas/sala_07.tscn",
+		"res://cenas/salas/sala_18.tscn",
+		"res://cenas/salas/sala_19.tscn",
 	],
-	8: [
-		"res://cenas/salas/sala_08.tscn",
-	],
-	9: [
-		"res://cenas/salas/sala_09.tscn",
-	],
-	10: [
-		"res://cenas/salas/sala_10.tscn",
-	],
-	11: [
-		"res://cenas/salas/sala_11.tscn",
-	],
-	12: [
-		"res://cenas/salas/sala_12.tscn",
-		"res://cenas/salas/poco_vertical.tscn",
-	],
-	13: [
-		"res://cenas/salas/sala_13.tscn",
-	],
-	14: [
-		"res://cenas/salas/sala_14.tscn",
-	],
-	15: [
-		"res://cenas/salas/sala_15.tscn",
-	],
+	8: ["res://cenas/salas/sala_08.tscn"],
+	9: ["res://cenas/salas/sala_09.tscn"],
+	10: ["res://cenas/salas/sala_10.tscn"],
+	11: ["res://cenas/salas/sala_11.tscn"],
+	12: ["res://cenas/salas/sala_12.tscn", "res://cenas/salas/poco_vertical.tscn"],
+	13: ["res://cenas/salas/sala_13.tscn"],
+	14: ["res://cenas/salas/sala_14.tscn"],
+	15: ["res://cenas/salas/sala_15.tscn", "res://cenas/salas/sala_24.tscn"],
 }
 const ESPECIAIS: Dictionary = {
 	"inicio": "res://cenas/salas/sala_inicio.tscn",
 	"bloqueio_pulo": "res://cenas/salas/sala_pulo_duplo.tscn",
-	"bloqueio_dash": "res://cenas/salas/sala_abismo_dash.tscn",
+	"bloqueio_dash": "res://cenas/salas/sala_17.tscn",
 	"boss1": "res://cenas/salas/sala_boss_1.tscn",
 	"boss2": "res://cenas/salas/sala_boss_2.tscn",
 	"boss3": "res://cenas/salas/sala_boss_3.tscn",
@@ -188,8 +165,11 @@ func gerar(quantidade_ramos: int = 23, semente_fixa: int = 0, salas_ate_boss1: i
 	# o caminho dos chefes nem criar ligacoes que contornem bloqueios.
 	_distribuir_exceptions(exceptions_por_trecho)
 
-	# Troca apenas o modelo de algumas salas normais por salas de descanso.
-	# A matriz e suas ligacoes continuam exatamente iguais.
+	# Um Data Cache especial em ponta de ramo somente apos o pulo duplo.
+	# O grafico e decidido antes de escolher modelos; nao revela esse bau antes da hora.
+	_reservar_cache_pos_pulo_duplo()
+
+	# Descansos nunca substituem o modulo reservado para o baú.
 	_distribuir_breakpoints(quantidade_breakpoints, distancia_minima_breakpoints)
 
 	# Modelos compativeis com todas as conexoes sorteadas.
@@ -199,6 +179,10 @@ func gerar(quantidade_ramos: int = 23, semente_fixa: int = 0, salas_ate_boss1: i
 		var mascara: int = mascara_das_conexoes(info["conexoes"])
 		info["mascara"] = mascara
 		if tipo == "normal":
+			var fixo: String = String(info.get("modelo_fixo", ""))
+			if not fixo.is_empty():
+				info["modelo"] = fixo
+				continue
 			var possibilidades: Array = MODELOS.get(mascara, [])
 			if possibilidades.is_empty():
 				push_error("Sem sala manual para a mascara %d" % mascara)
@@ -206,6 +190,96 @@ func gerar(quantidade_ramos: int = 23, semente_fixa: int = 0, salas_ate_boss1: i
 			info["modelo"] = possibilidades[gerador.randi_range(0, possibilidades.size() - 1)]
 		else:
 			info["modelo"] = ESPECIAIS.get(tipo, "")
+
+	# Curadoria PR19: a pool continua procedural, mas nao deixa as cenas
+	# recem-curadas dependerem apenas de sorteios de baixa probabilidade.
+	# So substituimos modelos normais com a MESMA mascara de conexoes.
+	_priorizar_modelos_curados()
+	_diagnosticar_modelos_curados()
+
+
+# -----------------------------------------------------------------------------
+# Curadoria PR19 - presenca de modelos novos quando a mascara permite
+# -----------------------------------------------------------------------------
+func _priorizar_modelos_curados() -> void:
+	var distancias: Dictionary = _distancias_da_sala(Vector2i.ZERO)
+	var corredores: Array[Vector2i] = [] # mascara 3: L/R (sala 21)
+	var cruzamentos_t: Array[Vector2i] = [] # mascara 7: L/R/U (salas 18 e 19)
+	var cruzamentos_4: Array[Vector2i] = [] # mascara 15 (sala 24)
+
+	for posicao in salas.keys():
+		var info: Dictionary = salas[posicao]
+		# Nunca troca Boss, Exception, BREAKPOINT, bloqueios ou o cache 22.
+		if info["tipo"] != "normal" or not String(info.get("modelo_fixo", "")).is_empty():
+			continue
+		match int(info["mascara"]):
+			3:
+				corredores.append(posicao)
+			7:
+				cruzamentos_t.append(posicao)
+			15:
+				cruzamentos_4.append(posicao)
+
+	# Proximo ao inicio = mais facil de encontrar durante os testes.
+	# O resto do mapa continua sorteado pela pool normal.
+	if not corredores.is_empty():
+		var pos_corredor: Vector2i = _candidato_mais_proximo(corredores, distancias)
+		salas[pos_corredor]["modelo"] = "res://cenas/salas/sala_21.tscn"
+
+	# As cenas 18 e 19 compartilham a mascara 7; com dois locais
+	# elegiveis ambas aparecem. Com um local, alterna entre elas por run.
+	var ordem: Array[String] = [
+		"res://cenas/salas/sala_18.tscn",
+		"res://cenas/salas/sala_19.tscn"
+	]
+	if gerador.randi_range(0, 1) == 1:
+		ordem.reverse()
+	for caminho in ordem:
+		if cruzamentos_t.is_empty():
+			break
+		var pos_t: Vector2i = _candidato_mais_proximo(cruzamentos_t, distancias)
+		salas[pos_t]["modelo"] = caminho
+		cruzamentos_t.erase(pos_t)
+
+	# A sala 24 so pode existir quando houver de fato quatro conexoes.
+	# Nao cria arestas artificiais nem atalhos que furem a progressao.
+	if not cruzamentos_4.is_empty():
+		var pos_cruzamento: Vector2i = _candidato_mais_proximo(cruzamentos_4, distancias)
+		salas[pos_cruzamento]["modelo"] = "res://cenas/salas/sala_24.tscn"
+
+
+func _candidato_mais_proximo(candidatos: Array[Vector2i], distancias: Dictionary) -> Vector2i:
+	var escolhido: Vector2i = candidatos[0]
+	for posicao in candidatos:
+		if int(distancias.get(posicao, 999999)) < int(distancias.get(escolhido, 999999)):
+			escolhido = posicao
+	return escolhido
+
+
+func _diagnosticar_modelos_curados() -> void:
+	# Mostra o que realmente foi sorteado NA RUN, sem revelar no mapa
+	# visual do jogador salas ainda nao exploradas.
+	var nomes: Array[String] = ["17", "18", "19", "21", "22", "24"]
+	var contagens: Dictionary = {}
+	for nome in nomes:
+		contagens[nome] = 0
+	var elegiveis: Dictionary = {3: 0, 7: 0, 15: 0}
+	var distancias: Dictionary = _distancias_da_sala(Vector2i.ZERO)
+	for posicao in salas.keys():
+		var info: Dictionary = salas[posicao]
+		if info["tipo"] == "normal" and elegiveis.has(int(info["mascara"])):
+			elegiveis[int(info["mascara"])] += 1
+		var caminho: String = String(info.get("modelo", ""))
+		for nome in nomes:
+			if caminho.ends_with("/sala_%s.tscn" % nome):
+				contagens[nome] += 1
+				print("[SALAS NOVAS] sala_%s em %s (distancia %d, tipo %s)" % [nome, str(posicao), int(distancias.get(posicao, -1)), String(info["tipo"])])
+	print("[SALAS NOVAS] Totais na run: 17=%d | 18=%d | 19=%d | 21=%d | 22=%d | 24=%d" % [contagens["17"], contagens["18"], contagens["19"], contagens["21"], contagens["22"], contagens["24"]])
+	print("[SALAS NOVAS] Modelos normais compativeis: mascara 3=%d, mascara 7=%d, mascara 15=%d" % [elegiveis[3], elegiveis[7], elegiveis[15]])
+	if int(elegiveis[15]) == 0:
+		print("[SALAS NOVAS] sala_24 indisponivel nesta run: nenhuma sala normal com 4 conexoes.")
+	if int(elegiveis[7]) == 0:
+		print("[SALAS NOVAS] salas_18/19 indisponiveis nesta run: nenhuma sala normal com mascara 7.")
 
 
 # -----------------------------------------------------------------------------
@@ -404,6 +478,64 @@ func _distancias_da_sala(origem: Vector2i) -> Dictionary:
 	return distancias
 
 
+
+# Cache opcional da sala 22. Escolhe apenas a regiao que se torna acessivel
+# apos o salto duplo, antes do boss 2. Nunca no corredor obrigatorio.
+# Ponta L=1 implica que o novo modulo fica a DIREITA da sala de origem.
+func _reservar_cache_pos_pulo_duplo() -> void:
+	var antes_pulo: Dictionary = alcancaveis(false, false, false)
+	var depois_pulo: Dictionary = alcancaveis(true, false, false)
+	var depois_boss2: Dictionary = _salas_apos_boss2()
+	var candidatos_ponta: Array[Vector2i] = []
+	var candidatos_ancora: Array[Vector2i] = []
+	var candidatos_desvio: Array[Vector2i] = []
+	for posicao in salas.keys():
+		var info: Dictionary = salas[posicao]
+		if info["tipo"] != "normal" or info.has("origem_exception"):
+			continue
+		if not depois_pulo.has(posicao) or antes_pulo.has(posicao) or depois_boss2.has(posicao):
+			continue
+		var conexoes: Dictionary = info["conexoes"]
+		if mascara_das_conexoes(conexoes) == ESQUERDA:
+			candidatos_ponta.append(posicao)
+		if not salas.has(posicao + Vector2i.RIGHT) and not conexoes.has(Vector2i.RIGHT):
+			candidatos_ancora.append(posicao)
+		else:
+			candidatos_desvio.append(posicao)
+	_embaralhar_coordenadas(candidatos_ponta)
+	_embaralhar_coordenadas(candidatos_ancora)
+	_embaralhar_coordenadas(candidatos_desvio)
+	var destino: Vector2i = Vector2i.ZERO
+	if not candidatos_ponta.is_empty():
+		destino = candidatos_ponta[0]
+	elif not candidatos_ancora.is_empty():
+		var origem: Vector2i = candidatos_ancora[0]
+		destino = origem + Vector2i.RIGHT
+		_adicionar(destino, "normal")
+		_ligar(origem, destino)
+	else:
+		# Fallback: desvio em dois passos, sem diagonal no grafo.
+		for ancora in candidatos_desvio:
+			for direcao in [Vector2i.UP, Vector2i.DOWN]:
+				var intermediaria: Vector2i = ancora + direcao
+				var ponta: Vector2i = intermediaria + Vector2i.RIGHT
+				if salas.has(intermediaria) or salas.has(ponta):
+					continue
+				_adicionar(intermediaria, "normal")
+				_ligar(ancora, intermediaria)
+				_adicionar(ponta, "normal")
+				_ligar(intermediaria, ponta)
+				destino = ponta
+				break
+			if destino != Vector2i.ZERO:
+				break
+		if destino == Vector2i.ZERO:
+			push_warning("Sala 22 nao pôde ser posicionada depois do pulo duplo. Seed: %d" % semente)
+			return
+	salas[destino]["modelo_fixo"] = "res://cenas/salas/sala_22.tscn"
+	salas[destino]["reservada_bau"] = true
+	print("[CACHE] Sala 22 em ponta pos-pulo: ", destino)
+
 func _distribuir_breakpoints(quantidade: int, distancia_minima: int) -> void:
 	## O terminal inicial ja existe. Estes sao os BREAKPOINTS adicionais.
 	quantidade = maxi(0, quantidade)
@@ -414,7 +546,7 @@ func _distribuir_breakpoints(quantidade: int, distancia_minima: int) -> void:
 	var candidatos: Array[Vector2i] = []
 	for posicao in salas:
 		var info: Dictionary = salas[posicao]
-		if info["tipo"] != "normal":
+		if info["tipo"] != "normal" or bool(info.get("reservada_bau", false)):
 			continue
 		# Preferimos salas de travessia, mas pontas sem saida podem
 		# ser usadas se necessario para manter a distancia e a quantidade.
