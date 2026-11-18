@@ -1,0 +1,269 @@
+[gd_scene format=3 uid="uid://gcmq55sd2u5u"]
+
+[ext_resource type="Script" uid="uid://dv2jt8kcp8u5y" path="res://scripts/sala_matriz.gd" id="1_va2le"]
+[ext_resource type="Script" uid="uid://0qbu5h1xwn6v" path="res://scripts/inimigos/ponto_spawn_inimigo.gd" id="2_mmbel"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hdl5o"]
+size = Vector2(38, 324)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mmbel"]
+size = Vector2(1200, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_va2le"]
+size = Vector2(25, 442)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_uwway"]
+size = Vector2(478, 35)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_moo5u"]
+size = Vector2(180, 35)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5ncac"]
+size = Vector2(35.5, 221.5)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wi6tv"]
+size = Vector2(55.5, 461.625)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_g3iff"]
+size = Vector2(198, 13)
+
+[node name="SalaBase" type="Node2D" unique_id=1259644344]
+script = ExtResource("1_va2le")
+mascara_saidas = 7
+
+[node name="Fundo" type="ColorRect" parent="." unique_id=1770946178]
+show_behind_parent = true
+offset_right = 1152.0
+offset_bottom = 648.0
+mouse_filter = 2
+color = Color(0.07, 0.13, 0.18, 1)
+
+[node name="ParedeEsqAcima" type="StaticBody2D" parent="Fundo" unique_id=182470265]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Fundo/ParedeEsqAcima" unique_id=1500404172]
+position = Vector2(618, 149)
+shape = SubResource("RectangleShape2D_hdl5o")
+
+[node name="Visual" type="ColorRect" parent="Fundo/ParedeEsqAcima" unique_id=807464846]
+offset_left = 600.0
+offset_top = -13.0
+offset_right = 637.0
+offset_bottom = 299.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="ParedeEsqAcima4" type="StaticBody2D" parent="Fundo" unique_id=1343046269]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Fundo/ParedeEsqAcima4" unique_id=663398468]
+position = Vector2(597, 652)
+shape = SubResource("RectangleShape2D_mmbel")
+
+[node name="Visual" type="ColorRect" parent="Fundo/ParedeEsqAcima4" unique_id=1483997908]
+offset_left = -7.0
+offset_top = 633.0
+offset_right = 1188.0
+offset_bottom = 672.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="ParedeEsqAcima3" type="StaticBody2D" parent="Fundo" unique_id=1941881149]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Fundo/ParedeEsqAcima3" unique_id=296280267]
+position = Vector2(1156, 404)
+shape = SubResource("RectangleShape2D_va2le")
+
+[node name="Visual" type="ColorRect" parent="Fundo/ParedeEsqAcima3" unique_id=2050507352]
+offset_left = 1140.0
+offset_top = 174.0
+offset_right = 1174.0
+offset_bottom = 638.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="ParedeEsqAcima8" type="StaticBody2D" parent="Fundo" unique_id=233344791]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Fundo/ParedeEsqAcima8" unique_id=634153796]
+position = Vector2(1013, 7.5)
+shape = SubResource("RectangleShape2D_uwway")
+
+[node name="Visual" type="ColorRect" parent="Fundo/ParedeEsqAcima8" unique_id=1319691083]
+offset_left = 774.0
+offset_top = -9.0
+offset_right = 1247.0
+offset_bottom = 28.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="ParedeEsqAcima9" type="StaticBody2D" parent="Fundo" unique_id=110170736]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Fundo/ParedeEsqAcima9" unique_id=1311732547]
+position = Vector2(1102, 193)
+shape = SubResource("RectangleShape2D_moo5u")
+
+[node name="Visual" type="ColorRect" parent="Fundo/ParedeEsqAcima9" unique_id=519108634]
+offset_left = 1011.0
+offset_top = 174.0
+offset_right = 1193.0
+offset_bottom = 215.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="ParedeEsqAcima7" type="StaticBody2D" parent="Fundo" unique_id=1587429292]
+
+[node name="Visual" type="ColorRect" parent="Fundo/ParedeEsqAcima7" unique_id=1947066837]
+offset_left = -9.0
+offset_top = -12.0
+offset_right = 609.0
+offset_bottom = 30.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="ParedeEsqAcima5" type="StaticBody2D" parent="Fundo" unique_id=1545896354]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Fundo/ParedeEsqAcima5" unique_id=1799622097]
+position = Vector2(857, 397)
+shape = SubResource("RectangleShape2D_5ncac")
+
+[node name="Visual" type="ColorRect" parent="Fundo/ParedeEsqAcima5" unique_id=1557756400]
+offset_left = 840.0
+offset_top = 288.0
+offset_right = 873.0
+offset_bottom = 516.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="ParedeEsqAcima6" type="StaticBody2D" parent="Fundo" unique_id=702177472]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Fundo/ParedeEsqAcima6" unique_id=176978110]
+position = Vector2(5.75, 409.8125)
+shape = SubResource("RectangleShape2D_wi6tv")
+
+[node name="Visual" type="ColorRect" parent="Fundo/ParedeEsqAcima6" unique_id=2056483368]
+offset_left = -20.0
+offset_top = 178.0
+offset_right = 34.0
+offset_bottom = 636.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="BordaCima" type="ColorRect" parent="Fundo" unique_id=1287984742]
+layout_mode = 0
+offset_left = 637.0
+offset_top = 15.0
+offset_right = 774.0
+offset_bottom = 20.0
+mouse_filter = 2
+color = Color(0.28, 0.76, 0.71, 1)
+
+[node name="BordaEsq" type="ColorRect" parent="Fundo" unique_id=1710756710]
+layout_mode = 0
+offset_left = 1112.0
+offset_top = 19.0
+offset_right = 1157.0
+offset_bottom = 38.0
+mouse_filter = 2
+color = Color(0.28, 0.76, 0.71, 1)
+
+[node name="BordaEsq2" type="ColorRect" parent="Fundo" unique_id=960674301]
+layout_mode = 0
+offset_left = -20.0
+offset_top = 28.0
+offset_right = 41.0
+offset_bottom = 60.0
+mouse_filter = 2
+color = Color(0.28, 0.76, 0.71, 1)
+
+[node name="EscadaParaTeto3" type="StaticBody2D" parent="Fundo" unique_id=316311560]
+position = Vector2(330, 285)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Fundo/EscadaParaTeto3" unique_id=1551520894]
+position = Vector2(142, 175)
+shape = SubResource("RectangleShape2D_g3iff")
+one_way_collision = true
+
+[node name="Visual" type="ColorRect" parent="Fundo/EscadaParaTeto3" unique_id=381365656]
+offset_left = 49.0
+offset_top = 169.0
+offset_right = 247.0
+offset_bottom = 182.0
+mouse_filter = 2
+color = Color(0.4, 0.66, 0.74, 1)
+
+[node name="EscadaParaTeto5" type="StaticBody2D" parent="Fundo" unique_id=1363934280]
+position = Vector2(330, 285)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Fundo/EscadaParaTeto5" unique_id=1132292347]
+position = Vector2(-6, 260)
+shape = SubResource("RectangleShape2D_g3iff")
+one_way_collision = true
+
+[node name="Visual" type="ColorRect" parent="Fundo/EscadaParaTeto5" unique_id=1447298383]
+offset_left = -105.0
+offset_top = 254.0
+offset_right = 93.0
+offset_bottom = 267.0
+mouse_filter = 2
+color = Color(0.4, 0.66, 0.74, 1)
+
+[node name="EscadaParaTeto4" type="StaticBody2D" parent="Fundo" unique_id=911599894]
+position = Vector2(330, 285)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Fundo/EscadaParaTeto4" unique_id=2034290071]
+position = Vector2(-88, -4)
+shape = SubResource("RectangleShape2D_g3iff")
+one_way_collision = true
+
+[node name="Visual" type="ColorRect" parent="Fundo/EscadaParaTeto4" unique_id=718262450]
+offset_left = -184.0
+offset_top = -12.0
+offset_right = 14.0
+offset_bottom = 1.0
+mouse_filter = 2
+color = Color(0.4, 0.66, 0.74, 1)
+
+[node name="Contorno" type="Node2D" parent="." unique_id=1138946078]
+
+[node name="Plataformas" type="Node2D" parent="." unique_id=957584933]
+
+[node name="Decoracao" type="Node2D" parent="." unique_id=2077496299]
+
+[node name="Conteudo" type="Node2D" parent="." unique_id=262312911]
+
+[node name="SpawnsInimigos" type="Node2D" parent="Conteudo" unique_id=1520556429]
+
+[node name="Inimigo_4" type="Marker2D" parent="Conteudo/SpawnsInimigos" unique_id=1409799516]
+position = Vector2(868, 227)
+script = ExtResource("2_mmbel")
+tipo_inimigo = "memory_leak"
+
+[node name="Inimigo_1" type="Marker2D" parent="Conteudo/SpawnsInimigos" unique_id=1902659985]
+position = Vector2(278, 479)
+script = ExtResource("2_mmbel")
+tipo_inimigo = "memory_leak"
+
+[node name="Inimigo_3" type="Marker2D" parent="Conteudo/SpawnsInimigos" unique_id=735350384]
+position = Vector2(503, 398)
+script = ExtResource("2_mmbel")
+tipo_inimigo = "segmentation_fault"
+
+[node name="Inimigo_2" type="Marker2D" parent="Conteudo/SpawnsInimigos" unique_id=1244111221]
+position = Vector2(929, 571)
+script = ExtResource("2_mmbel")
+tipo_inimigo = "segmentation_fault"
+
+[node name="Pontos" type="Node2D" parent="." unique_id=379144039]
+
+[node name="SpawnInicio" type="Marker2D" parent="Pontos" unique_id=1038843810]
+position = Vector2(15, 116)
+
+[node name="SpawnEsquerda" type="Marker2D" parent="Pontos" unique_id=753590669]
+position = Vector2(189, 204)
+
+[node name="SpawnDireita" type="Marker2D" parent="Pontos" unique_id=1232631956]
+position = Vector2(1051, 96)
+
+[node name="SpawnCima" type="Marker2D" parent="Pontos" unique_id=1104157971]
+position = Vector2(710, 510)
+
+[node name="SpawnBaixo" type="Marker2D" parent="Pontos" unique_id=1897866734]
+position = Vector2(715, 125)

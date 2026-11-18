@@ -1,0 +1,237 @@
+[gd_scene format=3 uid="uid://hdti1neh0ikk"]
+
+[ext_resource type="Script" uid="uid://dv2jt8kcp8u5y" path="res://scripts/sala_matriz.gd" id="1_base"]
+[ext_resource type="Script" uid="uid://0qbu5h1xwn6v" path="res://scripts/inimigos/ponto_spawn_inimigo.gd" id="2_spawn"]
+
+[sub_resource type="RectangleShape2D" id="shape_parede_esq_topo"]
+size = Vector2(26, 20)
+
+[sub_resource type="RectangleShape2D" id="shape_parede_esq_corpo"]
+size = Vector2(26, 524)
+
+[sub_resource type="RectangleShape2D" id="shape_parede_dir"]
+size = Vector2(26, 648)
+
+[sub_resource type="RectangleShape2D" id="shape_teto"]
+size = Vector2(1152, 26)
+
+[sub_resource type="RectangleShape2D" id="shape_piso_esq"]
+size = Vector2(26, 48)
+
+[sub_resource type="RectangleShape2D" id="shape_piso_dir"]
+size = Vector2(1002, 48)
+
+[sub_resource type="RectangleShape2D" id="shape_divisoria_u"]
+size = Vector2(674, 34)
+
+[sub_resource type="RectangleShape2D" id="shape_apoio_porta_sup"]
+size = Vector2(160, 13)
+
+[node name="sala_25" type="Node2D" unique_id=1062109273]
+script = ExtResource("1_base")
+mascara_saidas = 9
+
+[node name="Fundo" type="ColorRect" parent="." unique_id=890328134]
+show_behind_parent = true
+offset_right = 1152.0
+offset_bottom = 648.0
+mouse_filter = 2
+color = Color(0.07, 0.13, 0.18, 1)
+
+[node name="TextoBau" type="Label" parent="Fundo" unique_id=139856820]
+layout_mode = 0
+offset_left = 1022.0
+offset_top = 512.0
+offset_right = 1092.0
+offset_bottom = 538.0
+text = "BAÚ"
+horizontal_alignment = 1
+
+[node name="PlaceholderBau" type="ColorRect" parent="Fundo" unique_id=1013934360]
+layout_mode = 0
+offset_left = 1026.0
+offset_top = 553.0
+offset_right = 1096.0
+offset_bottom = 597.0
+mouse_filter = 2
+color = Color(0.95, 0.76, 0.24, 1)
+
+[node name="Contorno" type="Node2D" parent="." unique_id=1841372830]
+
+[node name="ParedeEsqTopo" type="StaticBody2D" parent="Contorno" unique_id=1413707879]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeEsqTopo" unique_id=955856309]
+position = Vector2(13, 10)
+shape = SubResource("shape_parede_esq_topo")
+
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeEsqTopo" unique_id=1058606506]
+offset_right = 26.0
+offset_bottom = 20.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="ParedeEsqCorpo" type="StaticBody2D" parent="Contorno" unique_id=15295798]
+position = Vector2(0, 124)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeEsqCorpo" unique_id=1345713468]
+position = Vector2(13, 262)
+shape = SubResource("shape_parede_esq_corpo")
+
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeEsqCorpo" unique_id=1518524089]
+offset_right = 26.0
+offset_bottom = 524.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="ParedeDir" type="StaticBody2D" parent="Contorno" unique_id=1904665316]
+position = Vector2(1126, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeDir" unique_id=210977531]
+position = Vector2(13, 324)
+shape = SubResource("shape_parede_dir")
+
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeDir" unique_id=1190090288]
+offset_right = 26.0
+offset_bottom = 648.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="Teto" type="StaticBody2D" parent="Contorno" unique_id=226270741]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/Teto" unique_id=1495834401]
+position = Vector2(576, 13)
+shape = SubResource("shape_teto")
+
+[node name="Visual" type="ColorRect" parent="Contorno/Teto" unique_id=859206663]
+offset_right = 1152.0
+offset_bottom = 26.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="PisoCantoEsq" type="StaticBody2D" parent="Contorno" unique_id=1565925656]
+position = Vector2(0, 600)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/PisoCantoEsq" unique_id=2067750097]
+position = Vector2(13, 24)
+shape = SubResource("shape_piso_esq")
+
+[node name="Visual" type="ColorRect" parent="Contorno/PisoCantoEsq" unique_id=2117425156]
+offset_right = 26.0
+offset_bottom = 48.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="PisoPrincipal" type="StaticBody2D" parent="Contorno" unique_id=352458680]
+position = Vector2(150, 600)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/PisoPrincipal" unique_id=1415376818]
+position = Vector2(501, 24)
+shape = SubResource("shape_piso_dir")
+
+[node name="Visual" type="ColorRect" parent="Contorno/PisoPrincipal" unique_id=259272167]
+offset_right = 1002.0
+offset_bottom = 48.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="DivisoriaU" type="StaticBody2D" parent="Contorno" unique_id=284857139]
+position = Vector2(26, 315)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/DivisoriaU" unique_id=736529720]
+position = Vector2(337, 17)
+shape = SubResource("shape_divisoria_u")
+
+[node name="Visual" type="ColorRect" parent="Contorno/DivisoriaU" unique_id=2026077411]
+offset_right = 670.0
+offset_bottom = 34.0
+mouse_filter = 2
+color = Color(0.235, 0.325, 0.405, 1)
+
+[node name="Plataformas" type="Node2D" parent="." unique_id=518541068]
+
+[node name="ApoioPortaSuperior" type="StaticBody2D" parent="Plataformas" unique_id=1973591470]
+position = Vector2(26, 124)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/ApoioPortaSuperior" unique_id=1570041065]
+position = Vector2(80, 6.5)
+shape = SubResource("shape_apoio_porta_sup")
+
+[node name="Visual" type="ColorRect" parent="Plataformas/ApoioPortaSuperior" unique_id=25982342]
+offset_right = 160.0
+offset_bottom = 13.0
+mouse_filter = 2
+color = Color(0.28, 0.76, 0.71, 1)
+
+[node name="DegrauTransicaoCima" type="StaticBody2D" parent="Plataformas" unique_id=1373071840]
+position = Vector2(260, 220)
+
+[node name="CurvaDireitaAlta" type="StaticBody2D" parent="Plataformas" unique_id=1335825374]
+position = Vector2(960, 380)
+
+[node name="CurvaDireitaBaixa" type="StaticBody2D" parent="Plataformas" unique_id=976852009]
+position = Vector2(930, 490)
+
+[node name="Decoracao" type="Node2D" parent="." unique_id=806149855]
+
+[node name="BordaEsqSuperior" type="ColorRect" parent="Decoracao" unique_id=1593092675]
+offset_top = 124.0
+offset_right = 26.0
+offset_bottom = 129.0
+mouse_filter = 2
+color = Color(0.28, 0.76, 0.71, 1)
+
+[node name="BordaBaixoEsq" type="ColorRect" parent="Decoracao" unique_id=604063867]
+offset_left = 26.0
+offset_top = 600.0
+offset_right = 150.0
+offset_bottom = 604.0
+mouse_filter = 2
+color = Color(0.28, 0.76, 0.71, 1)
+
+[node name="Conteudo" type="Node2D" parent="." unique_id=1004713303]
+
+[node name="SpawnsInimigos" type="Node2D" parent="Conteudo" unique_id=262813824]
+
+[node name="Inimigo_1" type="Marker2D" parent="Conteudo/SpawnsInimigos" unique_id=1010774429]
+position = Vector2(560, 283)
+script = ExtResource("2_spawn")
+
+[node name="Inimigo_2" type="Marker2D" parent="Conteudo/SpawnsInimigos" unique_id=408744521]
+position = Vector2(1020, 458)
+script = ExtResource("2_spawn")
+tipo_inimigo = "null_pointer"
+
+[node name="Inimigo_3" type="Marker2D" parent="Conteudo/SpawnsInimigos" unique_id=177919246]
+position = Vector2(680, 568)
+script = ExtResource("2_spawn")
+tipo_inimigo = "memory_leak"
+
+[node name="Inimigo_4" type="Marker2D" parent="Conteudo/SpawnsInimigos" unique_id=1065575498]
+position = Vector2(290, 568)
+script = ExtResource("2_spawn")
+tipo_inimigo = "segmentation_fault"
+
+[node name="Pontos" type="Node2D" parent="." unique_id=1827822976]
+
+[node name="SpawnInicio" type="Marker2D" parent="Pontos" unique_id=184529884]
+position = Vector2(96, 90)
+
+[node name="SpawnEsquerda" type="Marker2D" parent="Pontos" unique_id=881692668]
+position = Vector2(96, 90)
+
+[node name="SpawnDireita" type="Marker2D" parent="Pontos" unique_id=614691366]
+position = Vector2(966, 543)
+
+[node name="SpawnCima" type="Marker2D" parent="Pontos" unique_id=199949679]
+position = Vector2(210, 540)
+
+[node name="SpawnBaixo" type="Marker2D" parent="Pontos" unique_id=182898479]
+position = Vector2(576, 125)
+
+[node name="TextEdit" type="TextEdit" parent="." unique_id=1153568642]
+offset_left = 810.0
+offset_top = 191.0
+offset_right = 1049.0
+offset_bottom = 320.0
+text = "porta superior apenas
+com pulo duplo e/ou dash"

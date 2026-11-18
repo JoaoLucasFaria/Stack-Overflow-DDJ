@@ -18,6 +18,14 @@ const CENA_ENCONTRO_BOSS_1 = preload("res://scripts/bosses/encontro_boss_1.gd")
 const CENA_ENCONTRO_BOSS_2 = preload("res://scripts/bosses/encontro_boss_2.gd")
 const CENA_ENCONTRO_BOSS_3 = preload("res://scripts/bosses/encontro_boss_3.gd")
 const CENA_TERMINAL_APOS_BOSS: PackedScene = preload("res://cenas/descanso/terminal_breakpoint.tscn")
+# Adicione essa constante junto das outras no topo do arquivo (linha ~19):
+const CENA_JOGADOR_TESTE: PackedScene = preload("res://cenas/player.tscn")
+const SCRIPTS_INIMIGOS_TESTE: Dictionary = {
+	"syntax_error": preload("res://scripts/inimigos/syntax_error.gd"),
+	"null_pointer": preload("res://scripts/inimigos/null_pointer.gd"),
+	"memory_leak": preload("res://scripts/inimigos/memory_leak.gd"),
+	"segmentation_fault": preload("res://scripts/inimigos/segmentation_fault.gd"),
+} # ajuste o caminho se o nome do .tscn do player for outro
 
 @export_category("Conexoes do modulo")
 @export_flags("Esquerda", "Direita", "Cima", "Baixo") var mascara_saidas: int = 0
@@ -42,6 +50,11 @@ func configurar(posicao: Vector2i, informacoes: Dictionary, alvo: Jogador, derro
 
 
 func _ready() -> void:
+	# MODO DE TESTE ISOLADO (F6): roda apenas quando a sala é aberta sozinha no editor
+	if dados.is_empty():
+		_iniciar_teste_isolado_f6()
+		return
+
 	var mascara_necessaria: int = MapaMatriz.mascara_das_conexoes(dados.get("conexoes", {}))
 	if mascara_saidas != mascara_necessaria:
 		push_error("Modelo de sala com saídas incompatíveis: %s. Tem %d, precisa %d." % [scene_file_path, mascara_saidas, mascara_necessaria])
@@ -75,6 +88,59 @@ func _ready() -> void:
 				$Conteudo.add_child(encontro)
 
 
+func _iniciar_teste_isolado_f6() -> void:
+	# 1. Cria o jogador no SpawnInicio
+	var spawn: Marker2D = get_node_or_null("Pontos/SpawnInicio") as Marker2D
+	if CENA_JOGADOR_TESTE != null and spawn != null:
+		jogador = CENA_JOGADOR_TESTE.instantiate() as Jogador
+		add_child(jogador)
+		jogador.global_position = spawn.global_position
+		jogador.pulo_duplo_liberado = true
+		if jogador.get("dash_component") != null:
+			jogador.dash_component.dash_desbloqueado = true
+		jogador.grapple_liberado = true
+
+	# 2. Lê todos os PontoSpawnInimigo dentro de Conteudo/SpawnsInimigos
+	var pasta_spawns: Node2D = get_node_or_null("Conteudo/SpawnsInimigos") as Node2D
+	if pasta_spawns == null:
+		return
+	for filho in pasta_spawns.get_children():
+		if filho is PontoSpawnInimigo:
+			var tipo_sorteado: String = filho.sortear_tipo()
+			var inimigo: InimigoBase = _criar_inimigo_teste(tipo_sorteado)
+			if inimigo != null:
+				inimigo.configurar(jogador)
+				pasta_spawns.add_child(inimigo)
+				inimigo.global_position = filho.global_position
+
+
+func _criar_inimigo_teste(tipo: String) -> InimigoBase:
+	var script_inimigo: GDScript = SCRIPTS_INIMIGOS_TESTE.get(tipo)
+	if script_inimigo == null:
+		return null
+	var corpo: CharacterBody2D = CharacterBody2D.new()
+	corpo.set_script(script_inimigo)
+
+	var colisao: CollisionShape2D = CollisionShape2D.new()
+	colisao.name = "CollisionShape2D"
+	var forma: RectangleShape2D = RectangleShape2D.new()
+	forma.size = Vector2(32, 36)
+	colisao.shape = forma
+	corpo.add_child(colisao)
+
+	var visual: ColorRect = ColorRect.new()
+	visual.name = "Visual"
+	visual.position = Vector2(-16, -18)
+	visual.size = Vector2(32, 36)
+	visual.color = Color(0.9, 0.25, 0.3, 1.0)
+	corpo.add_child(visual)
+
+	var rotulo: Label = Label.new()
+	rotulo.name = "Nome"
+	rotulo.position = Vector2(-50, -38)
+	corpo.add_child(rotulo)
+
+	return corpo as InimigoBase
 
 func _criar_breakpoint_apos_boss() -> void:
 	# Reaproveita o terminal existente: G descansa, sem resetar itens ou STACK.
@@ -180,16 +246,14 @@ func direcao_de_passagem_confirmada(alvo: Jogador) -> Vector2i:
 		return Vector2i.ZERO
 	var centro: Vector2 = to_local(colisao.global_position)
 	var velocidade: Vector2 = alvo.velocity
-	var lateral: bool = centro.y >= 496.0 and centro.y <= PISO_Y
-	var vertical: bool = centro.x >= VAO_TOPO_X and centro.x <= VAO_TOPO_X + VAO_TOPO_L
 	var conexoes: Dictionary = dados.get("conexoes", {})
-	if conexoes.has(Vector2i.LEFT) and centro.x < 0.0 and velocidade.x < -0.01 and lateral:
+	if conexoes.has(Vector2i.LEFT) and centro.x < 0.0 and velocidade.x < -0.01:
 		return Vector2i.LEFT
-	if conexoes.has(Vector2i.RIGHT) and centro.x > LARGURA and velocidade.x > 0.01 and lateral:
+	if conexoes.has(Vector2i.RIGHT) and centro.x > LARGURA and velocidade.x > 0.01:
 		return Vector2i.RIGHT
-	if conexoes.has(Vector2i.UP) and centro.y < 0.0 and velocidade.y < -0.01 and vertical:
+	if conexoes.has(Vector2i.UP) and centro.y < 0.0 and velocidade.y < -0.01:
 		return Vector2i.UP
-	if conexoes.has(Vector2i.DOWN) and centro.y > ALTURA and velocidade.y > 0.01 and vertical:
+	if conexoes.has(Vector2i.DOWN) and centro.y > ALTURA and velocidade.y > 0.01:
 		return Vector2i.DOWN
 	return Vector2i.ZERO
 
