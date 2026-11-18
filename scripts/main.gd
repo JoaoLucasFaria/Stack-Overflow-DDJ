@@ -7,6 +7,7 @@ const CENA_HUD = preload("res://scripts/hud_matriz.gd")
 const CENA_MAPA = preload("res://scripts/mapa_matriz.gd")
 const CENA_DROP: PackedScene = preload("res://cenas/inimigos/drop_provisorio.tscn")
 const CENA_EXCEPTION_HANDLER = preload("res://scripts/desafios/controlador_exception_handler.gd")
+const CENA_HUD_SUPERIOR = preload("res://scripts/ui/hud_superior.gd")
 const CENAS_INIMIGOS: Dictionary = {
 	"syntax_error": preload("res://cenas/inimigos/inimigo_syntax_error.tscn"),
 	"null_pointer": preload("res://cenas/inimigos/inimigo_null_pointer.tscn"),
@@ -36,6 +37,8 @@ var coordenada_atual: Vector2i = Vector2i.ZERO
 var sala_atual: SalaMatriz
 var jogador: Jogador
 var hud: HUDMatriz
+var hud_superior: HUDSuperior
+var camera_principal: Camera2D
 var chefes_derrotados: Dictionary = {}
 ## Coordenadas dos Exception Handlers concluidos nesta run.
 ## Nao sao reiniciados ao descansar no BREAKPOINT.
@@ -59,6 +62,13 @@ var partida_terminou: bool = false
 
 
 func _ready() -> void:
+	# O mundo mantem 1152x648, desenhado abaixo da HUD de 72px.
+	# A camera fixa evita perder o enquadramento ao sair das arenas de boss.
+	camera_principal = Camera2D.new()
+	camera_principal.name = "CameraCampanha"
+	camera_principal.position = Vector2(576.0, 288.0)
+	add_child(camera_principal)
+	camera_principal.make_current()
 	mapa = CENA_MAPA.new() as MapaMatriz
 	mapa.gerar(
 		quantidade_salas_extras,
@@ -80,9 +90,17 @@ func _ready() -> void:
 	var inventario: EquipamentosAtivos = jogador.get_node("EquipamentosAtivos") as EquipamentosAtivos
 	inventario.aviso.connect(_ao_aviso_equipamento)
 	hud = CENA_HUD.new() as HUDMatriz
+	hud.usar_hud_superior = true
 	add_child(hud)
 	hud.teleporte_confirmado.connect(_ao_teleporte_confirmado)
 	hud.teleporte_cancelado.connect(_ao_teleporte_cancelado)
+	# Os indicadores antigos continuam nas arenas de teste, mas sao
+	# ocultados na campanha para nao duplicar HP/STACK e Q/E.
+	if is_instance_valid(inventario.hud):
+		inventario.hud.hide()
+	hud_superior = CENA_HUD_SUPERIOR.new() as HUDSuperior
+	add_child(hud_superior)
+	hud_superior.configurar(jogador, inventario)
 	_entrar_sala(Vector2i.ZERO, Vector2i.ZERO)
 	_aviso("Encontre o Guardiao 1. Explore atravessando as passagens.", 3.8)
 
@@ -228,6 +246,9 @@ func _entrar_sala(destino: Vector2i, direcao: Vector2i) -> void:
 		_salvar_estado_inimigos_da_sala()
 		remove_child(sala_atual)
 		sala_atual.queue_free()
+	# Retoma sempre a camera da campanha ao trocar de sala.
+	# Se a nova sala tiver boss, a camera da arena assume em _ready().
+	camera_principal.make_current()
 	sala_atual = nova
 	coordenada_atual = destino
 	add_child(sala_atual)

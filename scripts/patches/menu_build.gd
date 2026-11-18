@@ -23,28 +23,47 @@ func _ready() -> void:
 	visible = false
 
 
+
 func _input(evento: InputEvent) -> void:
 	if not (evento is InputEventKey):
 		return
+
 	var tecla: InputEventKey = evento as InputEventKey
 	if not tecla.pressed or tecla.echo or not evento.is_action_pressed("ui_cancel"):
 		return
+
+	# V15.2: ESC fecha o mapa de exploracao antes de abrir o BUILD.
+	var mapa_aberto: Node = get_tree().get_first_node_in_group("mapa_exploracao_aberto")
+
+	if mapa_aberto != null:
+		var hud_matriz: HUDMatriz = mapa_aberto.get_parent().get_parent() as HUDMatriz
+
+		if hud_matriz != null:
+			hud_matriz.alternar_mapa()
+			get_viewport().set_input_as_handled()
+			return
+
+	# Se o BUILD ja estiver aberto, ESC fecha normalmente.
 	if visible:
 		fechar()
 		get_viewport().set_input_as_handled()
 		return
-	# ESC tambem cancela a coleta de equipamentos e o mapa de teleporte.
-	# Nesses casos, o jogo ja esta pausado e o menu nao pode abrir.
+
+	# Nao abrir BUILD durante coleta ou teleporte.
 	if get_tree().paused or not is_instance_valid(gerenciador):
 		return
+
 	var jogador = gerenciador.jogador
 	if not is_instance_valid(jogador) or jogador.vida_atual <= 0:
 		return
+
 	var itens = jogador.get_node_or_null("EquipamentosAtivos")
 	if itens != null and itens.coleta_aberta:
 		return
+
 	abrir()
 	get_viewport().set_input_as_handled()
+
 
 
 ## Usado apenas pela escolha obrigatoria do Exception Handler.

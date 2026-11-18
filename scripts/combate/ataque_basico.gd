@@ -26,7 +26,10 @@ func _physics_process(delta: float) -> void:
 	recarga = maxf(0.0, recarga - delta)
 	var estava_desenhando: bool = flash_ataque > 0.0
 	flash_ataque = maxf(0.0, flash_ataque - delta)
-	if Input.is_action_just_pressed("ataque_basico") and recarga <= 0.0:
+	# Cliques no mapa M servem para arrastar, nunca para atacar.
+	# A simulacao continua ativa enquanto o jogador consulta o mapa.
+	var mapa_aberto: bool = not get_tree().get_nodes_in_group("mapa_exploracao_aberto").is_empty()
+	if Input.is_action_just_pressed("ataque_basico") and recarga <= 0.0 and not mapa_aberto:
 		_atacar()
 	if estava_desenhando or flash_ataque > 0.0:
 		queue_redraw()
