@@ -1,0 +1,294 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/sala_matriz.gd" id="1_room"]
+[ext_resource type="Script" path="res://scripts/inimigos/ponto_spawn_inimigo.gd" id="2_enemy"]
+
+
+[sub_resource type="RectangleShape2D" id="shape_ParedeEsqAcima"]
+size = Vector2(26, 496)
+
+[sub_resource type="RectangleShape2D" id="shape_ParedeEsqAbaixo"]
+size = Vector2(26, 48)
+
+[sub_resource type="RectangleShape2D" id="shape_ParedeDirAcima"]
+size = Vector2(26, 496)
+
+[sub_resource type="RectangleShape2D" id="shape_ParedeDirAbaixo"]
+size = Vector2(26, 48)
+
+[sub_resource type="RectangleShape2D" id="shape_TetoEsq"]
+size = Vector2(514, 26)
+
+[sub_resource type="RectangleShape2D" id="shape_TetoDir"]
+size = Vector2(514, 26)
+
+[sub_resource type="RectangleShape2D" id="shape_Piso"]
+size = Vector2(1152, 48)
+
+[sub_resource type="RectangleShape2D" id="shape_FirewallCentral"]
+size = Vector2(36, 105)
+
+[sub_resource type="RectangleShape2D" id="shape_LajeEsq"]
+size = Vector2(178, 13)
+
+[sub_resource type="RectangleShape2D" id="shape_LajeDir"]
+size = Vector2(178, 13)
+
+[sub_resource type="RectangleShape2D" id="shape_RampaCentro"]
+size = Vector2(200, 13)
+
+[sub_resource type="RectangleShape2D" id="shape_TopoEsq"]
+size = Vector2(160, 13)
+
+[sub_resource type="RectangleShape2D" id="shape_TopoDir"]
+size = Vector2(160, 13)
+
+[sub_resource type="RectangleShape2D" id="shape_SaidaTeto"]
+size = Vector2(136, 13)
+
+[node name="Sala18LigacaoFirewall" type="Node2D"]
+script = ExtResource("1_room")
+mascara_saidas = 7
+
+[node name="Fundo" type="ColorRect" parent="."]
+show_behind_parent = true
+offset_right = 1152.0
+offset_bottom = 648.0
+mouse_filter = 2
+color = Color(0.07, 0.13, 0.18, 1)
+
+[node name="Contorno" type="Node2D" parent="."]
+
+[node name="Plataformas" type="Node2D" parent="."]
+
+[node name="Decoracao" type="Node2D" parent="."]
+
+[node name="Conteudo" type="Node2D" parent="."]
+
+[node name="SpawnsInimigos" type="Node2D" parent="Conteudo"]
+
+[node name="Pontos" type="Node2D" parent="."]
+
+[node name="ParedeEsqAcima" type="StaticBody2D" parent="Contorno"]
+position = Vector2(0, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeEsqAcima"]
+position = Vector2(13, 248)
+shape = SubResource("shape_ParedeEsqAcima")
+
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeEsqAcima"]
+offset_right = 26.0
+offset_bottom = 496.0
+color = Color(0.235, 0.325, 0.405, 1)
+mouse_filter = 2
+
+[node name="ParedeEsqAbaixo" type="StaticBody2D" parent="Contorno"]
+position = Vector2(0, 600)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeEsqAbaixo"]
+position = Vector2(13, 24)
+shape = SubResource("shape_ParedeEsqAbaixo")
+
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeEsqAbaixo"]
+offset_right = 26.0
+offset_bottom = 48.0
+color = Color(0.235, 0.325, 0.405, 1)
+mouse_filter = 2
+
+[node name="ParedeDirAcima" type="StaticBody2D" parent="Contorno"]
+position = Vector2(1126, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeDirAcima"]
+position = Vector2(13, 248)
+shape = SubResource("shape_ParedeDirAcima")
+
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeDirAcima"]
+offset_right = 26.0
+offset_bottom = 496.0
+color = Color(0.235, 0.325, 0.405, 1)
+mouse_filter = 2
+
+[node name="ParedeDirAbaixo" type="StaticBody2D" parent="Contorno"]
+position = Vector2(1126, 600)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeDirAbaixo"]
+position = Vector2(13, 24)
+shape = SubResource("shape_ParedeDirAbaixo")
+
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeDirAbaixo"]
+offset_right = 26.0
+offset_bottom = 48.0
+color = Color(0.235, 0.325, 0.405, 1)
+mouse_filter = 2
+
+[node name="TetoEsq" type="StaticBody2D" parent="Contorno"]
+position = Vector2(0, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/TetoEsq"]
+position = Vector2(257, 13)
+shape = SubResource("shape_TetoEsq")
+
+[node name="Visual" type="ColorRect" parent="Contorno/TetoEsq"]
+offset_right = 514.0
+offset_bottom = 26.0
+color = Color(0.235, 0.325, 0.405, 1)
+mouse_filter = 2
+
+[node name="TetoDir" type="StaticBody2D" parent="Contorno"]
+position = Vector2(638, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/TetoDir"]
+position = Vector2(257, 13)
+shape = SubResource("shape_TetoDir")
+
+[node name="Visual" type="ColorRect" parent="Contorno/TetoDir"]
+offset_right = 514.0
+offset_bottom = 26.0
+color = Color(0.235, 0.325, 0.405, 1)
+mouse_filter = 2
+
+[node name="Piso" type="StaticBody2D" parent="Contorno"]
+position = Vector2(0, 600)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/Piso"]
+position = Vector2(576, 24)
+shape = SubResource("shape_Piso")
+
+[node name="Visual" type="ColorRect" parent="Contorno/Piso"]
+offset_right = 1152.0
+offset_bottom = 48.0
+color = Color(0.235, 0.325, 0.405, 1)
+mouse_filter = 2
+
+[node name="FirewallCentral" type="StaticBody2D" parent="Plataformas"]
+position = Vector2(558, 495)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/FirewallCentral"]
+position = Vector2(18, 52.5)
+shape = SubResource("shape_FirewallCentral")
+
+[node name="Visual" type="ColorRect" parent="Plataformas/FirewallCentral"]
+offset_right = 36.0
+offset_bottom = 105.0
+color = Color(0.235, 0.325, 0.405, 1)
+mouse_filter = 2
+
+[node name="LajeEsq" type="StaticBody2D" parent="Plataformas"]
+position = Vector2(260, 478)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/LajeEsq"]
+position = Vector2(89, 6.5)
+shape = SubResource("shape_LajeEsq")
+one_way_collision = true
+
+[node name="Visual" type="ColorRect" parent="Plataformas/LajeEsq"]
+offset_right = 178.0
+offset_bottom = 13.0
+color = Color(0.4, 0.66, 0.74, 1)
+mouse_filter = 2
+
+[node name="LajeDir" type="StaticBody2D" parent="Plataformas"]
+position = Vector2(714, 478)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/LajeDir"]
+position = Vector2(89, 6.5)
+shape = SubResource("shape_LajeDir")
+one_way_collision = true
+
+[node name="Visual" type="ColorRect" parent="Plataformas/LajeDir"]
+offset_right = 178.0
+offset_bottom = 13.0
+color = Color(0.4, 0.66, 0.74, 1)
+mouse_filter = 2
+
+[node name="RampaCentro" type="StaticBody2D" parent="Plataformas"]
+position = Vector2(476, 353)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/RampaCentro"]
+position = Vector2(100, 6.5)
+shape = SubResource("shape_RampaCentro")
+one_way_collision = true
+
+[node name="Visual" type="ColorRect" parent="Plataformas/RampaCentro"]
+offset_right = 200.0
+offset_bottom = 13.0
+color = Color(0.4, 0.66, 0.74, 1)
+mouse_filter = 2
+
+[node name="TopoEsq" type="StaticBody2D" parent="Plataformas"]
+position = Vector2(360, 231)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/TopoEsq"]
+position = Vector2(80, 6.5)
+shape = SubResource("shape_TopoEsq")
+one_way_collision = true
+
+[node name="Visual" type="ColorRect" parent="Plataformas/TopoEsq"]
+offset_right = 160.0
+offset_bottom = 13.0
+color = Color(0.4, 0.66, 0.74, 1)
+mouse_filter = 2
+
+[node name="TopoDir" type="StaticBody2D" parent="Plataformas"]
+position = Vector2(632, 231)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/TopoDir"]
+position = Vector2(80, 6.5)
+shape = SubResource("shape_TopoDir")
+one_way_collision = true
+
+[node name="Visual" type="ColorRect" parent="Plataformas/TopoDir"]
+offset_right = 160.0
+offset_bottom = 13.0
+color = Color(0.4, 0.66, 0.74, 1)
+mouse_filter = 2
+
+[node name="SaidaTeto" type="StaticBody2D" parent="Plataformas"]
+position = Vector2(508, 119)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/SaidaTeto"]
+position = Vector2(68, 6.5)
+shape = SubResource("shape_SaidaTeto")
+one_way_collision = true
+
+[node name="Visual" type="ColorRect" parent="Plataformas/SaidaTeto"]
+offset_right = 136.0
+offset_bottom = 13.0
+color = Color(0.4, 0.66, 0.74, 1)
+mouse_filter = 2
+
+[node name="Inimigo_1" type="Marker2D" parent="Conteudo/SpawnsInimigos"]
+position = Vector2(350, 568)
+script = ExtResource("2_enemy")
+tipo_inimigo = "syntax_error"
+tipos_possiveis = 1
+chance_novo_inimigo_percentual = 20
+
+[node name="Inimigo_2" type="Marker2D" parent="Conteudo/SpawnsInimigos"]
+position = Vector2(790, 568)
+script = ExtResource("2_enemy")
+tipo_inimigo = "memory_leak"
+tipos_possiveis = 4
+chance_novo_inimigo_percentual = 20
+
+[node name="Inimigo_3" type="Marker2D" parent="Conteudo/SpawnsInimigos"]
+position = Vector2(600, 321)
+script = ExtResource("2_enemy")
+tipo_inimigo = "null_pointer"
+tipos_possiveis = 2
+chance_novo_inimigo_percentual = 20
+
+[node name="SpawnInicio" type="Marker2D" parent="Pontos"]
+position = Vector2(105, 540)
+
+[node name="SpawnEsquerda" type="Marker2D" parent="Pontos"]
+position = Vector2(96, 540)
+
+[node name="SpawnDireita" type="Marker2D" parent="Pontos"]
+position = Vector2(1015, 540)
+
+[node name="SpawnCima" type="Marker2D" parent="Pontos"]
+position = Vector2(644, 515)
+
+[node name="SpawnBaixo" type="Marker2D" parent="Pontos"]
+position = Vector2(576, 70)

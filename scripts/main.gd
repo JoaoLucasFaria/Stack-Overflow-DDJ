@@ -105,6 +105,41 @@ func _ready() -> void:
 	_aviso("Encontre o Guardiao 1. Explore atravessando as passagens.", 3.8)
 
 
+## Atalho exclusivo de debug para testar salas sem derrotar os Bosses.
+## Asterisco (*) — inclusive no teclado numerico — desbloqueia
+## uma habilidade por toque, respeitando a ordem da campanha.
+func _unhandled_key_input(event: InputEvent) -> void:
+	if not OS.is_debug_build() or partida_terminou or not is_instance_valid(jogador):
+		return
+	if not event is InputEventKey:
+		return
+	var tecla: InputEventKey = event as InputEventKey
+	if not tecla.pressed or tecla.echo:
+		return
+	var eh_asterisco: bool = (tecla.keycode == KEY_KP_MULTIPLY
+		or tecla.keycode == KEY_ASTERISK
+		or tecla.unicode == KEY_ASTERISK)
+	if not eh_asterisco:
+		return
+
+	var aviso_debug: String = ""
+	if not jogador.pulo_duplo_liberado:
+		jogador.desbloquear_pulo_duplo()
+		aviso_debug = "[DEBUG] Pulo duplo desbloqueado!"
+	elif not jogador.dash_component.dash_desbloqueado:
+		jogador.desbloquear_dash()
+		aviso_debug = "[DEBUG] Dash desbloqueado!"
+	elif not jogador.grapple_liberado:
+		jogador.desbloquear_grapple()
+		aviso_debug = "[DEBUG] Grapple desbloqueado!"
+	else:
+		aviso_debug = "[DEBUG] Todas as habilidades ja estao desbloqueadas."
+
+	_aviso(aviso_debug, 3.0)
+	print(aviso_debug)
+	get_viewport().set_input_as_handled()
+
+
 func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("reiniciar_partida"):
 		get_tree().reload_current_scene()
