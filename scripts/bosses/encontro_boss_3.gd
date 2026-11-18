@@ -57,7 +57,7 @@ func _criar_camera() -> void:
 	camera_arena = Camera2D.new()
 	camera_arena.name = "CameraStonemaker"
 	add_child(camera_arena)
-	camera_arena.global_position = sala.to_global(Vector2(576.0, 324.0))
+	camera_arena.global_position = sala.to_global(Vector2(576.0, 288.0))
 	camera_arena.make_current()
 
 
@@ -67,13 +67,13 @@ func _criar_hud() -> void:
 	add_child(camada)
 
 	barra = ProgressBar.new()
-	barra.position = Vector2(316.0, 45.0)
+	barra.position = Vector2(316.0, 86.0)
 	barra.size = Vector2(518.0, 22.0)
 	barra.show_percentage = false
 	camada.add_child(barra)
 
 	status = Label.new()
-	status.position = Vector2(20.0, 88.0)
+	status.position = Vector2(20.0, 114.0)
 	status.add_theme_font_size_override("font_size", 15)
 	camada.add_child(status)
 

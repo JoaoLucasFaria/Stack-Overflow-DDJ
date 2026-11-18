@@ -156,6 +156,8 @@ func usar_slot(indice: int) -> void:
     if efeito == null:
         return
     var custo: float = float(efeito.get("custo_overflow"))
+    if is_instance_valid(jogador.patches):
+        custo *= jogador.patches.multiplicador_stack_equipamento()
     # O item que preenche a barra pode ser ativado; depois disso, Q/E ficam
     # bloqueados ate o jogador reduzir STACK com ataques basicos.
     var segue_jogador: bool = bool(efeito.get("acompanha_jogador"))
@@ -170,6 +172,8 @@ func usar_slot(indice: int) -> void:
     if not segue_jogador:
         efeitos_de_sala.append(efeito)
     jogador.adicionar_overflow(custo)
+    if is_instance_valid(jogador.patches):
+        jogador.patches.registrar_uso_equipamento()
     equipamentos_alterados.emit()
 
 

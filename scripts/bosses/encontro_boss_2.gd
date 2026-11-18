@@ -52,8 +52,8 @@ func _ready() -> void:
 func _criar_camera() -> void:
 	camera_arena = Camera2D.new()
 	camera_arena.name = "CameraWoodbreaker"
-	camera_arena.global_position = sala.to_global(Vector2(576.0, 324.0))
 	add_child(camera_arena)
+	camera_arena.global_position = sala.to_global(Vector2(576.0, 288.0))
 	camera_arena.make_current()
 
 
@@ -62,12 +62,12 @@ func _criar_hud() -> void:
 	camada.name = "HUDWoodbreaker"
 	add_child(camada)
 	barra = ProgressBar.new()
-	barra.position = Vector2(310.0, 32.0)
+	barra.position = Vector2(310.0, 86.0)
 	barra.size = Vector2(520.0, 20.0)
 	barra.show_percentage = false
 	camada.add_child(barra)
 	status = Label.new()
-	status.position = Vector2(310.0, 106.0)
+	status.position = Vector2(310.0, 114.0)
 	status.add_theme_font_size_override("font_size", 15)
 	camada.add_child(status)
 

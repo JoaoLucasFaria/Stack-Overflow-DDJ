@@ -171,27 +171,41 @@ func _marcador(nome: String) -> Marker2D:
 	return get_node("Pontos/" + nome) as Marker2D
 
 
+
 func direcao_de_passagem_confirmada(alvo: Jogador) -> Vector2i:
-	## Não usa Area2D que dispare duas vezes: cruza a borda real da sala.
 	if not is_instance_valid(alvo) or saidas_boss_bloqueadas:
 		return Vector2i.ZERO
+
 	var colisao: CollisionShape2D = alvo.get_node_or_null("CollisionShape2D") as CollisionShape2D
 	if colisao == null:
 		return Vector2i.ZERO
+
 	var centro: Vector2 = to_local(colisao.global_position)
 	var velocidade: Vector2 = alvo.velocity
-	var lateral: bool = centro.y >= 496.0 and centro.y <= PISO_Y
-	var vertical: bool = centro.x >= VAO_TOPO_X and centro.x <= VAO_TOPO_X + VAO_TOPO_L
 	var conexoes: Dictionary = dados.get("conexoes", {})
-	if conexoes.has(Vector2i.LEFT) and centro.x < 0.0 and velocidade.x < -0.01 and lateral:
-		return Vector2i.LEFT
-	if conexoes.has(Vector2i.RIGHT) and centro.x > LARGURA and velocidade.x > 0.01 and lateral:
-		return Vector2i.RIGHT
-	if conexoes.has(Vector2i.UP) and centro.y < 0.0 and velocidade.y < -0.01 and vertical:
-		return Vector2i.UP
-	if conexoes.has(Vector2i.DOWN) and centro.y > ALTURA and velocidade.y > 0.01 and vertical:
-		return Vector2i.DOWN
+
+	# Toda a borda esquerda
+	if conexoes.has(Vector2i.LEFT):
+		if centro.x < 0.0 and centro.y >= 0.0 and centro.y <= ALTURA and velocidade.x < -0.01:
+			return Vector2i.LEFT
+
+	# Toda a borda direita
+	if conexoes.has(Vector2i.RIGHT):
+		if centro.x > LARGURA and centro.y >= 0.0 and centro.y <= ALTURA and velocidade.x > 0.01:
+			return Vector2i.RIGHT
+
+	# Toda a borda superior
+	if conexoes.has(Vector2i.UP):
+		if centro.y < 0.0 and centro.x >= 0.0 and centro.x <= LARGURA and velocidade.y < -0.01:
+			return Vector2i.UP
+
+	# Toda a borda inferior
+	if conexoes.has(Vector2i.DOWN):
+		if centro.y > ALTURA and centro.x >= 0.0 and centro.x <= LARGURA and velocidade.y > 0.01:
+			return Vector2i.DOWN
+
 	return Vector2i.ZERO
+
 
 
 func spawn_para_entrada(direcao_movimento: Vector2i) -> Vector2:

@@ -6,6 +6,8 @@ const CENA_JOGADOR: PackedScene = preload("res://cenas/player.tscn")
 const CENA_HUD = preload("res://scripts/hud_matriz.gd")
 const CENA_MAPA = preload("res://scripts/mapa_matriz.gd")
 const CENA_DROP: PackedScene = preload("res://cenas/inimigos/drop_provisorio.tscn")
+const CENA_EXCEPTION_HANDLER = preload("res://scripts/desafios/controlador_exception_handler.gd")
+const CENA_HUD_SUPERIOR = preload("res://scripts/ui/hud_superior.gd")
 const CENAS_INIMIGOS: Dictionary = {
 	"syntax_error": preload("res://cenas/inimigos/inimigo_syntax_error.tscn"),
 	"null_pointer": preload("res://cenas/inimigos/inimigo_null_pointer.tscn"),
@@ -18,10 +20,12 @@ const CENAS_INIMIGOS: Dictionary = {
 }
 
 @export_category("Matriz procedural")
-@export_range(3, 15, 1) var salas_ate_boss1: int = 7
+@export_range(6, 18, 1) var salas_ate_boss1: int = 10
 @export_range(4, 18, 1) var salas_ate_boss2: int = 11
 @export_range(3, 15, 1) var salas_entre_boss2_boss3: int = 7
 @export_range(0, 50, 1) var quantidade_salas_extras: int = 23
+@export_category("Exception Handlers")
+@export_range(0, 5, 1) var exceptions_por_trecho: int = 3
 @export_category("BREAKPOINTS")
 @export_range(0, 12, 1) var breakpoints_adicionais: int = 4
 @export_range(2, 15, 1) var distancia_minima_breakpoints: int = 5
@@ -33,7 +37,12 @@ var coordenada_atual: Vector2i = Vector2i.ZERO
 var sala_atual: SalaMatriz
 var jogador: Jogador
 var hud: HUDMatriz
+var hud_superior: HUDSuperior
+var camera_principal: Camera2D
 var chefes_derrotados: Dictionary = {}
+## Coordenadas dos Exception Handlers concluidos nesta run.
+## Nao sao reiniciados ao descansar no BREAKPOINT.
+var desafios_exception_concluidos: Dictionary = {}
 ## Coordenada -> {nome do Marker2D: true}. Persistem até descansar no BREAKPOINT.
 var inimigos_derrotados: Dictionary = {}
 ## Coordenada -> {nome do marcador: tipo sorteado}. Mantem a escolha ate descansar.
@@ -53,6 +62,13 @@ var partida_terminou: bool = false
 
 
 func _ready() -> void:
+	# O mundo mantem 1152x648, desenhado abaixo da HUD de 72px.
+	# A camera fixa evita perder o enquadramento ao sair das arenas de boss.
+	camera_principal = Camera2D.new()
+	camera_principal.name = "CameraCampanha"
+	camera_principal.position = Vector2(576.0, 288.0)
+	add_child(camera_principal)
+	camera_principal.make_current()
 	mapa = CENA_MAPA.new() as MapaMatriz
 	mapa.gerar(
 		quantidade_salas_extras,
@@ -61,7 +77,8 @@ func _ready() -> void:
 		salas_ate_boss2,
 		salas_entre_boss2_boss3,
 		breakpoints_adicionais,
-		distancia_minima_breakpoints
+		distancia_minima_breakpoints,
+		exceptions_por_trecho
 	)
 	jogador = CENA_JOGADOR.instantiate() as Jogador
 	add_child(jogador)
@@ -73,11 +90,54 @@ func _ready() -> void:
 	var inventario: EquipamentosAtivos = jogador.get_node("EquipamentosAtivos") as EquipamentosAtivos
 	inventario.aviso.connect(_ao_aviso_equipamento)
 	hud = CENA_HUD.new() as HUDMatriz
+	hud.usar_hud_superior = true
 	add_child(hud)
 	hud.teleporte_confirmado.connect(_ao_teleporte_confirmado)
 	hud.teleporte_cancelado.connect(_ao_teleporte_cancelado)
+	# Os indicadores antigos continuam nas arenas de teste, mas sao
+	# ocultados na campanha para nao duplicar HP/STACK e Q/E.
+	if is_instance_valid(inventario.hud):
+		inventario.hud.hide()
+	hud_superior = CENA_HUD_SUPERIOR.new() as HUDSuperior
+	add_child(hud_superior)
+	hud_superior.configurar(jogador, inventario)
 	_entrar_sala(Vector2i.ZERO, Vector2i.ZERO)
 	_aviso("Encontre o Guardiao 1. Explore atravessando as passagens.", 3.8)
+
+
+## Atalho exclusivo de debug para testar salas sem derrotar os Bosses.
+## Asterisco (*) — inclusive no teclado numerico — desbloqueia
+## uma habilidade por toque, respeitando a ordem da campanha.
+func _unhandled_key_input(event: InputEvent) -> void:
+	if not OS.is_debug_build() or partida_terminou or not is_instance_valid(jogador):
+		return
+	if not event is InputEventKey:
+		return
+	var tecla: InputEventKey = event as InputEventKey
+	if not tecla.pressed or tecla.echo:
+		return
+	var eh_asterisco: bool = (tecla.keycode == KEY_KP_MULTIPLY
+		or tecla.keycode == KEY_ASTERISK
+		or tecla.unicode == KEY_ASTERISK)
+	if not eh_asterisco:
+		return
+
+	var aviso_debug: String = ""
+	if not jogador.pulo_duplo_liberado:
+		jogador.desbloquear_pulo_duplo()
+		aviso_debug = "[DEBUG] Pulo duplo desbloqueado!"
+	elif not jogador.dash_component.dash_desbloqueado:
+		jogador.desbloquear_dash()
+		aviso_debug = "[DEBUG] Dash desbloqueado!"
+	elif not jogador.grapple_liberado:
+		jogador.desbloquear_grapple()
+		aviso_debug = "[DEBUG] Grapple desbloqueado!"
+	else:
+		aviso_debug = "[DEBUG] Todas as habilidades ja estao desbloqueadas."
+
+	_aviso(aviso_debug, 3.0)
+	print(aviso_debug)
+	get_viewport().set_input_as_handled()
 
 
 func _process(delta: float) -> void:
@@ -221,6 +281,9 @@ func _entrar_sala(destino: Vector2i, direcao: Vector2i) -> void:
 		_salvar_estado_inimigos_da_sala()
 		remove_child(sala_atual)
 		sala_atual.queue_free()
+	# Retoma sempre a camera da campanha ao trocar de sala.
+	# Se a nova sala tiver boss, a camera da arena assume em _ready().
+	camera_principal.make_current()
 	sala_atual = nova
 	coordenada_atual = destino
 	add_child(sala_atual)
@@ -232,6 +295,8 @@ func _entrar_sala(destino: Vector2i, direcao: Vector2i) -> void:
 	protecao_entrada_restante = TEMPO_PROTECAO_ENTRADA
 	sala_atual.boss_derrotado.connect(_ao_derrotar_boss)
 	sala_atual.altar_ativado.connect(_ao_vencer)
+	_instalar_exception_handler()
+	_sinalizar_portas_boss()
 	_povoar_sala()
 	_conectar_terminais()
 	mapa.visitar(destino)
@@ -300,7 +365,8 @@ func _salvar_estado_inimigos_da_sala() -> void:
 
 func _povoar_sala() -> void:
 	## Somente marcadores manuais das cenas participam do spawn.
-	if sala_atual == null:
+	## Exception Handler controla seus proprios inimigos.
+	if sala_atual == null or sala_atual.dados.get("tipo", "") == "exception":
 		return
 	var grupo: Node = sala_atual.get_node_or_null("Conteudo/SpawnsInimigos")
 	if grupo == null:
@@ -483,3 +549,89 @@ func _ao_descansar() -> void:
 		# Recria depois que os anteriores forem removidos.
 		call_deferred("_povoar_sala")
 	_aviso("BREAKPOINT: HP restaurado. Equipamentos e STACK mantidos. Inimigos reiniciados.", 4.0)
+
+func _instalar_exception_handler() -> void:
+	if sala_atual == null or sala_atual.dados.get("tipo", "") != "exception":
+		return
+
+	var desafio: ControladorExceptionHandler = CENA_EXCEPTION_HANDLER.new() as ControladorExceptionHandler
+	desafio.name = "ExceptionHandler"
+
+	# Fork Bomb somente apos derrotar o primeiro chefe.
+	desafio.configurar(jogador, chefes_derrotados.has(1))
+
+	sala_atual.add_child(desafio)
+
+	# Um desafio concluido nao pode ser repetido nesta run.
+	if desafios_exception_concluidos.has(coordenada_atual):
+		desafio.restaurar_concluido()
+	else:
+		desafio.desafio_concluido.connect(
+			_ao_exception_concluido.bind(coordenada_atual)
+		)
+
+func _ao_exception_concluido(id_patch: StringName, sala: Vector2i) -> void:
+	desafios_exception_concluidos[sala] = true
+
+	if id_patch == &"":
+		_aviso("EXCEPTION HANDLED! Build maximizada.", 4.0)
+	else:
+		_aviso("EXCEPTION HANDLED! Patch adquirido.", 4.0)
+
+func _sinalizar_portas_boss() -> void:
+	if sala_atual == null:
+		return
+
+	var conexoes: Dictionary = sala_atual.dados.get("conexoes", {})
+
+	for direcao in conexoes:
+		var direcao_saida: Vector2i = direcao
+		var destino: Vector2i = conexoes[direcao_saida]
+		var info: Dictionary = mapa.obter(destino)
+		var tipo: String = String(info.get("tipo", ""))
+
+		if not tipo.begins_with("boss"):
+			continue
+
+		var numero: int = tipo.substr(4).to_int()
+
+		# Nao sinalizar chefes ja derrotados.
+		if chefes_derrotados.has(numero):
+			continue
+
+		var posicao: Vector2 = Vector2.ZERO
+
+		match direcao_saida:
+			Vector2i.LEFT:
+				posicao = Vector2(5, 437)
+			Vector2i.RIGHT:
+				posicao = Vector2(SalaMatriz.LARGURA - 75, 437)
+			Vector2i.UP:
+				posicao = Vector2(SalaMatriz.LARGURA / 2.0 - 35, 75)
+			Vector2i.DOWN:
+				posicao = Vector2(SalaMatriz.LARGURA / 2.0 - 35, SalaMatriz.ALTURA - 135)
+			_:
+				continue
+
+		var aviso: Label = Label.new()
+		aviso.name = "AvisoPortaBoss"
+		aviso.text = "☠"
+		aviso.position = posicao
+		aviso.size = Vector2(70, 65)
+		aviso.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		aviso.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		aviso.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		aviso.z_index = 10
+
+		aviso.add_theme_font_size_override("font_size", 48)
+		aviso.add_theme_color_override(
+			"font_color",
+			Color(1.0, 0.15, 0.22)
+		)
+		aviso.add_theme_color_override(
+			"font_outline_color",
+			Color(0.08, 0.02, 0.06)
+		)
+		aviso.add_theme_constant_override("outline_size", 5)
+
+		sala_atual.get_node("Conteudo").add_child(aviso)
