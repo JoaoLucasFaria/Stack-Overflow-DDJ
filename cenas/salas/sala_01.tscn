@@ -105,7 +105,7 @@ mouse_filter = 2
 color = Color(0.31, 0.64, 0.73, 1)
 
 [node name="CentroAlto" type="StaticBody2D" parent="Plataformas" index="1"]
-position = Vector2(520, 382)
+position = Vector2(777, 410)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/CentroAlto" index="0"]
 position = Vector2(80, 6.5)
@@ -131,8 +131,10 @@ color = Color(0.28, 0.76, 0.71, 1)
 position = Vector2(365, 568)
 script = ExtResource("9_spawn")
 tipo_inimigo = "null_pointer"
+tipos_possiveis = 7
 
 [node name="Inimigo_2" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="1"]
 position = Vector2(838, 568)
 script = ExtResource("9_spawn")
 tipo_inimigo = "memory_leak"
+tipos_possiveis = 7

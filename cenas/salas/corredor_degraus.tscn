@@ -110,7 +110,7 @@ mouse_filter = 2
 color = Color(0.235, 0.325, 0.405, 1)
 
 [node name="DegrauEsquerdo" type="StaticBody2D" parent="Plataformas" index="0"]
-position = Vector2(210, 498)
+position = Vector2(161, 482)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/DegrauEsquerdo" index="0"]
 position = Vector2(75, 6.5)
@@ -122,6 +122,7 @@ offset_right = 150.0
 offset_bottom = 13.0
 mouse_filter = 2
 color = Color(0.31, 0.64, 0.73, 1)
+metadata/_edit_group_ = true
 
 [node name="DegrauCentral" type="StaticBody2D" parent="Plataformas" index="1"]
 position = Vector2(432, 433)
@@ -169,10 +170,10 @@ color = Color(0.28, 0.76, 0.71, 1)
 [node name="SpawnsInimigos" type="Node2D" parent="Conteudo" index="0"]
 
 [node name="Inimigo_1" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="0"]
-position = Vector2(365, 568)
+position = Vector2(237, 454)
 script = ExtResource("9_spawn")
 tipo_inimigo = "null_pointer"
-tipos_possiveis = 3
+tipos_possiveis = 7
 
 [node name="Inimigo_2" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="1"]
 position = Vector2(838, 568)

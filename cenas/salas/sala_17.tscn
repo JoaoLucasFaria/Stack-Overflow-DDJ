@@ -1,6 +1,7 @@
-[gd_scene load_steps=12 format=3 uid="uid://c8sok3wowr216"]
+[gd_scene load_steps=13 format=3 uid="uid://c8sok3wowr216"]
 
 [ext_resource type="Script" uid="uid://cop8cbrhkpj3y" path="res://scripts/salas/sala_poco_17.gd" id="1_room"]
+[ext_resource type="Script" uid="uid://0qbu5h1xwn6v" path="res://scripts/inimigos/ponto_spawn_inimigo.gd" id="2_4vmie"]
 
 [sub_resource type="RectangleShape2D" id="shape_ParedeEsqCima"]
 size = Vector2(26, 422)
@@ -21,7 +22,7 @@ size = Vector2(1152, 26)
 size = Vector2(37, 424)
 
 [sub_resource type="RectangleShape2D" id="shape_PisoEsquerdo"]
-size = Vector2(256, 48)
+size = Vector2(256, 23)
 
 [sub_resource type="RectangleShape2D" id="shape_PisoDireito"]
 size = Vector2(256, 48)
@@ -44,6 +45,7 @@ mouse_filter = 2
 color = Color(0.07, 0.13, 0.18, 1)
 
 [node name="Visual" type="ColorRect" parent="Fundo"]
+layout_mode = 0
 offset_right = 1152.0
 offset_bottom = 26.0
 mouse_filter = 2
@@ -67,13 +69,13 @@ color = Color(0.235, 0.325, 0.405, 1)
 position = Vector2(0, 600)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeEsqBaixo"]
-position = Vector2(12, -40)
+position = Vector2(12, -33)
 shape = SubResource("shape_ParedeEsqBaixo")
 
 [node name="Visual" type="ColorRect" parent="Contorno/ParedeEsqBaixo"]
-offset_top = -64.0
+offset_top = -52.0
 offset_right = 26.0
-offset_bottom = -16.0
+offset_bottom = 57.0
 mouse_filter = 2
 color = Color(0.235, 0.325, 0.405, 1)
 
@@ -135,13 +137,13 @@ shape = SubResource("RectangleShape2D_w06gj")
 position = Vector2(0, 600)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/PisoEsquerdo"]
-position = Vector2(129, -40)
+position = Vector2(129, -43.5)
 shape = SubResource("shape_PisoEsquerdo")
 
 [node name="Visual" type="ColorRect" parent="Contorno/PisoEsquerdo"]
-offset_top = -65.0
+offset_top = -55.0
 offset_right = 256.0
-offset_bottom = -17.0
+offset_bottom = -28.0
 mouse_filter = 2
 color = Color(0.235, 0.325, 0.405, 1)
 
@@ -202,13 +204,25 @@ color = Color(0.52, 0.08, 0.18, 0.94)
 
 [node name="SpawnsInimigos" type="Node2D" parent="Conteudo"]
 
+[node name="Inimigo_4" type="Marker2D" parent="Conteudo/SpawnsInimigos"]
+position = Vector2(45, 168)
+script = ExtResource("2_4vmie")
+tipo_inimigo = "segmentation_fault"
+tipos_possiveis = 8
+
+[node name="Inimigo_5" type="Marker2D" parent="Conteudo/SpawnsInimigos"]
+position = Vector2(539, 77)
+script = ExtResource("2_4vmie")
+tipo_inimigo = "segmentation_fault"
+tipos_possiveis = 8
+
 [node name="Pontos" type="Node2D" parent="."]
 
 [node name="SpawnInicio" type="Marker2D" parent="Pontos"]
-position = Vector2(105, 540)
+position = Vector2(88, 500)
 
 [node name="SpawnEsquerda" type="Marker2D" parent="Pontos"]
-position = Vector2(86, 504)
+position = Vector2(86, 498)
 
 [node name="SpawnDireita" type="Marker2D" parent="Pontos"]
 position = Vector2(1135, 103)
@@ -220,7 +234,7 @@ position = Vector2(576, 540)
 position = Vector2(576, 115)
 
 [node name="RetornoAbismoEsquerda" type="Marker2D" parent="Pontos"]
-position = Vector2(89, 505)
+position = Vector2(89, 497)
 
 [node name="RetornoAbismoDireita" type="Marker2D" parent="Pontos"]
 position = Vector2(1134, 103)

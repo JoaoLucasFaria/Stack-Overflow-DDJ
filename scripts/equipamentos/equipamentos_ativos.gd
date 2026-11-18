@@ -83,7 +83,7 @@ func _physics_process(delta: float) -> void:
         return
     for tipo in recargas.keys():
         recargas[tipo] = maxf(0.0, float(recargas[tipo]) - delta)
-    if jogador.esta_travado_por_overflow():
+    if jogador.esta_travado_por_overflow() or jogador.tempo_bloqueio_ataque > 0.0:
         return
     if Input.is_action_just_pressed("usar_item_1"):
         usar_slot(0)
@@ -137,7 +137,7 @@ func equipar(item_id: StringName) -> String:
 func usar_slot(indice: int) -> void:
     if indice < 0 or indice >= slots.size() or coleta_aberta:
         return
-    if not is_instance_valid(jogador) or jogador.esta_travado_por_overflow():
+    if not is_instance_valid(jogador) or jogador.esta_travado_por_overflow() or jogador.tempo_bloqueio_ataque > 0.0:
         return
     # No limite nao e possivel usar Q/E; apenas acertos basicos reduzem STACK.
     if jogador.overflow_atual >= jogador.overflow_maximo:

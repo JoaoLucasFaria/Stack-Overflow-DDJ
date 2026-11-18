@@ -36,7 +36,7 @@ func _physics_process(delta: float) -> void:
 
 
 func _atacar() -> void:
-	if not is_instance_valid(jogador) or jogador.vida_atual <= 0 or jogador.dash_component.esta_dashing or jogador.esta_travado_por_overflow():
+	if not is_instance_valid(jogador) or jogador.vida_atual <= 0 or jogador.dash_component.esta_dashing or jogador.esta_travado_por_overflow() or jogador.tempo_bloqueio_ataque > 0.0:
 		return
 
 	var patches: GerenciadorPatches = jogador.patches

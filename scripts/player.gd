@@ -2,7 +2,10 @@ class_name Jogador
 extends CharacterBody2D
 
 const SCRIPT_PATCHES = preload("res://scripts/patches/gerenciador_patches.gd")
+const SCRIPT_ITENS = preload("res://scripts/itens/inventario_utilitarios.gd")
 var patches: GerenciadorPatches
+var utilitarios: InventarioUtilitarios
+var tempo_bloqueio_ataque: float = 0.0
 
 ## Movimentação básica. Mantemos os nomes exportados para preservar ajustes nas cenas.
 @export_category("Movimentação")
@@ -71,6 +74,10 @@ func _ready() -> void:
 	patches.name = "GerenciadorPatches"
 	patches.configurar(self)
 	add_child(patches)
+	utilitarios = SCRIPT_ITENS.new() as InventarioUtilitarios
+	utilitarios.name = "InventarioUtilitarios"
+	utilitarios.configurar(self)
+	add_child(utilitarios)
 	jumps_remaining = quantidade_pulos_disponiveis()
 	vida_alterada.emit(vida_atual, vida_maxima)
 	overflow_alterado.emit(overflow_atual, overflow_maximo)
@@ -82,6 +89,7 @@ func _physics_process(delta: float) -> void:
 	if lentidao_deadlock_restante <= 0.0:
 		fator_lentidao_deadlock = 1.0
 	tempo_iframes = maxf(0.0, tempo_iframes - delta)
+	tempo_bloqueio_ataque = maxf(0.0, tempo_bloqueio_ataque - delta)
 	tempo_knockback = maxf(0.0, tempo_knockback - delta)
 	tempo_trava_wall_jump = maxf(0.0, tempo_trava_wall_jump - delta)
 	if tempo_travamento_overflow_restante > 0.0:
@@ -135,6 +143,10 @@ func _physics_process(delta: float) -> void:
 		no_chao = false
 
 	if not no_chao:
+		# Ao cair de uma borda sem pular, o salto do chao nao fica guardado.
+		# Sem pulo duplo: 0 saltos no ar. Com pulo duplo: resta 1.
+		# mini() preserva pulos que ja foram consumidos durante o salto.
+		jumps_remaining = mini(jumps_remaining, quantidade_pulos_disponiveis() - 1)
 		velocity += get_gravity() * delta
 	else:
 		jumps_remaining = quantidade_pulos_disponiveis()
@@ -415,6 +427,8 @@ func receber_dano(dano: int, origem_dano: Vector2 = Vector2.ZERO) -> void:
 		morrer()
 
 func morrer() -> void:
+	if is_instance_valid(utilitarios) and utilitarios.tentar_reviver():
+		return
 	print("O personagem morreu!")
 	morreu.emit()
 	queue_free()

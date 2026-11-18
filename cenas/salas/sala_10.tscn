@@ -121,7 +121,7 @@ mouse_filter = 2
 color = Color(0.31, 0.64, 0.73, 1)
 
 [node name="PatamarDireito" type="StaticBody2D" parent="Plataformas" index="1"]
-position = Vector2(770, 455)
+position = Vector2(812, 453)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/PatamarDireito" index="0"]
 position = Vector2(87.5, 6.5)
@@ -156,8 +156,27 @@ color = Color(0.28, 0.76, 0.71, 1)
 position = Vector2(365, 568)
 script = ExtResource("9_spawn")
 tipo_inimigo = "memory_leak"
+tipos_possiveis = 7
 
-[node name="Inimigo_2" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="1"]
+[node name="Inimigo_3" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="1"]
+position = Vector2(41, 113)
+script = ExtResource("9_spawn")
+tipo_inimigo = "memory_leak"
+tipos_possiveis = 8
+permitir_novos_inimigos = false
+
+[node name="Inimigo_4" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="2"]
+position = Vector2(45, 284)
+script = ExtResource("9_spawn")
+tipo_inimigo = "memory_leak"
+tipos_possiveis = 8
+permitir_novos_inimigos = false
+
+[node name="Inimigo_2" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="3"]
 position = Vector2(838, 568)
 script = ExtResource("9_spawn")
 tipo_inimigo = "segmentation_fault"
+tipos_possiveis = 7
+
+[node name="SpawnCima" parent="Pontos" index="3"]
+position = Vector2(577, 502)

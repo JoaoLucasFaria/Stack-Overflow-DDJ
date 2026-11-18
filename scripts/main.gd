@@ -59,9 +59,11 @@ const MARGEM_RECUPERACAO: float = 115.0
 var protecao_entrada_restante: float = 0.0
 var posicao_segura_atual: Vector2 = Vector2(100, 540)
 var partida_terminou: bool = false
+var teleporte_item_ativo: bool = false
 
 
 func _ready() -> void:
+	add_to_group("main_campanha")
 	# O mundo mantem 1152x648, desenhado abaixo da HUD de 72px.
 	# A camera fixa evita perder o enquadramento ao sair das arenas de boss.
 	camera_principal = Camera2D.new()
@@ -86,6 +88,7 @@ func _ready() -> void:
 	jogador.dash_component.dash_desbloqueado = false
 	jogador.grapple_liberado = false
 	jogador.morreu.connect(_ao_morrer)
+	jogador.utilitarios.aviso.connect(func(texto: String): _aviso(texto, 3.2))
 	jogador.overflow_estourou.connect(_ao_overflow_estourou)
 	var inventario: EquipamentosAtivos = jogador.get_node("EquipamentosAtivos") as EquipamentosAtivos
 	inventario.aviso.connect(_ao_aviso_equipamento)
@@ -471,6 +474,18 @@ func _breakpoints_descobertos() -> Array[Vector2i]:
 	return destinos
 
 
+func abrir_teleporte_item() -> void:
+	if not is_instance_valid(jogador) or jogador.utilitarios.quantidade(InventarioUtilitarios.TELEPORTE) <= 0: 
+		return
+		if partida_terminou or em_transicao or hud.teleporte_ativo:
+			return
+			if _breakpoints_descobertos().is_empty():
+				_aviso("Nenhum BREAKPOINT descoberto para teleportar.", 3.0)
+				return
+				teleporte_item_ativo = true
+				_ao_abrir_mapa_teleporte()
+
+
 func _ao_abrir_mapa_teleporte() -> void:
 	if partida_terminou or em_transicao or not is_instance_valid(jogador) or hud.teleporte_ativo:
 		return
@@ -499,24 +514,28 @@ func _finalizar_mapa_teleporte() -> void:
 
 
 func _ao_teleporte_cancelado() -> void:
+	teleporte_item_ativo = false
 	_finalizar_mapa_teleporte()
 
 
 func _ao_teleporte_confirmado(destino: Vector2i) -> void:
 	# Revalida destino no Main: o HUD so controla a selecao visual.
 	if partida_terminou or em_transicao or not _breakpoints_descobertos().has(destino):
+		teleporte_item_ativo = false
 		_finalizar_mapa_teleporte()
 		return
 	_finalizar_mapa_teleporte()
 	if destino == coordenada_atual:
+		teleporte_item_ativo = false
 		_aviso("Voce ja esta neste BREAKPOINT.", 2.0)
 		return
 	em_transicao = true
 	# Usa a mesma troca segura das portas, preservando estados da sala.
-	call_deferred("_realizar_teleporte", destino)
+	call_deferred("_realizar_teleporte", destino, teleporte_item_ativo)
+	teleporte_item_ativo = false
 
 
-func _realizar_teleporte(destino: Vector2i) -> void:
+func _realizar_teleporte(destino: Vector2i, consumir_item: bool = false) -> void:
 	_entrar_sala(destino, Vector2i.ZERO)
 	if em_transicao or sala_atual == null or coordenada_atual != destino:
 		return
@@ -529,6 +548,8 @@ func _realizar_teleporte(destino: Vector2i) -> void:
 		jogador.global_position = terminal.global_position + Vector2(-20.0, -41.0)
 		posicao_segura_atual = jogador.global_position
 	protecao_entrada_restante = TEMPO_PROTECAO_ENTRADA
+	if consumir_item:
+		jogador.utilitarios.consumir(InventarioUtilitarios.TELEPORTE)
 	_aviso("BREAKPOINT: viagem concluida. HP, equipamentos e STACK preservados.", 3.0)
 
 func _ao_descansar() -> void:

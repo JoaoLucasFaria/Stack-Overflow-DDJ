@@ -154,10 +154,23 @@ color = Color(0.28, 0.76, 0.71, 1)
 [node name="Inimigo_1" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="0"]
 position = Vector2(46, 141)
 script = ExtResource("9_spawn")
-tipos_possiveis = 9
+tipos_possiveis = 8
+permitir_novos_inimigos = false
 
-[node name="Inimigo_2" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="1"]
+[node name="Inimigo_3" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="1"]
+position = Vector2(1097, 141)
+script = ExtResource("9_spawn")
+tipos_possiveis = 8
+permitir_novos_inimigos = false
+
+[node name="Inimigo_2" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="2"]
 position = Vector2(838, 568)
 script = ExtResource("9_spawn")
 tipo_inimigo = "null_pointer"
-tipos_possiveis = 1
+tipos_possiveis = 7
+
+[node name="Inimigo_4" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="3"]
+position = Vector2(361, 572)
+script = ExtResource("9_spawn")
+tipo_inimigo = "null_pointer"
+tipos_possiveis = 7

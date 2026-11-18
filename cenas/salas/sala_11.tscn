@@ -179,9 +179,12 @@ color = Color(0.28, 0.76, 0.71, 1)
 position = Vector2(365, 568)
 script = ExtResource("9_spawn")
 tipo_inimigo = "segmentation_fault"
-tipos_possiveis = 1
+tipos_possiveis = 7
 
 [node name="Inimigo_2" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="1"]
 position = Vector2(838, 568)
 script = ExtResource("9_spawn")
-tipos_possiveis = 1
+tipos_possiveis = 7
+
+[node name="SpawnCima" parent="Pontos" index="3"]
+position = Vector2(572, 507)

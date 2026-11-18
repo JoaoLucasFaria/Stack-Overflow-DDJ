@@ -116,7 +116,7 @@ mouse_filter = 2
 color = Color(0.235, 0.325, 0.405, 1)
 
 [node name="EscadaParaTeto1" type="StaticBody2D" parent="Plataformas" index="0"]
-position = Vector2(330, 505)
+position = Vector2(369, 505)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/EscadaParaTeto1" index="0"]
 position = Vector2(99, 6.5)
@@ -130,7 +130,7 @@ mouse_filter = 2
 color = Color(0.4, 0.66, 0.74, 1)
 
 [node name="EscadaParaTeto2" type="StaticBody2D" parent="Plataformas" index="1"]
-position = Vector2(482, 395)
+position = Vector2(645, 392)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/EscadaParaTeto2" index="0"]
 position = Vector2(95, 6.5)
@@ -144,7 +144,7 @@ mouse_filter = 2
 color = Color(0.4, 0.66, 0.74, 1)
 
 [node name="EscadaParaTeto3" type="StaticBody2D" parent="Plataformas" index="2"]
-position = Vector2(330, 285)
+position = Vector2(365, 289)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/EscadaParaTeto3" index="0"]
 position = Vector2(99, 6.5)
@@ -158,7 +158,7 @@ mouse_filter = 2
 color = Color(0.4, 0.66, 0.74, 1)
 
 [node name="EscadaParaTeto4" type="StaticBody2D" parent="Plataformas" index="3"]
-position = Vector2(482, 175)
+position = Vector2(579, 171)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/EscadaParaTeto4" index="0"]
 position = Vector2(95, 6.5)
@@ -172,7 +172,7 @@ mouse_filter = 2
 color = Color(0.4, 0.66, 0.74, 1)
 
 [node name="EscadaParaTeto5" type="StaticBody2D" parent="Plataformas" index="4"]
-position = Vector2(495, 80)
+position = Vector2(451, 86)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/EscadaParaTeto5" index="0"]
 position = Vector2(78, 6.5)
@@ -207,8 +207,13 @@ position = Vector2(51, 164)
 script = ExtResource("9_spawn")
 tipo_inimigo = "segmentation_fault"
 tipos_possiveis = 8
+permitir_novos_inimigos = false
 
 [node name="Inimigo_2" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="1"]
 position = Vector2(1112, 158)
 script = ExtResource("9_spawn")
 tipos_possiveis = 8
+permitir_novos_inimigos = false
+
+[node name="SpawnBaixo" parent="Pontos" index="4"]
+position = Vector2(571, 34)

@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://cf0l52wq6vux5"]
+
+[ext_resource type="Script" uid="uid://ckiiis603cjwv" path="res://scripts/debug/testador_salas.gd" id="1_testador"]
+[ext_resource type="PackedScene" uid="uid://cu6ucoufj11en" path="res://cenas/salas/sala_pulo_duplo.tscn" id="2_f8neh"]
+
+[node name="TestadorSalas" type="Node2D"]
+position = Vector2(2, 0)
+script = ExtResource("1_testador")
+cena_da_sala = ExtResource("2_f8neh")

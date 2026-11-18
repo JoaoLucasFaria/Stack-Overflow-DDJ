@@ -152,6 +152,36 @@ func opcoes_recompensa(quantidade: int = 3) -> Array[StringName]:
 	return candidatos.slice(0, mini(quantidade, candidatos.size()))
 
 
+func candidatos_refactor(removido: StringName) -> Array[StringName]:
+	var candidatos: Array[StringName] = []
+	for id in ORDEM:
+		if id != removido and not niveis.has(id):
+			candidatos.append(id)
+	candidatos.shuffle()
+	return candidatos.slice(0, mini(3, candidatos.size()))
+
+func refatorar_patch(removido: StringName, novo: StringName) -> bool:
+	if not niveis.has(removido) or novo == removido or niveis.has(novo) or not NOMES.has(novo):
+		return false
+	var nivel_antigo: int = nivel(removido)
+	niveis.erase(removido)
+	if removido == &"heap_alloc" and is_instance_valid(jogador):
+		jogador.vida_maxima = maxi(1, jogador.vida_maxima - nivel_antigo)
+		jogador.vida_atual = mini(jogador.vida_atual, jogador.vida_maxima)
+		jogador.vida_alterada.emit(jogador.vida_atual, jogador.vida_maxima)
+	if removido == &"watchdog":
+		abates_watchdog = 0
+	if removido == &"try_catch":
+		tempo_try_catch = 0.0
+	if removido == &"recursive_call":
+		acertos_recursao = 0
+	if removido == &"memory_cache":
+		tempo_memory_cache = 0.0
+	if removido == &"parallel_execution":
+		paralelo_preparado = false
+	return instalar_patch(novo)
+
+
 func multiplicador_velocidade() -> float:
 	var bonus: float = 1.0 + 0.06 * nivel(&"branch_prediction")
 	if tempo_memory_cache > 0.0:

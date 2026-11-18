@@ -146,7 +146,7 @@ mouse_filter = 2
 color = Color(0.4, 0.66, 0.74, 1)
 
 [node name="EscadaParaTeto2" type="StaticBody2D" parent="Plataformas" index="1"]
-position = Vector2(482, 395)
+position = Vector2(563, 396)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/EscadaParaTeto2" index="0"]
 position = Vector2(95, 6.5)
@@ -174,7 +174,7 @@ mouse_filter = 2
 color = Color(0.4, 0.66, 0.74, 1)
 
 [node name="EscadaParaTeto4" type="StaticBody2D" parent="Plataformas" index="3"]
-position = Vector2(482, 175)
+position = Vector2(586, 181)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/EscadaParaTeto4" index="0"]
 position = Vector2(95, 6.5)
@@ -188,7 +188,7 @@ mouse_filter = 2
 color = Color(0.4, 0.66, 0.74, 1)
 
 [node name="EscadaParaTeto5" type="StaticBody2D" parent="Plataformas" index="4"]
-position = Vector2(495, 80)
+position = Vector2(574, 77)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/EscadaParaTeto5" index="0"]
 position = Vector2(78, 6.5)
@@ -231,8 +231,22 @@ color = Color(0.28, 0.76, 0.71, 1)
 position = Vector2(365, 568)
 script = ExtResource("9_spawn")
 tipo_inimigo = "memory_leak"
+tipos_possiveis = 7
 
-[node name="Inimigo_2" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="1"]
+[node name="Inimigo_3" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="1"]
+position = Vector2(721, 146)
+script = ExtResource("9_spawn")
+tipo_inimigo = "memory_leak"
+tipos_possiveis = 3
+
+[node name="Inimigo_2" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="2"]
 position = Vector2(838, 568)
 script = ExtResource("9_spawn")
 tipo_inimigo = "segmentation_fault"
+tipos_possiveis = 7
+
+[node name="SpawnCima" parent="Pontos" index="3"]
+position = Vector2(578, 510)
+
+[node name="SpawnBaixo" parent="Pontos" index="4"]
+position = Vector2(575, 43)

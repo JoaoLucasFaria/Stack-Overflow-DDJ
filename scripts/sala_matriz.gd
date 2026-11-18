@@ -181,31 +181,22 @@ func direcao_de_passagem_confirmada(alvo: Jogador) -> Vector2i:
 		return Vector2i.ZERO
 
 	var centro: Vector2 = to_local(colisao.global_position)
-	var velocidade: Vector2 = alvo.velocity
 	var conexoes: Dictionary = dados.get("conexoes", {})
 
-	# Toda a borda esquerda
-	if conexoes.has(Vector2i.LEFT):
-		if centro.x < 0.0 and centro.y >= 0.0 and centro.y <= ALTURA and velocidade.x < -0.01:
-			return Vector2i.LEFT
-
-	# Toda a borda direita
-	if conexoes.has(Vector2i.RIGHT):
-		if centro.x > LARGURA and centro.y >= 0.0 and centro.y <= ALTURA and velocidade.x > 0.01:
-			return Vector2i.RIGHT
-
-	# Toda a borda superior
-	if conexoes.has(Vector2i.UP):
-		if centro.y < 0.0 and centro.x >= 0.0 and centro.x <= LARGURA and velocidade.y < -0.01:
-			return Vector2i.UP
-
-	# Toda a borda inferior
-	if conexoes.has(Vector2i.DOWN):
-		if centro.y > ALTURA and centro.x >= 0.0 and centro.x <= LARGURA and velocidade.y > 0.01:
-			return Vector2i.DOWN
+	# Detecta toda a extensao de cada borda com conexao real no grafo.
+	# Nao exige velocidade nem limita a coordenada perpendicular: assim,
+	# atravessar o canto de uma passagem nao faz o Main recuperar o spawn.
+	# Preserva a prioridade horizontal em cruzamentos de cantos.
+	if centro.x < 0.0 and conexoes.has(Vector2i.LEFT):
+		return Vector2i.LEFT
+	if centro.x > LARGURA and conexoes.has(Vector2i.RIGHT):
+		return Vector2i.RIGHT
+	if centro.y < 0.0 and conexoes.has(Vector2i.UP):
+		return Vector2i.UP
+	if centro.y > ALTURA and conexoes.has(Vector2i.DOWN):
+		return Vector2i.DOWN
 
 	return Vector2i.ZERO
-
 
 
 func spawn_para_entrada(direcao_movimento: Vector2i) -> Vector2:

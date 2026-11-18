@@ -14,6 +14,11 @@ var permitir_abertura_pausada: bool = false
 var texto_resumo: Label
 var coluna_equipamentos: VBoxContainer
 var coluna_patches: VBoxContainer
+var coluna_utilitarios: VBoxContainer
+var painel_refactor: PanelContainer
+var lista_refactor: VBoxContainer
+var patch_para_remover: StringName = &""
+var alternativas_refactor: Array[StringName] = []
 
 
 func _ready() -> void:
@@ -42,6 +47,11 @@ func _input(evento: InputEvent) -> void:
 			hud_matriz.alternar_mapa()
 			get_viewport().set_input_as_handled()
 			return
+
+	if visible and painel_refactor != null and painel_refactor.visible:
+		_cancelar_refactor()
+		get_viewport().set_input_as_handled()
+		return
 
 	# Se o BUILD ja estiver aberto, ESC fecha normalmente.
 	if visible:
@@ -98,6 +108,8 @@ func fechar() -> void:
 	if not visible:
 		return
 	visible = false
+	if painel_refactor != null:
+		painel_refactor.visible = false
 	# Se o BUILD foi aberto sobre uma recompensa, retorna a essa pausa.
 	get_tree().paused = pausa_antes_do_menu
 	if is_instance_valid(inventario):
@@ -183,6 +195,29 @@ func _criar_interface() -> void:
 	coluna_patches.add_theme_constant_override("separation", 9)
 	conteudo.add_child(coluna_patches)
 
+	painel_refactor = PanelContainer.new()
+	painel_refactor.anchor_left = 0.24
+	painel_refactor.anchor_top = 0.15
+	painel_refactor.anchor_right = 0.76
+	painel_refactor.anchor_bottom = 0.85
+	painel_refactor.mouse_filter = Control.MOUSE_FILTER_STOP
+	var estilo_refactor: StyleBoxFlat = StyleBoxFlat.new()
+	estilo_refactor.bg_color = Color(0.035, 0.11, 0.15, 1.0)
+	estilo_refactor.border_color = Color(0.48, 0.88, 0.72)
+	estilo_refactor.set_border_width_all(3)
+	painel_refactor.add_theme_stylebox_override("panel", estilo_refactor)
+	raiz.add_child(painel_refactor)
+	var margem_ref: MarginContainer = MarginContainer.new()
+	margem_ref.add_theme_constant_override("margin_left", 16)
+	margem_ref.add_theme_constant_override("margin_right", 16)
+	margem_ref.add_theme_constant_override("margin_top", 16)
+	margem_ref.add_theme_constant_override("margin_bottom", 16)
+	painel_refactor.add_child(margem_ref)
+	lista_refactor = VBoxContainer.new()
+	lista_refactor.add_theme_constant_override("separation", 10)
+	margem_ref.add_child(lista_refactor)
+	painel_refactor.visible = false
+
 	var rodape: Label = _rotulo("ESC: fechar BUILD   |   Os Patches permanecem ate a morte da run.", 12, Color(0.56, 0.77, 0.83))
 	coluna.add_child(rodape)
 
@@ -244,6 +279,41 @@ func _atualizar_conteudo() -> void:
 	]
 	_limpar(coluna_equipamentos)
 	_limpar(coluna_patches)
+	coluna_utilitarios = VBoxContainer.new()
+	coluna_utilitarios.add_theme_constant_override("separation", 7)
+	coluna_equipamentos.add_child(coluna_utilitarios)
+
+	var utilitarios: InventarioUtilitarios = jogador.utilitarios
+	var ids_possuidos: Array[StringName] = []
+	for id in [InventarioUtilitarios.REVIVE, InventarioUtilitarios.REROLL, InventarioUtilitarios.TELEPORTE, InventarioUtilitarios.REFACTOR]:
+		if utilitarios.quantidade(id) > 0:
+			ids_possuidos.append(id)
+
+	# Sem utilitarios: nao exibe nem a secao nem os cartoes com x0.
+	if not ids_possuidos.is_empty():
+		_secao(coluna_utilitarios, "UTILITARIOS // DATA CACHES")
+		for id in ids_possuidos:
+			_cartao(
+				coluna_utilitarios,
+				String(InventarioUtilitarios.NOMES[id]),
+				"x%d" % utilitarios.quantidade(id),
+				String(InventarioUtilitarios.DESCRICOES[id]),
+				Color(0.57, 0.88, 0.74)
+			)
+
+		if utilitarios.quantidade(InventarioUtilitarios.TELEPORTE) > 0:
+			var botao_tp: Button = Button.new()
+			botao_tp.text = "[TELEPORTE] Escolher BREAKPOINT no mapa"
+			botao_tp.disabled = pausa_antes_do_menu
+			botao_tp.pressed.connect(_usar_teleporte)
+			coluna_utilitarios.add_child(botao_tp)
+
+		if utilitarios.quantidade(InventarioUtilitarios.REFACTOR) > 0:
+			var botao_refactor: Button = Button.new()
+			botao_refactor.text = "[REFACTOR] Substituir um Patch"
+			botao_refactor.disabled = pausa_antes_do_menu or gerenciador.slots_ocupados() == 0
+			botao_refactor.pressed.connect(_iniciar_refactor)
+			coluna_utilitarios.add_child(botao_refactor)
 
 	_secao(coluna_equipamentos, "EQUIPAMENTOS // Q + E")
 	for indice in range(2):
@@ -283,6 +353,113 @@ func _atualizar_conteudo() -> void:
 		_cartao(coluna_patches, titulo, "NIVEL %d / %d" % [lvl, MAX_NIVEL], info, Color(0.57, 0.98, 0.77))
 	for _i in range(MAX_SLOTS - gerenciador.slots_ocupados()):
 		_cartao(coluna_patches, "SLOT DE PATCH LIVRE", "Disponivel nesta run", "Conclua um Exception Handler para instalar um novo Patch.", Color(0.57, 0.69, 0.75))
+
+
+func _usar_teleporte() -> void:
+	if not visible or pausa_antes_do_menu:
+		return
+
+	var jogador_atual = gerenciador.jogador
+	if not is_instance_valid(jogador_atual):
+		return
+	if jogador_atual.utilitarios.quantidade(InventarioUtilitarios.TELEPORTE) <= 0:
+		return
+
+	# Usar a MESMA rotina do terminal BREAKPOINT, em vez de passar
+	# pela validacao antiga do item que exigia dois terminais descobertos.
+	var main: Node = get_tree().get_first_node_in_group("main_campanha")
+	if not is_instance_valid(main) or not main.has_method("_ao_abrir_mapa_teleporte"):
+		push_warning("[TP] Abra a campanha com F5 para usar o Teleporte.")
+		return
+	if not main.has_method("_breakpoints_descobertos"):
+		push_warning("[TP] A campanha nao encontrou a lista de BREAKPOINTS visitados.")
+		return
+
+	var destinos: Array = main.call("_breakpoints_descobertos")
+	if destinos.is_empty():
+		push_warning("[TP] Ainda nao existe BREAKPOINT visitado nesta run.")
+		return
+
+	# O mapa usa a CanvasLayer 22. Esconder o BUILD (layer 25)
+	# primeiro e abrir o mapa depois do processamento deste clique.
+	fechar()
+	call_deferred("_abrir_tp_apos_fechar_build", main)
+
+
+func _abrir_tp_apos_fechar_build(main: Node) -> void:
+	if not is_instance_valid(main):
+		return
+
+	var hud_campanha: HUDMatriz = main.get("hud") as HUDMatriz
+	if not is_instance_valid(hud_campanha):
+		push_warning("[TP] HUD do mapa nao encontrada na campanha.")
+		return
+
+	# A selecao usa exatamente o mapa, teclado e confirmacao dos
+	# terminais. A flag informa ao Main que esta viagem gasta o item.
+	main.set("teleporte_item_ativo", true)
+	main.call("_ao_abrir_mapa_teleporte")
+
+	if not hud_campanha.teleporte_ativo:
+		main.set("teleporte_item_ativo", false)
+		push_warning("[TP] Nao foi possivel abrir o mapa. Verifique se ha transicao em andamento no Output.")
+		return
+	print("[TP] Mapa de BREAKPOINTS aberto pelo item fast.travel().")
+
+
+func _iniciar_refactor() -> void:
+	if not visible or painel_refactor.visible or pausa_antes_do_menu:
+		return
+	patch_para_remover = &""
+	alternativas_refactor.clear()
+	painel_refactor.visible = true
+	_desenhar_refactor()
+
+func _cancelar_refactor() -> void:
+	painel_refactor.visible = false
+	alternativas_refactor.clear()
+	patch_para_remover = &""
+
+func _desenhar_refactor() -> void:
+	_limpar(lista_refactor)
+	var titulo: Label = _rotulo("patch.refactor() | ESC para cancelar", 21, Color(0.54, 0.97, 0.84))
+	lista_refactor.add_child(titulo)
+	if patch_para_remover == &"":
+		lista_refactor.add_child(_rotulo("Selecione o Patch instalado que deseja remover:", 14, Color.WHITE))
+		for id in gerenciador.niveis.keys():
+			var patch_id: StringName = StringName(id)
+			var botao: Button = Button.new()
+			botao.text = "%s  LV.%d" % [gerenciador.nome_patch(patch_id), gerenciador.nivel(patch_id)]
+			botao.pressed.connect(_selecionar_removido.bind(patch_id))
+			lista_refactor.add_child(botao)
+	else:
+		lista_refactor.add_child(_rotulo("Substituir %s por (todos LV.1):" % gerenciador.nome_patch(patch_para_remover), 15, Color.WHITE))
+		for id in alternativas_refactor:
+			var botao: Button = Button.new()
+			botao.text = "%s | %s" % [gerenciador.nome_patch(id), String(GerenciadorPatches.DESCRICOES[id])]
+			botao.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			botao.custom_minimum_size.y = 65
+			botao.pressed.connect(_confirmar_refactor.bind(id))
+			lista_refactor.add_child(botao)
+	var cancelar: Button = Button.new()
+	cancelar.text = "Cancelar (nao gastar item)"
+	cancelar.pressed.connect(_cancelar_refactor)
+	lista_refactor.add_child(cancelar)
+
+func _selecionar_removido(id: StringName) -> void:
+	patch_para_remover = id
+	alternativas_refactor = gerenciador.candidatos_refactor(id)
+	_desenhar_refactor()
+
+func _confirmar_refactor(novo: StringName) -> void:
+	var utilitarios: InventarioUtilitarios = gerenciador.jogador.utilitarios
+	if utilitarios.quantidade(InventarioUtilitarios.REFACTOR) <= 0 or not alternativas_refactor.has(novo):
+		return
+	if not gerenciador.refatorar_patch(patch_para_remover, novo):
+		return
+	utilitarios.consumir(InventarioUtilitarios.REFACTOR)
+	_cancelar_refactor()
+	_atualizar_conteudo()
 
 
 func _estado_patch(id: StringName) -> String:

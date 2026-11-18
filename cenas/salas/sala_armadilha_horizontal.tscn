@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://duk210b42ov7h"]
+[gd_scene load_steps=12 format=3 uid="uid://jk4cnf4ydyn6"]
 
 [ext_resource type="PackedScene" uid="uid://in0k036vtlnr" path="res://cenas/salas/sala_base.tscn" id="1_base"]
 [ext_resource type="PackedScene" uid="uid://culwc25asd38g" path="res://cenas/Trap.tscn" id="2_trap"]

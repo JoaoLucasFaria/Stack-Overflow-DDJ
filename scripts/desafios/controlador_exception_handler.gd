@@ -54,6 +54,7 @@ var instrucao: Label
 var painel_recompensa: PanelContainer
 var rotulo_opcoes: Label
 var botoes: Array[Button] = []
+var botao_reroll: Button
 var opcoes: Array[StringName] = []
 var selecionado: int = 0
 var inventario: EquipamentosAtivos
@@ -385,6 +386,39 @@ func _montar_opcoes() -> void:
 		rotulo_opcoes.get_parent().add_child(botao)
 		botoes.append(botao)
 	_selecionar(0)
+	_atualizar_botao_reroll()
+
+
+func _atualizar_botao_reroll() -> void:
+	if botao_reroll == null or not is_instance_valid(jogador):
+		return
+	var qtd: int = jogador.utilitarios.quantidade(InventarioUtilitarios.REROLL)
+	botao_reroll.visible = qtd > 0
+	botao_reroll.text = "REROLL  [x%d]  - sortear outras opcoes" % qtd
+
+
+func _usar_reroll() -> void:
+	if estado != Estado.RECOMPENSA or not is_instance_valid(jogador) or not is_instance_valid(jogador.utilitarios):
+		return
+	if jogador.utilitarios.quantidade(InventarioUtilitarios.REROLL) <= 0:
+		return
+	var candidatas: Array[StringName] = jogador.patches.opcoes_recompensa(GerenciadorPatches.ORDEM.size())
+	var novas: Array[StringName] = []
+	for id in candidatas:
+		if not opcoes.has(id):
+			novas.append(id)
+	for id in candidatas:
+		if novas.size() >= 3:
+			break
+		if not novas.has(id):
+			novas.append(id)
+	if novas.is_empty():
+		return
+	if not jogador.utilitarios.consumir(InventarioUtilitarios.REROLL):
+		return
+	opcoes = novas.slice(0, mini(3, novas.size()))
+	selecionado = 0
+	_montar_opcoes()
 
 
 func _selecionar(indice: int) -> void:
@@ -515,6 +549,12 @@ func _criar_interface() -> void:
 	rotulo_opcoes.text = "W/S ou mouse para selecionar; F para confirmar"
 	rotulo_opcoes.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	coluna.add_child(rotulo_opcoes)
+	botao_reroll = Button.new()
+	botao_reroll.text = "REROLL"
+	botao_reroll.focus_mode = Control.FOCUS_NONE
+	botao_reroll.pressed.connect(_usar_reroll)
+	coluna.add_child(botao_reroll)
+	botao_reroll.visible = false
 	painel_recompensa.visible = false
 
 

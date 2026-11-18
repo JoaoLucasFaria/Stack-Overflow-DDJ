@@ -1,6 +1,7 @@
-[gd_scene load_steps=9 format=3 uid="uid://dbyv1jphwm2oo"]
+[gd_scene load_steps=10 format=3 uid="uid://dbyv1jphwm2oo"]
 
 [ext_resource type="PackedScene" uid="uid://in0k036vtlnr" path="res://cenas/salas/sala_base.tscn" id="1_base"]
+[ext_resource type="PackedScene" path="res://cenas/salas/componentes/data_cache.tscn" id="2_ck2dw"]
 [ext_resource type="Script" uid="uid://0qbu5h1xwn6v" path="res://scripts/inimigos/ponto_spawn_inimigo.gd" id="9_spawn"]
 
 [sub_resource type="RectangleShape2D" id="shape_1"]
@@ -23,6 +24,10 @@ size = Vector2(205, 13)
 
 [node name="sala_08" instance=ExtResource("1_base")]
 mascara_saidas = 8
+
+[node name="DataCache" parent="Fundo" index="0" instance=ExtResource("2_ck2dw")]
+position = Vector2(281, 475)
+identificador = "piramide"
 
 [node name="ParedeEsq" type="StaticBody2D" parent="Contorno" index="0"]
 
@@ -88,7 +93,7 @@ mouse_filter = 2
 color = Color(0.235, 0.325, 0.405, 1)
 
 [node name="PatamarEsquerdo" type="StaticBody2D" parent="Plataformas" index="0"]
-position = Vector2(155, 486)
+position = Vector2(178, 467)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/PatamarEsquerdo" index="0"]
 position = Vector2(102.5, 6.5)
@@ -114,8 +119,28 @@ color = Color(0.28, 0.76, 0.71, 1)
 [node name="Inimigo_1" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="0"]
 position = Vector2(365, 568)
 script = ExtResource("9_spawn")
+tipos_possiveis = 7
 
-[node name="Inimigo_2" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="1"]
-position = Vector2(838, 568)
+[node name="Inimigo_3" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="1"]
+position = Vector2(1109, 208)
 script = ExtResource("9_spawn")
 tipo_inimigo = "null_pointer"
+tipos_possiveis = 8
+permitir_novos_inimigos = false
+
+[node name="Inimigo_4" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="2"]
+position = Vector2(43, 171)
+script = ExtResource("9_spawn")
+tipo_inimigo = "null_pointer"
+tipos_possiveis = 8
+permitir_novos_inimigos = false
+
+[node name="Inimigo_5" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="3"]
+position = Vector2(43, 278)
+script = ExtResource("9_spawn")
+tipo_inimigo = "null_pointer"
+tipos_possiveis = 8
+permitir_novos_inimigos = false
+
+[node name="SpawnCima" parent="Pontos" index="3"]
+position = Vector2(575, 480)

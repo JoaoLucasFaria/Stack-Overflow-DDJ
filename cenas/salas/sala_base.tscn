@@ -32,7 +32,7 @@ position = Vector2(96, 540)
 position = Vector2(1015, 540)
 
 [node name="SpawnCima" type="Marker2D" parent="Pontos"]
-position = Vector2(710, 510)
+position = Vector2(579, 438)
 
 [node name="SpawnBaixo" type="Marker2D" parent="Pontos"]
-position = Vector2(715, 125)
+position = Vector2(565, 35)

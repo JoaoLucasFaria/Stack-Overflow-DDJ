@@ -1,9 +1,9 @@
-[gd_scene format=3 uid="uid://cbaifjb530b5o"]
+[gd_scene load_steps=24 format=3 uid="uid://cbaifjb530b5o"]
 
 [ext_resource type="PackedScene" uid="uid://in0k036vtlnr" path="res://cenas/salas/sala_base.tscn" id="1_base"]
 [ext_resource type="Script" uid="uid://0qbu5h1xwn6v" path="res://scripts/inimigos/ponto_spawn_inimigo.gd" id="9_spawn"]
 [ext_resource type="PackedScene" path="res://cenas/salas/componentes/data_cache.tscn" id="10_cache"]
-[ext_resource type="Script" path="res://scripts/salas/nucleo_cache.gd" id="11_core"]
+[ext_resource type="Script" uid="uid://ckodc5ylkeyg7" path="res://scripts/salas/nucleo_cache.gd" id="11_core"]
 
 [sub_resource type="RectangleShape2D" id="shape_parede_esq_cima"]
 size = Vector2(26, 496)
@@ -56,247 +56,247 @@ size = Vector2(150, 13)
 [sub_resource type="RectangleShape2D" id="shape_plat_cume"]
 size = Vector2(160, 13)
 
-
 [sub_resource type="RectangleShape2D" id="barreira_cache_forma"]
-size = Vector2(170, 134)
+size = Vector2(232, 45)
 
 [sub_resource type="RectangleShape2D" id="nucleo_cache_forma"]
 size = Vector2(54, 54)
 
-[node name="sala_piramide_dados" unique_id=672709203 instance=ExtResource("1_base")]
+[node name="sala_piramide_dados" instance=ExtResource("1_base")]
 mascara_saidas = 7
 
-[node name="ParedeEsqAcima" type="StaticBody2D" parent="Contorno" index="0" unique_id=1251138373]
+[node name="ParedeEsqAcima" type="StaticBody2D" parent="Contorno" index="0"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeEsqAcima" index="0" unique_id=452072716]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeEsqAcima" index="0"]
 position = Vector2(13, 248)
 shape = SubResource("shape_parede_esq_cima")
 
-[node name="Visual" type="ColorRect" parent="Contorno/ParedeEsqAcima" index="1" unique_id=1758574198]
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeEsqAcima" index="1"]
 offset_right = 26.0
 offset_bottom = 496.0
 mouse_filter = 2
 color = Color(0.235, 0.325, 0.405, 1)
 
-[node name="ParedeEsqAbaixo" type="StaticBody2D" parent="Contorno" index="1" unique_id=1522929871]
+[node name="ParedeEsqAbaixo" type="StaticBody2D" parent="Contorno" index="1"]
 position = Vector2(0, 600)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeEsqAbaixo" index="0" unique_id=1990008525]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeEsqAbaixo" index="0"]
 position = Vector2(13, 24)
 shape = SubResource("shape_parede_esq_baixo")
 
-[node name="Visual" type="ColorRect" parent="Contorno/ParedeEsqAbaixo" index="1" unique_id=574464174]
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeEsqAbaixo" index="1"]
 offset_right = 26.0
 offset_bottom = 48.0
 mouse_filter = 2
 color = Color(0.235, 0.325, 0.405, 1)
 
-[node name="ParedeDirAcima" type="StaticBody2D" parent="Contorno" index="2" unique_id=870259494]
+[node name="ParedeDirAcima" type="StaticBody2D" parent="Contorno" index="2"]
 position = Vector2(1126, 0)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeDirAcima" index="0" unique_id=1241646242]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeDirAcima" index="0"]
 position = Vector2(13, 248)
 shape = SubResource("shape_parede_dir_cima")
 
-[node name="Visual" type="ColorRect" parent="Contorno/ParedeDirAcima" index="1" unique_id=2071872217]
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeDirAcima" index="1"]
 offset_right = 26.0
 offset_bottom = 496.0
 mouse_filter = 2
 color = Color(0.235, 0.325, 0.405, 1)
 
-[node name="ParedeDirAbaixo" type="StaticBody2D" parent="Contorno" index="3" unique_id=468832474]
+[node name="ParedeDirAbaixo" type="StaticBody2D" parent="Contorno" index="3"]
 position = Vector2(1126, 600)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeDirAbaixo" index="0" unique_id=1386066012]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/ParedeDirAbaixo" index="0"]
 position = Vector2(13, 24)
 shape = SubResource("shape_parede_dir_baixo")
 
-[node name="Visual" type="ColorRect" parent="Contorno/ParedeDirAbaixo" index="1" unique_id=1347174212]
+[node name="Visual" type="ColorRect" parent="Contorno/ParedeDirAbaixo" index="1"]
 offset_right = 26.0
 offset_bottom = 48.0
 mouse_filter = 2
 color = Color(0.235, 0.325, 0.405, 1)
 
-[node name="TetoEsq" type="StaticBody2D" parent="Contorno" index="4" unique_id=75758176]
+[node name="TetoEsq" type="StaticBody2D" parent="Contorno" index="4"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/TetoEsq" index="0" unique_id=842161356]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/TetoEsq" index="0"]
 position = Vector2(257, 13)
 shape = SubResource("shape_teto_esq")
 
-[node name="Visual" type="ColorRect" parent="Contorno/TetoEsq" index="1" unique_id=1758503067]
+[node name="Visual" type="ColorRect" parent="Contorno/TetoEsq" index="1"]
 offset_right = 514.0
 offset_bottom = 26.0
 mouse_filter = 2
 color = Color(0.235, 0.325, 0.405, 1)
 
-[node name="TetoDir" type="StaticBody2D" parent="Contorno" index="5" unique_id=1891282560]
+[node name="TetoDir" type="StaticBody2D" parent="Contorno" index="5"]
 position = Vector2(638, 0)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/TetoDir" index="0" unique_id=1230794867]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/TetoDir" index="0"]
 position = Vector2(257, 13)
 shape = SubResource("shape_teto_dir")
 
-[node name="Visual" type="ColorRect" parent="Contorno/TetoDir" index="1" unique_id=1320110856]
+[node name="Visual" type="ColorRect" parent="Contorno/TetoDir" index="1"]
 offset_right = 514.0
 offset_bottom = 26.0
 mouse_filter = 2
 color = Color(0.235, 0.325, 0.405, 1)
 
-[node name="Piso" type="StaticBody2D" parent="Contorno" index="6" unique_id=567141131]
+[node name="Piso" type="StaticBody2D" parent="Contorno" index="6"]
 position = Vector2(0, 600)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/Piso" index="0" unique_id=436734619]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contorno/Piso" index="0"]
 position = Vector2(576, 24)
 shape = SubResource("shape_piso")
 
-[node name="Visual" type="ColorRect" parent="Contorno/Piso" index="1" unique_id=35055417]
+[node name="Visual" type="ColorRect" parent="Contorno/Piso" index="1"]
 offset_right = 1152.0
 offset_bottom = 48.0
 mouse_filter = 2
 color = Color(0.235, 0.325, 0.405, 1)
 
-[node name="PiramideBaseEsq" type="StaticBody2D" parent="Plataformas" index="0" unique_id=1093294611]
+[node name="PiramideBaseEsq" type="StaticBody2D" parent="Plataformas" index="0"]
 position = Vector2(200, 505)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/PiramideBaseEsq" index="0" unique_id=84582029]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/PiramideBaseEsq" index="0"]
 position = Vector2(110, 47.5)
 shape = SubResource("shape_base_piramide_esq")
 
-[node name="Visual" type="ColorRect" parent="Plataformas/PiramideBaseEsq" index="1" unique_id=2141521467]
+[node name="Visual" type="ColorRect" parent="Plataformas/PiramideBaseEsq" index="1"]
 offset_right = 220.0
 offset_bottom = 95.0
 mouse_filter = 2
 color = Color(0.235, 0.325, 0.405, 1)
 
-[node name="PiramideBaseDir" type="StaticBody2D" parent="Plataformas" index="1" unique_id=1086212764]
+[node name="PiramideBaseDir" type="StaticBody2D" parent="Plataformas" index="1"]
 position = Vector2(732, 505)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/PiramideBaseDir" index="0" unique_id=1363644766]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/PiramideBaseDir" index="0"]
 position = Vector2(110, 47.5)
 shape = SubResource("shape_base_piramide_dir")
 
-[node name="Visual" type="ColorRect" parent="Plataformas/PiramideBaseDir" index="1" unique_id=1820728822]
+[node name="Visual" type="ColorRect" parent="Plataformas/PiramideBaseDir" index="1"]
 offset_right = 220.0
 offset_bottom = 95.0
 mouse_filter = 2
 color = Color(0.235, 0.325, 0.405, 1)
 
-[node name="PiramideMeioEsq" type="StaticBody2D" parent="Plataformas" index="2" unique_id=1077649097]
+[node name="PiramideMeioEsq" type="StaticBody2D" parent="Plataformas" index="2"]
 position = Vector2(320, 395)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/PiramideMeioEsq" index="0" unique_id=619672608]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/PiramideMeioEsq" index="0"]
 position = Vector2(70, 55)
 shape = SubResource("shape_meio_piramide_esq")
 
-[node name="Visual" type="ColorRect" parent="Plataformas/PiramideMeioEsq" index="1" unique_id=1758355150]
+[node name="Visual" type="ColorRect" parent="Plataformas/PiramideMeioEsq" index="1"]
 offset_right = 140.0
 offset_bottom = 110.0
 mouse_filter = 2
 color = Color(0.235, 0.325, 0.405, 1)
 
-[node name="PiramideMeioDir" type="StaticBody2D" parent="Plataformas" index="3" unique_id=826001417]
+[node name="PiramideMeioDir" type="StaticBody2D" parent="Plataformas" index="3"]
 position = Vector2(692, 395)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/PiramideMeioDir" index="0" unique_id=722436185]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/PiramideMeioDir" index="0"]
 position = Vector2(70, 55)
 shape = SubResource("shape_meio_piramide_dir")
 
-[node name="Visual" type="ColorRect" parent="Plataformas/PiramideMeioDir" index="1" unique_id=716581612]
+[node name="Visual" type="ColorRect" parent="Plataformas/PiramideMeioDir" index="1"]
 offset_right = 140.0
 offset_bottom = 110.0
 mouse_filter = 2
 color = Color(0.235, 0.325, 0.405, 1)
 
-[node name="PiramideTopoEsq" type="StaticBody2D" parent="Plataformas" index="4" unique_id=474008884]
+[node name="PiramideTopoEsq" type="StaticBody2D" parent="Plataformas" index="4"]
 position = Vector2(439, 235)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/PiramideTopoEsq" index="0" unique_id=2008571330]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/PiramideTopoEsq" index="0"]
 position = Vector2(37.5, 57.5)
 shape = SubResource("shape_topo_piramide_esq")
 
-[node name="Visual" type="ColorRect" parent="Plataformas/PiramideTopoEsq" index="1" unique_id=397722582]
+[node name="Visual" type="ColorRect" parent="Plataformas/PiramideTopoEsq" index="1"]
 offset_right = 75.0
 offset_bottom = 115.0
 mouse_filter = 2
 color = Color(0.235, 0.325, 0.405, 1)
 
-[node name="PiramideTopoDir" type="StaticBody2D" parent="Plataformas" index="5" unique_id=2084641450]
+[node name="PiramideTopoDir" type="StaticBody2D" parent="Plataformas" index="5"]
 position = Vector2(638, 235)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/PiramideTopoDir" index="0" unique_id=265882527]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/PiramideTopoDir" index="0"]
 position = Vector2(37.5, 57.5)
 shape = SubResource("shape_topo_piramide_dir")
 
-[node name="Visual" type="ColorRect" parent="Plataformas/PiramideTopoDir" index="1" unique_id=1885790761]
+[node name="Visual" type="ColorRect" parent="Plataformas/PiramideTopoDir" index="1"]
 offset_right = 75.0
 offset_bottom = 115.0
 mouse_filter = 2
 color = Color(0.235, 0.325, 0.405, 1)
 
-[node name="PonteCentroBaixa" type="StaticBody2D" parent="Plataformas" index="6" unique_id=1903525178]
+[node name="PonteCentroBaixa" type="StaticBody2D" parent="Plataformas" index="6"]
 position = Vector2(481, 440)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/PonteCentroBaixa" index="0" unique_id=45065162]
-position = Vector2(95, 6.5)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/PonteCentroBaixa" index="0"]
+position = Vector2(95, 45.5)
 shape = SubResource("shape_plat_centro_meio")
 one_way_collision = true
 
-[node name="Visual" type="ColorRect" parent="Plataformas/PonteCentroBaixa" index="1" unique_id=888286016]
+[node name="Visual" type="ColorRect" parent="Plataformas/PonteCentroBaixa" index="1"]
+offset_top = 40.0
 offset_right = 190.0
-offset_bottom = 13.0
+offset_bottom = 53.0
 mouse_filter = 2
 color = Color(0.31, 0.64, 0.73, 1)
 
-[node name="DegrauExternoEsq" type="StaticBody2D" parent="Plataformas" index="7" unique_id=2073704404]
+[node name="DegrauExternoEsq" type="StaticBody2D" parent="Plataformas" index="7"]
 position = Vector2(205, 290)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/DegrauExternoEsq" index="0" unique_id=1382823926]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/DegrauExternoEsq" index="0"]
 position = Vector2(75, 6.5)
 shape = SubResource("shape_plat_meio_esq")
 one_way_collision = true
 
-[node name="Visual" type="ColorRect" parent="Plataformas/DegrauExternoEsq" index="1" unique_id=157319987]
+[node name="Visual" type="ColorRect" parent="Plataformas/DegrauExternoEsq" index="1"]
 offset_right = 150.0
 offset_bottom = 13.0
 mouse_filter = 2
 color = Color(0.31, 0.64, 0.73, 1)
 
-[node name="DegrauExternoDir" type="StaticBody2D" parent="Plataformas" index="8" unique_id=2026622884]
+[node name="DegrauExternoDir" type="StaticBody2D" parent="Plataformas" index="8"]
 position = Vector2(797, 290)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/DegrauExternoDir" index="0" unique_id=165384133]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/DegrauExternoDir" index="0"]
 position = Vector2(75, 6.5)
 shape = SubResource("shape_plat_meio_dir")
 one_way_collision = true
 
-[node name="Visual" type="ColorRect" parent="Plataformas/DegrauExternoDir" index="1" unique_id=77622413]
+[node name="Visual" type="ColorRect" parent="Plataformas/DegrauExternoDir" index="1"]
 offset_right = 150.0
 offset_bottom = 13.0
 mouse_filter = 2
 color = Color(0.31, 0.64, 0.73, 1)
 
-[node name="PlataformaCume" type="StaticBody2D" parent="Plataformas" index="9" unique_id=854300252]
+[node name="PlataformaCume" type="StaticBody2D" parent="Plataformas" index="9"]
 position = Vector2(496, 105)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/PlataformaCume" index="0" unique_id=2021922825]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataformas/PlataformaCume" index="0"]
 position = Vector2(80, 6.5)
 shape = SubResource("shape_plat_cume")
 one_way_collision = true
 
-[node name="Visual" type="ColorRect" parent="Plataformas/PlataformaCume" index="1" unique_id=1424975003]
+[node name="Visual" type="ColorRect" parent="Plataformas/PlataformaCume" index="1"]
 offset_right = 160.0
 offset_bottom = 13.0
 mouse_filter = 2
 color = Color(0.31, 0.64, 0.73, 1)
 
-[node name="BordaEsq" type="ColorRect" parent="Decoracao" index="0" unique_id=592356795]
+[node name="BordaEsq" type="ColorRect" parent="Decoracao" index="0"]
 offset_top = 490.0
 offset_right = 26.0
 offset_bottom = 495.0
 mouse_filter = 2
 color = Color(0.28, 0.76, 0.71, 1)
 
-[node name="BordaDir" type="ColorRect" parent="Decoracao" index="1" unique_id=1482442053]
+[node name="BordaDir" type="ColorRect" parent="Decoracao" index="1"]
 offset_left = 1126.0
 offset_top = 490.0
 offset_right = 1152.0
@@ -304,7 +304,7 @@ offset_bottom = 495.0
 mouse_filter = 2
 color = Color(0.28, 0.76, 0.71, 1)
 
-[node name="BordaCima" type="ColorRect" parent="Decoracao" index="2" unique_id=1423736381]
+[node name="BordaCima" type="ColorRect" parent="Decoracao" index="2"]
 offset_left = 514.0
 offset_top = 21.0
 offset_right = 638.0
@@ -312,77 +312,103 @@ offset_bottom = 25.0
 mouse_filter = 2
 color = Color(0.28, 0.76, 0.71, 1)
 
-[node name="NucleoPiramide" type="ColorRect" parent="Decoracao" index="3" unique_id=1581083712]
-offset_left = 556.0
-offset_top = 240.0
-offset_right = 596.0
-offset_bottom = 280.0
-mouse_filter = 2
-color = Color(0.28, 0.76, 0.71, 0.35)
+[node name="SpawnsInimigos" type="Node2D" parent="Conteudo" index="0"]
 
-[node name="SpawnsInimigos" type="Node2D" parent="Conteudo" index="0" unique_id=1992316917]
-
-[node name="Inimigo_4" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="0" unique_id=217377882]
+[node name="Inimigo_4" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="0"]
 position = Vector2(576, 568)
 script = ExtResource("9_spawn")
-tipo_inimigo = "syntax_error"
 tipos_possiveis = 1
 chance_novo_inimigo_percentual = 20
 
-[node name="Inimigo_3" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="1" unique_id=1425697872]
-position = Vector2(820, 568)
+[node name="Inimigo_3" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="1"]
+position = Vector2(674, 568)
 script = ExtResource("9_spawn")
 tipo_inimigo = "memory_leak"
-tipos_possiveis = 4
+tipos_possiveis = 11
 chance_novo_inimigo_percentual = 20
 
-[node name="Inimigo_2" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="2" unique_id=1298752720]
-position = Vector2(330, 568)
+[node name="Inimigo_2" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="2"]
+position = Vector2(462, 568)
 script = ExtResource("9_spawn")
 tipo_inimigo = "null_pointer"
-tipos_possiveis = 2
+tipos_possiveis = 11
 chance_novo_inimigo_percentual = 20
 
-[node name="BarreiraCache" type="StaticBody2D" parent="Conteudo"]
+[node name="Inimigo_5" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="3"]
+position = Vector2(261, 457)
+script = ExtResource("9_spawn")
+tipo_inimigo = "null_pointer"
+tipos_possiveis = 7
+chance_novo_inimigo_percentual = 20
+
+[node name="Inimigo_6" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="4"]
+position = Vector2(889, 454)
+script = ExtResource("9_spawn")
+tipo_inimigo = "null_pointer"
+tipos_possiveis = 7
+chance_novo_inimigo_percentual = 20
+
+[node name="Inimigo_7" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="5"]
+position = Vector2(1111, 143)
+script = ExtResource("9_spawn")
+tipo_inimigo = "null_pointer"
+tipos_possiveis = 8
+permitir_novos_inimigos = false
+chance_novo_inimigo_percentual = 20
+
+[node name="Inimigo_8" type="Marker2D" parent="Conteudo/SpawnsInimigos" index="6"]
+position = Vector2(43, 143)
+script = ExtResource("9_spawn")
+tipo_inimigo = "null_pointer"
+tipos_possiveis = 8
+permitir_novos_inimigos = false
+chance_novo_inimigo_percentual = 20
+
+[node name="BarreiraCache" type="StaticBody2D" parent="Conteudo" index="1"]
 position = Vector2(491, 306)
-collision_layer = 1
 collision_mask = 0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Conteudo/BarreiraCache"]
-position = Vector2(85, 67)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Conteudo/BarreiraCache" index="0"]
+position = Vector2(85, 111.5)
 shape = SubResource("barreira_cache_forma")
 
-[node name="Visual" type="ColorRect" parent="Conteudo/BarreiraCache"]
-offset_right = 170.0
+[node name="Visual" type="ColorRect" parent="Conteudo/BarreiraCache" index="1"]
+offset_left = -31.0
+offset_top = 89.0
+offset_right = 201.0
 offset_bottom = 134.0
-color = Color(0.25, 0.78, 0.96, 0.48)
 mouse_filter = 2
+color = Color(0.25, 0.78, 0.96, 0.48)
 
-[node name="NucleoCache" type="StaticBody2D" parent="Conteudo"]
+[node name="NucleoCache" type="StaticBody2D" parent="Conteudo" index="2"]
 position = Vector2(576, 340)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("11_core")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Conteudo/NucleoCache"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Conteudo/NucleoCache" index="0"]
+position = Vector2(0, -132)
 shape = SubResource("nucleo_cache_forma")
 
-[node name="Visual" type="ColorRect" parent="Conteudo/NucleoCache"]
+[node name="Visual" type="ColorRect" parent="Conteudo/NucleoCache" index="1"]
 offset_left = -27.0
-offset_top = -27.0
+offset_top = -159.0
 offset_right = 27.0
-offset_bottom = 27.0
-color = Color(1, 0.67, 0.28, 1)
+offset_bottom = -105.0
 mouse_filter = 2
+color = Color(1, 0.67, 0.28, 1)
 
-[node name="Mensagem" type="Label" parent="Conteudo/NucleoCache"]
+[node name="Mensagem" type="Label" parent="Conteudo/NucleoCache" index="2"]
 offset_left = -95.0
-offset_top = -62.0
+offset_top = -184.0
 offset_right = 95.0
-offset_bottom = -36.0
-text = "CORE 0/3 [J]"
+offset_bottom = -158.0
+text = "CORE 0/3"
 horizontal_alignment = 1
 
-[node name="DataCache" parent="Conteudo" instance=ExtResource("10_cache")]
-position = Vector2(576, 423)
+[node name="DataCache" parent="Conteudo" index="3" instance=ExtResource("10_cache")]
+position = Vector2(576, 603)
 identificador = "piramide"
+
+[node name="SpawnBaixo" parent="Pontos" index="4"]
+position = Vector2(573, 44)

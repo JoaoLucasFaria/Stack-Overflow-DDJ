@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://db2s4hti3k06b"]
+
+[ext_resource type="Script" uid="uid://c4iskkrjdoi2i" path="res://cenas/salas/componentes/espinhos.gd" id="1_swdu3"]
+
+[node name="Espinhos" type="Area2D"]
+script = ExtResource("1_swdu3")
