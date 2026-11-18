@@ -107,7 +107,7 @@ func _criar_espinhos(nome: String, inicio: Vector2, face_direita: bool) -> void:
 
 func _criar_camera() -> void:
 	camera_arena = Camera2D.new()
-	camera_arena.position = Vector2(576, 324)
+	camera_arena.position = Vector2(576, 288)
 	add_child(camera_arena)
 	camera_arena.make_current()
 
@@ -116,12 +116,12 @@ func _criar_hud() -> void:
 	hud = CanvasLayer.new()
 	add_child(hud)
 	barra = ProgressBar.new()
-	barra.position = Vector2(310, 28)
+	barra.position = Vector2(310, 86)
 	barra.size = Vector2(520, 20)
 	barra.show_percentage = false
 	hud.add_child(barra)
 	status = Label.new()
-	status.position = Vector2(310, 53)
+	status.position = Vector2(310, 114)
 	status.add_theme_font_size_override("font_size", 15)
 	hud.add_child(status)
 

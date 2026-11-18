@@ -12,7 +12,10 @@ enum Estado { PRONTO, COMBATE, RECOMPENSA, CONCLUIDO, FALHOU }
 
 const ALTAR: Vector2 = Vector2(576, 544)
 const DISTANCIA_INTERACAO: float = 105.0
-const TOTAL_ONDAS: int = 3
+# Por padrao sao 3 ondas com 3 processos. Para testar 2x4, altere
+# total_ondas=2 e inimigos_por_onda=4 neste script (campanha instancia por codigo).
+const SPAWN_X_3: Array[float] = [300.0, 576.0, 852.0]
+const SPAWN_X_4: Array[float] = [250.0, 465.0, 685.0, 900.0]
 const CENAS: Dictionary = {
 	"syntax_error": preload("res://cenas/inimigos/inimigo_syntax_error.tscn"),
 	"memory_leak": preload("res://cenas/inimigos/inimigo_memory_leak.tscn"),
@@ -29,6 +32,8 @@ const ESPECIAIS: Array[String] = ["deadlock", "out_of_bounds", "fork_bomb"]
 
 @export_category("Exception Handler")
 @export var permitir_fork_bomb: bool = false
+@export_range(2, 3, 1) var total_ondas: int = 3
+@export_range(3, 4, 1) var inimigos_por_onda: int = 3
 @export_range(0.5, 3.0, 0.1) var intervalo_entre_ondas: float = 1.5
 @export_range(80.0, 200.0, 5.0) var distancia_ativacao: float = 105.0
 
@@ -151,7 +156,7 @@ func ativar_desafio() -> void:
 	_erguer_portas()
 	_criar_plataformas()
 	status.text = "EXCEPTION HANDLER  |  INICIANDO ..."
-	instrucao.text = "Portas bloqueadas. Sobreviva a tres ondas. Sem descanso nem drops."
+	instrucao.text = "Portas bloqueadas. Sobreviva a %d ondas, sem descanso nem drops." % total_ondas
 	espera_proxima_onda = 0.9
 	queue_redraw()
 
@@ -207,41 +212,45 @@ func _erguer_portas() -> void:
 func _iniciar_onda() -> void:
 	if estado != Estado.COMBATE or not is_instance_valid(jogador):
 		return
-	if onda_atual >= TOTAL_ONDAS:
+	if onda_atual >= total_ondas:
 		_abrir_recompensa()
 		return
 	onda_atual += 1
 	inimigos_raiz.clear()
-	var tipos: Array[String] = _sortear_dupla(onda_atual)
+	var tipos: Array[String] = _sortear_onda(onda_atual)
 	for indice in range(tipos.size()):
 		_criar_inimigo(tipos[indice], indice)
-	status.text = "EXCEPTION HANDLER  |  ONDA %d/%d" % [onda_atual, TOTAL_ONDAS]
-	instrucao.text = "Derrote os dois processos da onda. Nenhum deles gera equipamentos."
+	status.text = "EXCEPTION HANDLER  |  ONDA %d/%d" % [onda_atual, total_ondas]
+	instrucao.text = "Derrote os %d processos. Nenhum deles gera equipamentos." % tipos.size()
 	# A criacao pode ser recusada por scripts de ancoragem; a verificacao
 	# automatica garante que a arena nao fique travada nesse caso.
 	queue_redraw()
 
 
-func _sortear_dupla(numero: int) -> Array[String]:
-	var a: String = ""
-	var b: String = ""
-	match numero:
-		1:
-			a = _sorte(LEVES)
-			b = _sorte(LEVES)
-		2:
-			a = _sorte(LEVES)
-			b = _sorte(MEDIOS)
-		_:
-			a = _sorte(MEDIOS)
-			var especiais: Array[String] = ESPECIAIS.duplicate()
+func _sortear_onda(numero: int) -> Array[String]:
+	## Escolhas aleatorias, com escalada: leves -> medios -> um especial.
+	## Evita duplicar um tipo na mesma onda enquanto houver alternativas.
+	var escolhidos: Array[String] = []
+	for i in range(inimigos_por_onda):
+		var grupo: Array[String] = LEVES
+		if numero == total_ondas and i == inimigos_por_onda - 1:
+			grupo = ESPECIAIS.duplicate()
 			if not permitir_fork_bomb:
-				especiais.erase("fork_bomb")
-			b = _sorte(especiais)
-	var dupla: Array[String] = [a, b]
-	if randf() < 0.5:
-		dupla.reverse()
-	return dupla
+				grupo.erase("fork_bomb")
+		elif numero == 1:
+			grupo = LEVES if i < 2 else MEDIOS
+		elif numero == total_ondas:
+			grupo = MEDIOS
+		else:
+			grupo = LEVES if i == 0 else MEDIOS
+		var disponiveis: Array[String] = grupo.duplicate()
+		for anterior in escolhidos:
+			disponiveis.erase(anterior)
+		if disponiveis.is_empty():
+			disponiveis = grupo.duplicate()
+		escolhidos.append(_sorte(disponiveis))
+	escolhidos.shuffle()
+	return escolhidos
 
 
 func _sorte(opcoes_validas: Array[String]) -> String:
@@ -256,7 +265,9 @@ func _criar_inimigo(tipo: String, indice: int) -> void:
 	var inimigo: InimigoBase = cena.instantiate() as InimigoBase
 	if inimigo == null:
 		return
-	var lado: float = -1.0 if indice == 0 else 1.0
+	# Posicoes distintas para 3 ou 4 inimigos por onda.
+	var posicoes: Array[float] = SPAWN_X_4 if inimigos_por_onda == 4 else SPAWN_X_3
+	var spawn_x: float = posicoes[indice % posicoes.size()]
 	inimigo.configurar(jogador)
 	# Sem drops, inclusive ao matar Fork Bomb; seus filhos ja nao dropam.
 	inimigo.chance_drop_percentual = 0
@@ -265,13 +276,13 @@ func _criar_inimigo(tipo: String, indice: int) -> void:
 	if tipo == "segmentation_fault":
 		# Excecao importante: a torreta precisa chegar junto da parede
 		# para o raycast de ancoragem encontrar uma face horizontal.
-		inimigo.position = Vector2(91 if indice == 0 else 1061, 376)
+		inimigo.position = Vector2(91.0 if spawn_x < 576.0 else 1061.0, 376.0)
 		_sinalizar_lancamento(Vector2(576, 474), inimigo.position)
 	elif tipo == "fork_bomb" or tipo == "out_of_bounds":
-		inimigo.position = Vector2(576 + lado * 62.0, 402)
+		inimigo.position = Vector2(spawn_x, 402.0)
 		_sinalizar_lancamento(Vector2(576, 474), inimigo.position)
 	else:
-		inimigo.position = Vector2(576 + lado * 32.0, 468)
+		inimigo.position = Vector2(spawn_x, 468.0)
 	entidades.add_child(inimigo)
 	inimigos_raiz.append(inimigo)
 	inimigo.derrotado.connect(_ao_inimigo_derrotado.bind(inimigo))
@@ -311,7 +322,7 @@ func _verificar_fim_da_onda() -> void:
 			inimigos_raiz.remove_at(i)
 			if falha_ancoragem:
 				print("[EXCEPTION] Spawn sem apoio: substituindo por Syntax Error")
-				_criar_inimigo("syntax_error", i % 2)
+				_criar_inimigo("syntax_error", i % inimigos_por_onda)
 	if not inimigos_raiz.is_empty():
 		return
 	# Limpa clones, Child Processes, correntes e projeteis que sobraram.
@@ -456,7 +467,7 @@ func _criar_interface() -> void:
 	raiz.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	interface.add_child(raiz)
 	status = Label.new()
-	status.position = Vector2(350, 15)
+	status.position = Vector2(350, 94)
 	status.size = Vector2(470, 30)
 	status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	status.add_theme_font_size_override("font_size", 21)
@@ -464,7 +475,7 @@ func _criar_interface() -> void:
 	status.text = "EXCEPTION HANDLER  |  AGUARDANDO"
 	raiz.add_child(status)
 	instrucao = Label.new()
-	instrucao.position = Vector2(255, 57)
+	instrucao.position = Vector2(255, 132)
 	instrucao.size = Vector2(650, 30)
 	instrucao.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	instrucao.add_theme_font_size_override("font_size", 14)
@@ -497,7 +508,7 @@ func _criar_interface() -> void:
 	titulo.add_theme_color_override("font_color", Color(0.61, 0.97, 0.91))
 	coluna.add_child(titulo)
 	var descricao: Label = Label.new()
-	descricao.text = "Tres processos compilados. Escolha UM Patch para sua run."
+	descricao.text = "%d processos compilados. Escolha UM Patch para sua run." % (total_ondas * inimigos_por_onda)
 	descricao.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	coluna.add_child(descricao)
 	rotulo_opcoes = Label.new()
